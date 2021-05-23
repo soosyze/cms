@@ -1,38 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Contact\Hook;
+
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
+use SoosyzeCore\System\Services\Alias;
 
 class ApiRoute implements \SoosyzeCore\System\ApiRouteInterface
 {
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($alias, $config, $router)
+    public function __construct(Alias $alias, Config $config, Router $router)
     {
         $this->alias  = $alias;
         $this->config = $config;
         $this->router = $router;
     }
 
-    public function apiRoute(array &$routes, $search, $exclude, $limit)
+    public function apiRoute(array &$routes, string $search, string $exclude, int $limit): void
     {
         $title = t('Contact');
-        if ($title === $exclude) {
-            return;
-        }
-        if (stristr($title, $search) === false) {
+        if ($title === $exclude || stristr($title, $search) === false) {
             return;
         }
 

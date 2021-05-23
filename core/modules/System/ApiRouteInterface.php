@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System;
 
 interface ApiRouteInterface
@@ -10,5 +12,5 @@ interface ApiRouteInterface
      * @param string $exclude Le nom de la route à exclure.
      * @param int    $limit   Le nombre maximum de routes.
      */
-    public function apiRoute(array &$routes, $search, $exclude, $limit);
+    public function apiRoute(array &$routes, string $search, string $exclude, int $limit): void;
 }

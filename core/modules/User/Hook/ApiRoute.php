@@ -1,26 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Hook;
+
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
 
 class ApiRoute implements \SoosyzeCore\System\ApiRouteInterface
 {
     /**
-     * @var \Soosyze\Config
+     * @var string
      */
-    private $config;
+    private $connectUrl;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($config, $router)
+    public function __construct(Config $config, Router $router)
     {
-        $this->config = $config;
-        $this->router = $router;
+        $this->connectUrl = $config->get('connect_url', '');
+        $this->router     = $router;
     }
 
-    public function apiRoute(array &$routes, $search, $exclude, $limit)
+    public function apiRoute(array &$routes, string $search, string $exclude, int $limit): void
     {
         $values = [
             [
@@ -29,19 +34,19 @@ class ApiRoute implements \SoosyzeCore\System\ApiRouteInterface
                 'title' => t('My account')
             ], [
                 'link'  => $this->router->getRoute('user.login', [
-                    ':url' => $this->config->get('connect_url', '')
+                    ':url' => $this->connectUrl
                 ]),
                 'route' => 'user/login',
                 'title' => t('Sign in')
             ], [
                 'link'  => $this->router->getRoute('user.relogin', [
-                    ':url' => $this->config->get('connect_url', '')
+                    ':url' => $this->connectUrl
                 ]),
                 'route' => 'user/relogin',
                 'title' => t('Request a new password')
             ], [
                 'link'  => $this->router->getRoute('user.logout', [
-                    ':url' => $this->config->get('connect_url', '')
+                    ':url' => $this->connectUrl
                 ]),
                 'route' => 'user/logout',
                 'title' => t('Sign out')
@@ -53,13 +58,11 @@ class ApiRoute implements \SoosyzeCore\System\ApiRouteInterface
         ];
 
         foreach ($values as $value) {
-            if ($exclude === $value[ 'title' ]) {
+            if ($exclude === $value[ 'title' ] || stristr($value[ 'title' ], $search) === false) {
                 continue;
             }
 
-            if (stristr($value[ 'title' ], $search) !== false) {
-                $routes[] = $value;
-            }
+            $routes[] = $value;
         }
     }
 }

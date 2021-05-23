@@ -1,32 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Hook;
+
+use Soosyze\Components\Router\Router;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\System\Services\Alias;
 
 class ApiRoute implements \SoosyzeCore\System\ApiRouteInterface
 {
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
     /**
-     * @var \Queryflatfile\Request
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($alias, $query, $router)
+    public function __construct(Alias $alias, Query $query, Router $router)
     {
         $this->alias  = $alias;
         $this->query  = $query;
         $this->router = $router;
     }
 
-    public function apiRoute(array &$routes, $search, $exclude, $limit)
+    public function apiRoute(array &$routes, string $search, string $exclude, int $limit): void
     {
         $nodes = $this->query
             ->from('node')
