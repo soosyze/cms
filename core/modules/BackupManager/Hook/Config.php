@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\BackupManager\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Validator\Validator;
 
 final class Config implements \SoosyzeCore\Config\ConfigInterface
 {
     private static $attrGrp = [ 'class' => 'form-group' ];
 
-    public function defaultValues()
+    public function defaultValues(): array
     {
         return [
             'max_backups'      => 0,
@@ -15,14 +21,14 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function menu(array &$menu)
+    public function menu(array &$menu): void
     {
         $menu[ 'backupmanager' ] = [
             'title_link' => 'Backups'
         ];
     }
 
-    public function form(&$form, array $data, $req)
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void
     {
         $form
             ->group('backups-fieldset', 'fieldset', function ($form) use ($data) {
@@ -74,7 +80,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
             });
     }
 
-    public function validator(&$validator)
+    public function validator(Validator &$validator): void
     {
         $validator->setRules([
             'max_backups'      => 'min:0',
@@ -87,7 +93,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ]);
     }
 
-    public function before(&$validator, array &$data, $id)
+    public function before(Validator &$validator, array &$data, string $id): void
     {
         $data = [
             'max_backups'      => $validator->getInput('max_backups'),
@@ -96,11 +102,11 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function after(&$validator, array $data, $id)
+    public function after(&$validator, array $data, string $id): void
     {
     }
 
-    public function files(array &$inputsFile)
+    public function files(array &$inputsFile): void
     {
     }
 }

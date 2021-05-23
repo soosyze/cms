@@ -1,34 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Router\Router;
+use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\Filesystem\Services\File;
+use SoosyzeCore\Translate\Services\Translation;
 
 final class Config implements \SoosyzeCore\Config\ConfigInterface
 {
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**
-     * @var \SoosyzeCore\Filesystem\Services\File
+     * @var File
      */
     private $file;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
     /**
-     * @var \SoosyzeCore\Translate\Services\Translation
+     * @var Translation
      */
     private $translate;
 
-    public function __construct($file, $router, $translate)
+    public function __construct(File $file, Router $router, Translation $translate)
     {
         $this->file      = $file;
         $this->router    = $router;
         $this->translate = $translate;
     }
 
-    public function defaultValues()
+    public function defaultValues(): array
     {
         return [
             'lang'               => '',
@@ -45,14 +54,14 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function menu(array &$menu)
+    public function menu(array &$menu): void
     {
         $menu[ 'system' ] = [
             'title_link' => 'System'
         ];
     }
 
-    public function form(&$form, array $data, $req)
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void
     {
         $optionTimezone = [];
         foreach (timezone_identifiers_list() as $value) {
@@ -217,7 +226,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
                 });
     }
 
-    public function validator(&$validator)
+    public function validator(Validator &$validator): void
     {
         $langs  = implode(',', array_keys($this->translate->getLang())) . ',en';
         $validator->setRules([
@@ -247,7 +256,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ]);
     }
 
-    public function before(&$validator, array &$data, $id)
+    public function before(Validator &$validator, array &$data, string $id): void
     {
         $data = [
             'lang'               => $validator->getInput('lang'),
@@ -264,11 +273,11 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function files(array &$inputsFile)
+    public function files(array &$inputsFile): void
     {
     }
 
-    public function after(&$validator, array $data, $id)
+    public function after(Validator &$validator, array $data, string $id): void
     {
     }
 }

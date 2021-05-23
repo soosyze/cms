@@ -1,20 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Config;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Validator\Validator;
 
 interface ConfigInterface
 {
-    public function defaultValues();
+    public function defaultValues(): array;
 
-    public function menu(array &$menu);
+    public function menu(array &$menu): void;
 
-    public function form(&$form, array $data, $req);
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void;
 
-    public function validator(&$validator);
+    public function validator(Validator &$validator): void;
 
-    public function files(array &$inputsFile);
+    public function files(array &$inputsFile): void;
 
-    public function before(&$validator, array &$data, $id);
+    public function before(Validator &$validator, array &$data, string $id): void;
 
-    public function after(&$validator, array $data, $id);
+    public function after(Validator &$validator, array $data, string $id): void;
 }

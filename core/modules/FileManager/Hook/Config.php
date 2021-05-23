@@ -1,6 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\App;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Validator\Validator;
 
 final class Config implements \SoosyzeCore\Config\ConfigInterface
 {
@@ -15,16 +22,16 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
     const COPY_RELATIVE = 2;
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
-    public function __construct($core)
+    public function __construct(App $core)
     {
         $this->core = $core;
     }
 
-    public function defaultValues()
+    public function defaultValues(): array
     {
         return [
             'replace_file'   => self::REPLACE_WITH,
@@ -32,14 +39,14 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function menu(array &$menu)
+    public function menu(array &$menu): void
     {
         $menu[ 'filemanager' ] = [
             'title_link' => 'File'
         ];
     }
 
-    public function form(&$form, array $data, $req)
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void
     {
         $form->group('replace_file-fieldset', 'fieldset', function ($form) use ($data) {
             $form->legend('file-legend', t('File transfer behavior'))
@@ -99,7 +106,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
             });
     }
 
-    public function validator(&$validator)
+    public function validator(Validator &$validator): void
     {
         $validator->setRules([
             'replace_file'   => 'required|between_numeric:1,3',
@@ -107,7 +114,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ]);
     }
 
-    public function before(&$validator, array &$data, $id)
+    public function before(Validator &$validator, array &$data, string $id): void
     {
         $data = [
             'replace_file'   => (int) $validator->getInput('replace_file'),
@@ -115,21 +122,21 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function after(&$validator, array $data, $id)
+    public function after(Validator &$validator, array $data, string $id): void
     {
     }
 
-    public function files(array &$inputsFile)
+    public function files(array &$inputsFile): void
     {
     }
 
-    private function getLabelCopyLinkFileFull()
+    private function getLabelCopyLinkFileFull(): string
     {
         return t('Absolute path')
             . " <code>{$this->core->getPath('files_public', 'public/files')}/exemple.jpg</code>";
     }
 
-    private function getLabelCopyLinkFileBase()
+    private function getLabelCopyLinkFileBase(): string
     {
         return t('Relative path')
             . " <code>/{$this->core->getSetting('files_public', 'public/files')}/exemple.jpg</code>";

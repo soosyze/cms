@@ -1,6 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\QueryBuilder\Services\Query;
 
 final class Config implements \SoosyzeCore\Config\ConfigInterface
 {
@@ -11,14 +18,14 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
      */
     private $nodeTypes = [];
 
-    public function __construct($query)
+    public function __construct(Query $query)
     {
         $this->nodeTypes = $query
             ->from('node_type')
             ->fetchAll();
     }
 
-    public function defaultValues()
+    public function defaultValues(): array
     {
         return [
             'node_default_url' => '',
@@ -26,16 +33,16 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function menu(array &$menu)
+    public function menu(array &$menu): void
     {
         $menu[ 'node' ] = [
             'title_link' => 'Node'
         ];
     }
 
-    public function form(&$form, array $data, $req)
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void
     {
-        return $form->group('node_default_url-fieldset', 'fieldset', function ($form) use ($data) {
+        $form->group('node_default_url-fieldset', 'fieldset', function ($form) use ($data) {
             $form->legend('node_default_url-legend', t('Url'))
                     ->group('node_default_url-group', 'div', function ($form) use ($data) {
                         $form->label('node_default_url-label', t('Default url'), [
@@ -51,9 +58,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
                     $form->label('node_url_' . $nodeType[ 'node_type' ] . '-label', t($nodeType[ 'node_type_name' ]))
                             ->text('node_url_' . $nodeType[ 'node_type' ], [
                                 'class' => 'form-control',
-                                'value' => isset($data[ 'node_url_' . $nodeType[ 'node_type' ] ])
-                                ? $data[ 'node_url_' . $nodeType[ 'node_type' ] ]
-                                : ''
+                                'value' => $data[ 'node_url_' . $nodeType[ 'node_type' ] ] ?? ''
                             ]);
                 }, self::$attrGrp);
             }
@@ -79,7 +84,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
                 });
     }
 
-    public function validator(&$validator)
+    public function validator(Validator &$validator): void
     {
         $validator->setRules([
             'node_default_url' => '!required|string|max:255|regex:/^[-:\w\d_\/]+$/',
@@ -103,7 +108,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         }
     }
 
-    public function before(&$validator, array &$data, $id)
+    public function before(Validator &$validator, array &$data, string $id): void
     {
         $data = [
             'node_default_url' => $validator->getInput('node_default_url'),
@@ -111,15 +116,17 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
 
         foreach ($this->nodeTypes as $nodeType) {
-            $data[ 'node_url_' . $nodeType[ 'node_type' ] ] = $validator->getInput('node_url_' . $nodeType[ 'node_type' ]);
+            $key = 'node_url_' . $nodeType[ 'node_type' ];
+
+            $data[ $key ] = $validator->getInput($key);
         }
     }
 
-    public function after(&$validator, array $data, $id)
+    public function after(Validator &$validator, array $data, string $id): void
     {
     }
 
-    public function files(array &$inputsFile)
+    public function files(array &$inputsFile): void
     {
     }
 }

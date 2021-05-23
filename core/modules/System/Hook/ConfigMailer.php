@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Validator\Validator;
 
 class ConfigMailer implements \SoosyzeCore\Config\ConfigInterface
 {
     private static $attrGrp = [ 'class' => 'form-group' ];
 
-    public function defaultValues()
+    public function defaultValues(): array
     {
         return [
             'driver'          => '',
@@ -19,7 +25,7 @@ class ConfigMailer implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function menu(array &$menu)
+    public function menu(array &$menu): void
     {
         $menu[ 'mailer' ] = [
             'config'     => 'mailer',
@@ -27,7 +33,7 @@ class ConfigMailer implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function form(&$form, array $data, $req)
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void
     {
         $form->group('information-fieldset', 'fieldset', function ($form) use ($data) {
             $form->legend('information-legend', t('Information'))
@@ -102,7 +108,7 @@ class ConfigMailer implements \SoosyzeCore\Config\ConfigInterface
             }, [ 'class' => 'select-pane' . ($data[ 'driver' ] === 'smtp' ? ' active' : ''), 'id' => 'smtp' ]);
     }
 
-    public function validator(&$validator)
+    public function validator(Validator &$validator): void
     {
         $rules  = [
             'driver' => 'required|inarray:mail,smtp',
@@ -134,7 +140,7 @@ class ConfigMailer implements \SoosyzeCore\Config\ConfigInterface
             ->setLabels($labels);
     }
 
-    public function before(&$validator, array &$data, $id)
+    public function before(Validator &$validator, array &$data, string $id): void
     {
         $data = [
             'driver'          => $validator->getInput('driver'),
@@ -147,15 +153,15 @@ class ConfigMailer implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function files(array &$inputFiles)
+    public function files(array &$inputFiles): void
     {
     }
 
-    public function after(&$validator, array $data, $id)
+    public function after(Validator &$validator, array $data, string $id): void
     {
     }
 
-    private static function getOptionsEncryption()
+    private static function getOptionsEncryption(): array
     {
         return [
             [ 'label' => 'none', 'value' => 'none' ],
@@ -164,7 +170,7 @@ class ConfigMailer implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    private static function getOptionsDriver()
+    private static function getOptionsDriver(): array
     {
         return [
             [ 'label' => 'mail', 'value' => 'mail' ],

@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Block\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Validator\Validator;
 
 final class Config implements \SoosyzeCore\Config\ConfigInterface
 {
@@ -25,24 +31,19 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         'youtube'    => 'Youtube'
     ];
 
-    public function defaultValues()
+    public function defaultValues(): array
     {
-        $out = [];
-        foreach (array_keys($this->socials) as $social) {
-            $out['icon_socials'][$social] = '';
-        }
-
-        return $out;
+        return [ 'icon_socials' => array_fill_keys(array_keys($this->socials), '') ];
     }
 
-    public function menu(array &$menu)
+    public function menu(array &$menu): void
     {
         $menu[ 'social' ] = [
             'title_link' => 'Social networks'
         ];
     }
 
-    public function form(&$form, array $data, $req)
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void
     {
         $form->group('social-fieldset', 'fieldset', function ($form) use ($data) {
             $form->legend('social-legend', t('Social networks'));
@@ -63,7 +64,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         });
     }
 
-    public function validator(&$validator)
+    public function validator(Validator &$validator): void
     {
         foreach (array_keys($this->socials) as $key) {
             $validator->addRule($key, '!required|route_or_url');
@@ -71,7 +72,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         $validator->setLabels($this->socials);
     }
 
-    public function before(&$validator, array &$data, $id)
+    public function before(&$validator, array &$data, string $id): void
     {
         $data[ 'icon_socials' ] = [];
         foreach (array_keys($this->socials) as $key) {
@@ -81,11 +82,11 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         }
     }
 
-    public function after(&$validator, array $data, $id)
+    public function after(Validator &$validator, array $data, string $id): void
     {
     }
 
-    public function files(array &$inputsFile)
+    public function files(array &$inputsFile): void
     {
     }
 }

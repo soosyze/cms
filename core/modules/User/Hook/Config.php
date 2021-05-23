@@ -1,6 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Router\Router;
+use Soosyze\Components\Validator\Validator;
 
 final class Config implements \SoosyzeCore\Config\ConfigInterface
 {
@@ -11,16 +18,16 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($router)
+    public function __construct(Router $router)
     {
         $this->router = $router;
     }
 
-    public function defaultValues()
+    public function defaultValues(): array
     {
         return [
             'user_delete'            => '',
@@ -42,14 +49,14 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function menu(array &$menu)
+    public function menu(array &$menu): void
     {
         $menu[ 'user' ] = [
             'title_link' => 'User'
         ];
     }
 
-    public function form(&$form, array $data, $req)
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void
     {
         $form
             ->group('login-fieldset', 'fieldset', function ($form) use ($data) {
@@ -288,7 +295,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
             });
     }
 
-    public function validator(&$validator)
+    public function validator(Validator &$validator): void
     {
         $validator->setRules([
             'user_delete'            => 'required|numeric|inarray:1,2',
@@ -349,7 +356,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         }
     }
 
-    public function before(&$validator, array &$data, $id)
+    public function before(Validator &$validator, array &$data, string $id): void
     {
         $data = [
             'user_delete'            => (int) $validator->getInput('user_delete'),
@@ -371,11 +378,11 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function after(&$validator, array $data, $id)
+    public function after(Validator&$validator, array $data, string $id): void
     {
     }
 
-    public function files(array &$inputsFile)
+    public function files(array &$inputsFile): void
     {
     }
 }

@@ -1,22 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\News\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\FileSystem\Services\File;
 
 class Config implements \SoosyzeCore\Config\ConfigInterface
 {
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**
-     * @var \SoosyzeCore\FileSystem\Services\File
+     * @var File
      */
     private $file;
 
-    public function __construct($file)
+    public function __construct(File $file)
     {
         $this->file = $file;
     }
 
-    public function defaultValues()
+    public function defaultValues(): array
     {
         return [
             'new_default_icon'  => '',
@@ -26,14 +33,14 @@ class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function menu(array &$menu)
+    public function menu(array &$menu): void
     {
         $menu[ 'news' ] = [
             'title_link' => 'News'
         ];
     }
 
-    public function form(&$form, array $data, $req)
+    public function form(FormBuilder &$form, array $data, ServerRequestInterface $req): void
     {
         $form->group('news_settings-fieldset', 'fieldset', function ($form) use ($data) {
             $form->legend('news_settings-legend', t('Settings'))
@@ -65,7 +72,6 @@ class Config implements \SoosyzeCore\Config\ConfigInterface
                 $form->legend('new_default_image-legend', t('Default image'))
                 ->group('new_default_image-group', 'div', function ($form) use ($data) {
                     $form->label('new_default_image-label', t('Default image'), [
-//                        'class'        => 'control-label',
                         'data-tooltip' => '200ko maximum.',
                         'for'          => 'new_default_image'
                     ]);
@@ -95,7 +101,7 @@ class Config implements \SoosyzeCore\Config\ConfigInterface
             });
     }
 
-    public function validator(&$validator)
+    public function validator(Validator &$validator): void
     {
         $validator->setRules([
             'new_default_icon'  => 'required|string|fontawesome:solid,brands',
@@ -110,7 +116,7 @@ class Config implements \SoosyzeCore\Config\ConfigInterface
         ]);
     }
 
-    public function before(&$validator, array &$data, $id)
+    public function before(Validator &$validator, array &$data, string $id): void
     {
         $data = [
             'new_default_icon' => $validator->getInput('new_default_icon'),
@@ -119,11 +125,11 @@ class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function after(&$validator, array $data, $id)
+    public function after(Validator &$validator, array $data, string $id): void
     {
     }
 
-    public function files(array &$inputsFile)
+    public function files(array &$inputsFile): void
     {
         $inputsFile = [ 'new_default_image' ];
     }
