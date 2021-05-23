@@ -1,6 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Hook;
+
+use Soosyze\Components\Form\FormGroupBuilder;
+use Soosyze\Components\Router\Router;
+use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\Node\Services\Node;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\System\Services\Alias;
+use SoosyzeCore\Template\Services\Block as TemplateBlock;
 
 class Block implements \SoosyzeCore\Block\BlockInterface
 {
@@ -13,7 +23,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
     const TYPE_DEFAULT = 'page';
 
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
@@ -28,16 +38,16 @@ class Block implements \SoosyzeCore\Block\BlockInterface
     private $pathViews;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($alias, $node, $query, $router)
+    public function __construct(Alias $alias, Node $node, Query $query, Router $router)
     {
         $this->alias  = $alias;
         $this->node   = $node;
@@ -47,7 +57,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function hookBlockCreateFormData(array &$blocks)
+    public function hookBlockCreateFormData(array &$blocks): void
     {
         $blocks[ 'node.next_previous' ] = [
             'hook'    => 'node.next_previous',
@@ -63,26 +73,24 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         ];
     }
 
-    public function hookBlockNextPrevious($tpl, array $options)
+    public function hookBlockNextPrevious(TemplateBlock $tpl, array $options): TemplateBlock
     {
         $node = $this->node->getCurrentNode();
         if ($node === null || $node[ 'type' ] !== $options[ 'type' ]) {
-            return;
+            return $tpl;
         }
-
-        $nodeTypeName = $this->getNodeTypeName($options[ 'type' ]);
 
         return $tpl->addVars([
                 'display'        => $options[ 'display' ],
                 'next'           => $this->getNextNode($node),
                 'next_text'      => $options[ 'next_text' ],
-                'node_type_name' => $nodeTypeName,
+                'node_type_name' => $this->getNodeTypeName($options[ 'type' ]),
                 'previous'       => $this->getPreviousNode($node),
                 'previous_text'  => $options[ 'previous_text' ]
         ]);
     }
 
-    public function hookNodeNextPreviousEditForm(&$form, $data)
+    public function hookNodeNextPreviousEditForm(FormGroupBuilder &$form, array $data): void
     {
         $form->group('node-fieldset', 'fieldset', function ($form) use ($data) {
             $form->legend('node-legend', t('Settings'))
@@ -127,7 +135,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         });
     }
 
-    public function hookNodeNextPreviousUpdateValidator(&$validator, $id)
+    public function hookNodeNextPreviousUpdateValidator(Validator &$validator, $id): void
     {
         $validator
             ->addRule('display', 'required|inarray:' . $this->getListNameOptionsDisplay())
@@ -141,7 +149,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
             ->addLabel('type', t('Content type'));
     }
 
-    public function hookNodeNextPreviousUpdateBefore($validator, &$values, $id)
+    public function hookNodeNextPreviousUpdateBefore(Validator $validator, &$values, $id): void
     {
         $values[ 'options' ] = json_encode([
             'display'       => $validator->getInput('display'),
@@ -151,19 +159,17 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         ]);
     }
 
-    private function getNodeTypeName($type)
+    private function getNodeTypeName(string $type): string
     {
         $nodeType = $this->query
             ->from('node_type')
             ->where('node_type', '=', $type)
             ->fetch();
 
-        return isset($nodeType[ 'node_type' ])
-            ? $nodeType[ 'node_type' ]
-            : '';
+        return $nodeType[ 'node_type' ] ?? '';
     }
 
-    private function getNextNode(array $node)
+    private function getNextNode(array $node): string
     {
         $next = $this->query->from('node')
             ->where(static function ($query) use ($node) {
@@ -186,7 +192,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         return $next;
     }
 
-    private function getPreviousNode(array $node)
+    private function getPreviousNode(array $node): array
     {
         $previous = $this->query->from('node')
             ->where(static function ($query) use ($node) {
@@ -209,7 +215,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         return $previous;
     }
 
-    private function getOptionsType()
+    private function getOptionsType(): array
     {
         $nodeTypes = $this->query
             ->from('node_type')
@@ -227,7 +233,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         return $out;
     }
 
-    private function getOptionsDisplay()
+    private function getOptionsDisplay(): array
     {
         return [
             [
@@ -243,7 +249,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         ];
     }
 
-    private function getListNameOptionsType()
+    private function getListNameOptionsType(): array
     {
         $nodeTypes = $this->query
             ->from('node_type')
@@ -254,7 +260,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
             : [];
     }
 
-    private function getListNameOptionsDisplay()
+    private function getListNameOptionsDisplay(): string
     {
         return 'meta,title,meta-title';
     }

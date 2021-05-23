@@ -1,18 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\News\Hook;
 
 use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Form\FormGroupBuilder;
+use Soosyze\Components\Router\Router;
+use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\Node\Services\Node;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\System\Services\Alias;
+use SoosyzeCore\Template\Services\Block as TemplateBlock;
 
 class Block implements \SoosyzeCore\Block\BlockInterface
 {
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
     /**
-     * @var \SoosyzeCore\Node\Services\Node
+     * @var Node
      */
     private $node;
 
@@ -22,16 +31,16 @@ class Block implements \SoosyzeCore\Block\BlockInterface
     private $pathViews;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($alias, $node, $query, $router)
+    public function __construct(Alias $alias, Node $node, Query $query, Router $router)
     {
         $this->alias  = $alias;
         $this->node   = $node;
@@ -41,7 +50,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function hookBlockCreateFormData(array &$blocks)
+    public function hookBlockCreateFormData(array &$blocks): void
     {
         $blocks[ 'news.archive' ]        = [
             'hook'    => 'news.archive',
@@ -65,7 +74,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         ];
     }
 
-    public function hookBlockNewsArchiveSelect($tpl, array $options)
+    public function hookBlockNewsArchiveSelect(TemplateBlock $tpl, array $options): TemplateBlock
     {
         $data = $this->query
             ->from('node')
@@ -89,8 +98,8 @@ class Block implements \SoosyzeCore\Block\BlockInterface
             'value' => $this->router->getRoute('news.index')
         ];
         foreach ($data as $value) {
-            $year  = date('Y', $value[ 'date_created' ]);
-            $month = date('m', $value[ 'date_created' ]);
+            $year  = date('Y', (int) $value[ 'date_created' ]);
+            $month = date('m', (int) $value[ 'date_created' ]);
 
             if (!isset($optionsSelect[ $year ])) {
                 $optionsSelect[ $year ] = [
@@ -112,7 +121,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
             }
 
             $optionsSelect[ $year ][ 'value' ][ $month ] = [
-                'label' => strftime('%b', $value[ 'date_created' ]),
+                'label' => strftime('%b', (int) $value[ 'date_created' ]),
                 'value' => $this->router->getRoute('news.month', [
                     ':year'  => $year,
                     ':month' => $month,
@@ -145,7 +154,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         return $tpl->addVar('form', $form);
     }
 
-    public function hookBlockNewsArchive($tpl, array $options)
+    public function hookBlockNewsArchive(TemplateBlock $tpl, array $options): TemplateBlock
     {
         $data = $this->query
             ->from('node')
@@ -161,8 +170,8 @@ class Block implements \SoosyzeCore\Block\BlockInterface
 
         $output = [];
         foreach ($data as $value) {
-            $year  = date('Y', $value[ 'date_created' ]);
-            $month = date('m', $value[ 'date_created' ]);
+            $year  = date('Y', (int) $value[ 'date_created' ]);
+            $month = date('m', (int) $value[ 'date_created' ]);
 
             if (isset($output[ $year ])) {
                 ++$output[ $year ][ 'number' ];
@@ -205,7 +214,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         return $tpl->addVar('years', $output);
     }
 
-    public function hookBlockNewsArchiveEditForm(&$form, array $data)
+    public function hookBlockNewsArchiveEditForm(FormGroupBuilder &$form, array $data): void
     {
         $form->group('new-fieldset', 'fieldset', function ($form) use ($data) {
             $form->legend('new-legend', t('News setting'))
@@ -221,21 +230,21 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         });
     }
 
-    public function hookNewsBlockArchiveUpdateValidator(&$validator)
+    public function hookNewsBlockArchiveUpdateValidator(Validator &$validator): void
     {
         $validator
             ->addRule('expand', 'bool')
             ->addLabel('expand', t('Expand archives per month'));
     }
 
-    public function hookNewsArchiveUpdateBefore($validator, &$values, $id)
+    public function hookNewsArchiveUpdateBefore(Validator $validator, array &$values, int $id)
     {
         $values[ 'options' ] = json_encode([
             'expand' => (bool) $validator->getInput('expand')
         ]);
     }
 
-    public function hookBlockNewsLast($tpl, array $options)
+    public function hookBlockNewsLast(TemplateBlock $tpl, array $options): TemplateBlock
     {
         $news = $this->query
             ->from('node')
@@ -271,7 +280,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         ]);
     }
 
-    public function hookBlockNewsLastEditForm(&$form, array $data)
+    public function hookBlockNewsLastEditForm(FormGroupBuilder &$form, array $data): void
     {
         $form->group('new-fieldset', 'fieldset', function ($form) use ($data) {
             $form->legend('new-legend', t('News setting'))
@@ -310,7 +319,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         });
     }
 
-    public function hookBlockNewsLastUpdateValidator(&$validator, $id)
+    public function hookBlockNewsLastUpdateValidator(Validator &$validator, int $id): void
     {
         $validator
             ->addRule('limit', 'required|inarray:1,2,3,4')
@@ -322,7 +331,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
             ->addLabel('more', t('Add a "more" link at the bottom of the screen if there is more content'));
     }
 
-    public function hookNewsLastUpdateBefore($validator, array &$values, $id)
+    public function hookNewsLastUpdateBefore(Validator $validator, array &$values, int $id): void
     {
         $values[ 'options' ] = json_encode([
             'limit'  => (int) $validator->getInput('limit'),

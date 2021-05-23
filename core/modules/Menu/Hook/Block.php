@@ -1,6 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Menu\Hook;
+
+use Soosyze\Components\Form\FormGroupBuilder;
+use Soosyze\Components\Router\Router;
+use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\Menu\Services\Menu;
+use SoosyzeCore\Template\Services\Block as TemplateBlock;
 
 class Block implements \SoosyzeCore\Block\BlockInterface
 {
@@ -10,17 +18,17 @@ class Block implements \SoosyzeCore\Block\BlockInterface
     private $menu;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($menu, $router)
+    public function __construct(Menu $menu, Router $router)
     {
         $this->menu   = $menu;
         $this->router = $router;
     }
 
-    public function hookBlockCreateFormData(array &$blocks)
+    public function hookBlockCreateFormData(array &$blocks): void
     {
         $menus = $this->menu->getAllMenu();
 
@@ -36,15 +44,18 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         }
     }
 
-    public function hookBlockMenu($tpl, array $options)
+    public function hookBlockMenu(TemplateBlock $tpl, array $options): TemplateBlock
     {
-        if ($menu = $this->menu->renderMenu($options[ 'name' ], $options['parent'])) {
-            return $menu->setName('components/block/menu.php')
+        if ($menu = $this->menu->renderMenu($options[ 'name' ], $options[ 'parent' ])) {
+            return $menu
+                    ->setName('components/block/menu.php')
                     ->setNamesOverride([ "components/block/menu-{$options[ 'name' ]}.php" ]);
         }
+
+        return $tpl;
     }
 
-    public function hookMenuEditForm(&$form, array $data)
+    public function hookMenuEditForm(FormGroupBuilder &$form, array $data): void
     {
         $menus = $this->menu->getAllMenu();
 
@@ -85,7 +96,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         });
     }
 
-    public function hookMenuUpdateValidator(&$validator, $id)
+    public function hookMenuUpdateValidator(Validator &$validator, int $id): void
     {
         $menus = $this->menu->getAllMenu();
         $names = array_column($menus, 'name');
@@ -97,7 +108,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
             ->addLabel('parent', t('Parent link'));
     }
 
-    public function hookMenuUpdateBefore($validator, array &$values, $id)
+    public function hookMenuUpdateBefore(Validator $validator, array &$values, int $id): void
     {
         $values[ 'options' ] = json_encode([
             'name'   => $validator->getInput('name'),
