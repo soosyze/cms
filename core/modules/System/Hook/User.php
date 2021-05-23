@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
 
 class User implements \SoosyzeCore\User\UserInterface
 {
-    public function hookUserPermissionModule(array &$permissions)
+    public function hookUserPermissionModule(array &$permissions): void
     {
         $permissions[ 'System' ] = [
             'system.module.manage'      => 'Administer the modules',
@@ -15,27 +19,27 @@ class User implements \SoosyzeCore\User\UserInterface
         ];
     }
 
-    public function hookModuleManage()
+    public function hookModuleManage(): string
     {
         return 'system.module.manage';
     }
 
-    public function hookThemeManage()
+    public function hookThemeManage(): string
     {
         return 'system.theme.manage';
     }
 
-    public function hookToolManage()
+    public function hookToolManage(): string
     {
         return 'system.tool.manage';
     }
 
-    public function hookToolAction()
+    public function hookToolAction(): string
     {
         return 'system.tool.action';
     }
 
-    public function apiRoute($req, $user)
+    public function apiRoute(?ServerRequestInterface $req, ?array $user): bool
     {
         return !empty($user);
     }

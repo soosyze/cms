@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Config\Hook;
+
+use Soosyze\App;
 
 class User implements \SoosyzeCore\User\UserInterface
 {
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
-    public function __construct($core)
+    public function __construct(App $core)
     {
         $this->core = $core;
     }
 
-    public function hookUserPermissionModule(array &$permissions)
+    public function hookUserPermissionModule(array &$permissions): void
     {
         $menu = [];
         $this->core->callHook('config.edit.menu', [ &$menu ]);
@@ -28,7 +32,7 @@ class User implements \SoosyzeCore\User\UserInterface
         }
     }
 
-    public function hookConfigAdmin()
+    public function hookConfigAdmin(): array
     {
         $menu  = [];
         $this->core->callHook('config.edit.menu', [ &$menu ]);
@@ -41,7 +45,7 @@ class User implements \SoosyzeCore\User\UserInterface
         return $out;
     }
 
-    public function hookConfigManage($id)
+    public function hookConfigManage(string $id): array
     {
         return [ 'config.manage', "$id.config.manage" ];
     }

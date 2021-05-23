@@ -1,8 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Hook;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Util\Util;
+use SoosyzeCore\FileManager\Services\FileProfil;
+use SoosyzeCore\User\Services\User as UserService;
 
 class User implements \SoosyzeCore\User\UserInterface
 {
@@ -11,27 +16,27 @@ class User implements \SoosyzeCore\User\UserInterface
     /**
      * @var FileProfil
      */
-    private $profil;
+    private $fileProfil;
 
     /**
-     * @var \SoosyzeCore\User\Services\User
+     * @var UserService
      */
     private $user;
 
-    public function __construct($profil, $user)
+    public function __construct(FileProfil $fileProfil, UserService $user)
     {
-        $this->profil = $profil;
-        $this->user   = $user;
+        $this->fileProfil = $fileProfil;
+        $this->user       = $user;
     }
 
-    public function hookUserPermissionModule(array &$permissions)
+    public function hookUserPermissionModule(array &$permissions): void
     {
         $permissions[ 'FileManager' ] = [
             'filemanager.permission.admin' => 'Administer file permissions'
         ];
     }
 
-    public function getRight($path, $userId = null)
+    public function getRight(string $path, ?int $userId = null): array
     {
         if (empty($userId) && ($user = $this->user->isConnected())) {
             $userId = $user[ 'user_id' ];
@@ -40,7 +45,7 @@ class User implements \SoosyzeCore\User\UserInterface
         $path    = $path === '/' || $path === ''
             ? '/'
             : Util::cleanPath('/' . $path);
-        $profils = $this->profil->getProfilsFileByUser($userId);
+        $profils = $this->fileProfil->getProfilsFileByUser($userId);
 
         foreach ($profils as $profil) {
             $pattern = $profil[ 'folder_show' ];
@@ -58,14 +63,19 @@ class User implements \SoosyzeCore\User\UserInterface
         return [];
     }
 
-    public function hookFileAdmin()
+    public function hookFileAdmin(): string
     {
         return 'filemanager.permission.admin';
     }
 
-    public function hookFileShow($path, $name, $ext, $req = null, $user = null)
-    {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+    public function hookFileShow(
+        string $path,
+        string $name,
+        string $ext,
+        ?ServerRequestInterface $req = null,
+        ?array $user = null
+    ): bool {
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         if (empty($right)) {
             return false;
@@ -74,21 +84,21 @@ class User implements \SoosyzeCore\User\UserInterface
         return $this->rightExtension($ext, $right);
     }
 
-    public function hookFileStore($path, $req = null, $user = null)
+    public function hookFileStore(string $path, ?ServerRequestInterface $req = null, ?array $user = null): bool
     {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         return !empty($right[ 'file_store' ]);
     }
 
     public function hookFileUpdate(
-        $path,
-        $name,
-        $ext,
-        $req = null,
-        $user = null
-    ) {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        string $path,
+        string $name,
+        string $ext,
+        ?ServerRequestInterface $req = null,
+        ?array $user = null
+    ): bool {
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         if (empty($right[ 'file_update' ])) {
             return false;
@@ -98,37 +108,37 @@ class User implements \SoosyzeCore\User\UserInterface
     }
 
     public function hookFileCopyClipboard(
-        $path,
-        $name,
-        $ext,
-        $req = null,
-        $user = null
-    ) {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        string $path,
+        string $name,
+        string $ext,
+        ?ServerRequestInterface $req = null,
+        ?array $user = null
+    ): bool {
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         return !empty($right[ 'file_clipboard' ]);
     }
 
     public function hookFileCopy(
-        $path,
-        $name,
-        $ext,
-        $req = null,
-        $user = null
-    ) {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        string $path,
+        string $name,
+        string $ext,
+        ?ServerRequestInterface $req = null,
+        ?array $user = null
+    ): bool {
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         return !empty($right[ 'file_copy' ]);
     }
 
     public function hookFileDelete(
-        $path,
-        $name,
-        $ext,
-        $req = null,
-        $user = null
-    ) {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        string $path,
+        string $name,
+        string $ext,
+        ?ServerRequestInterface $req = null,
+        ?array $user = null
+    ): bool {
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         if (empty($right[ 'file_delete' ])) {
             return false;
@@ -138,13 +148,13 @@ class User implements \SoosyzeCore\User\UserInterface
     }
 
     public function hookFileDownlod(
-        $path,
-        $name,
-        $ext,
-        $req = null,
-        $user = null
-    ) {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        string $path,
+        string $name,
+        string $ext,
+        ?ServerRequestInterface $req = null,
+        ?array $user = null
+    ): bool {
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         if (empty($right[ 'file_download' ])) {
             return false;
@@ -153,42 +163,42 @@ class User implements \SoosyzeCore\User\UserInterface
         return $this->rightExtension($ext, $right);
     }
 
-    public function hookFolderAdmin($req = null, $user = null)
+    public function hookFolderAdmin($req = null, ?array $user = null): bool
     {
-        $profils = $this->profil->getProfilsFileByUser($user[ 'user_id' ]);
+        $profils = $this->fileProfil->getProfilsFileByUser($user[ 'user_id' ]);
 
         return !empty($profils);
     }
 
-    public function hookFolderShow($path, $req = null, $user = null)
+    public function hookFolderShow(string $path, ?ServerRequestInterface $req = null, ?array $user = null): bool
     {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         return !empty($right);
     }
 
-    public function hookFolderStore($path, $req = null, $user = null)
+    public function hookFolderStore(string $path, ?ServerRequestInterface $req = null, ?array $user = null): bool
     {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         return !empty($right[ 'folder_store' ]) && !empty($right[ 'folder_show_sub' ]);
     }
 
-    public function hookFolderUpdate($path, $req = null, $user = null)
+    public function hookFolderUpdate(string $path, ?ServerRequestInterface $req = null, ?array $user = null): bool
     {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         return !empty($right[ 'folder_update' ]) && !empty($right[ 'folder_show_sub' ]);
     }
 
-    public function hookFolderDelete($path, $req = null, $user = null)
+    public function hookFolderDelete(string $path, ?ServerRequestInterface $req = null, ?array $user = null): bool
     {
-        $right = $this->getRight($path, empty($user[ 'user_id' ]) ? null : $user[ 'user_id' ]);
+        $right = $this->getRight($path, $user[ 'user_id' ] ?? null);
 
         return !empty($right[ 'folder_delete' ]) && !empty($right[ 'folder_show_sub' ]);
     }
 
-    public function getMaxUpload($path)
+    public function getMaxUpload(string $path): int
     {
         $profil = $this->getRight($path);
 
@@ -201,7 +211,7 @@ class User implements \SoosyzeCore\User\UserInterface
         return min(Util::getOctetUploadLimit(), $maxUpload);
     }
 
-    private function rightExtension($ext, array $right = [])
+    private function rightExtension(string $ext, array $right = []): bool
     {
         if ($right[ 'file_extensions_all' ]) {
             return true;

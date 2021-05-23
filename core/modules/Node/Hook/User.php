@@ -1,6 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use SoosyzeCore\QueryBuilder\Services\Query;
 
 class User implements \SoosyzeCore\User\UserInterface
 {
@@ -10,16 +15,16 @@ class User implements \SoosyzeCore\User\UserInterface
     private $nodes = [];
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
-    public function __construct($query)
+    public function __construct(Query $query)
     {
         $this->query = $query;
     }
 
-    public function hookUserPermissionModule(array &$permissions)
+    public function hookUserPermissionModule(array &$permissions): void
     {
         $nodeTypes = $this->query->from('node_type')->fetchAll();
 
@@ -47,36 +52,38 @@ class User implements \SoosyzeCore\User\UserInterface
         }
     }
 
-    public function hookNodeManager()
+    public function hookNodeManager(): array
     {
         return [ 'node.administer', 'node.manager' ];
     }
 
-    public function hookNodeSow($idNode, $req, $user)
-    {
-        $node   = $this->getNode($idNode);
-        $rights = '';
+    public function hookNodeSow(
+        int $idNode,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): ?array {
+        $node = $this->getNode($idNode);
 
-        if ($node) {
-            $rights = [ 'node.administer' ];
+        if (!$node) {
+            return null;
+        }
 
-            if ($user && $user[ 'user_id' ] == $node[ 'user_id' ]) {
-                $rights[] = 'node.show.own';
-            }
-
-            if ($node[ 'node_status_id' ] !== 1) {
-                $rights[] = 'node.show.not_published';
-                $rights[] = 'node.show.not_published.' . $node[ 'type' ];
-            } else {
-                $rights[] = 'node.show.published';
-                $rights[] = 'node.show.published.' . $node[ 'type' ];
-            }
+        $rights = [ 'node.administer' ];
+        if ($user && $user[ 'user_id' ] == $node[ 'user_id' ]) {
+            $rights[] = 'node.show.own';
+        }
+        if ($node[ 'node_status_id' ] !== 1) {
+            $rights[] = 'node.show.not_published';
+            $rights[] = 'node.show.not_published.' . $node[ 'type' ];
+        } else {
+            $rights[] = 'node.show.published';
+            $rights[] = 'node.show.published.' . $node[ 'type' ];
         }
 
         return $rights;
     }
 
-    public function hookNodeAdd($req, $user)
+    public function hookNodeAdd(?ServerRequestInterface $req, ?array $user): array
     {
         $nodeTypes = $this->query->from('node_type')->fetchAll();
         $rights    = [ 'node.administer' ];
@@ -88,77 +95,100 @@ class User implements \SoosyzeCore\User\UserInterface
         return $rights;
     }
 
-    public function hookNodeCreated($type)
+    public function hookNodeCreated(string $type): array
     {
         return [ 'node.administer', 'node.created.' . $type ];
     }
 
-    public function hookNodeClone($idNode, $req, $user)
-    {
-        $node   = $this->getNode($idNode);
-        $rights = '';
+    public function hookNodeClone(
+        int $idNode,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): ?array {
+        $node = $this->getNode($idNode);
 
-        if ($node) {
-            $rights = [ 'node.administer', 'node.cloned.' . $node[ 'type' ] ];
+        if (!$node) {
+            return null;
+        }
 
-            if ($user && $user[ 'user_id' ] == $node[ 'user_id' ]) {
-                $rights[] = 'node.cloned.own';
-            }
+        $rights = [ 'node.administer', 'node.cloned.' . $node[ 'type' ] ];
+        if ($user && $user[ 'user_id' ] == $node[ 'user_id' ]) {
+            $rights[] = 'node.cloned.own';
         }
 
         return $rights;
     }
 
-    public function hookNodeEdited($idNode, $req, $user)
-    {
-        $node   = $this->getNode($idNode);
-        $rights = '';
+    public function hookNodeEdited(
+        int $idNode,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): ?array {
+        $node = $this->getNode($idNode);
 
-        if ($node) {
-            $rights = [ 'node.administer', 'node.edited.' . $node[ 'type' ] ];
+        if (!$node) {
+            return null;
+        }
 
-            if ($user && $user[ 'user_id' ] == $node[ 'user_id' ]) {
-                $rights[] = 'node.edited.own';
-            }
+        $rights = [ 'node.administer', 'node.edited.' . $node[ 'type' ] ];
+        if ($user && $user[ 'user_id' ] == $node[ 'user_id' ]) {
+            $rights[] = 'node.edited.own';
         }
 
         return $rights;
     }
 
-    public function hookNodeDeleted($idNode, $req, $user)
-    {
-        $node   = $this->getNode($idNode);
-        $rights = '';
+    public function hookNodeDeleted(
+        int $idNode,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): ?array {
+        $node = $this->getNode($idNode);
 
-        if ($node) {
-            $rights = [ 'node.administer', 'node.deleted.' . $node[ 'type' ] ];
+        if (!$node) {
+            return null;
+        }
 
-            if ($user && $user[ 'user_id' ] == $node[ 'user_id' ]) {
-                $rights[] = 'node.deleted.own';
-            }
+        $rights = [ 'node.administer', 'node.deleted.' . $node[ 'type' ] ];
+        if ($user && $user[ 'user_id' ] == $node[ 'user_id' ]) {
+            $rights[] = 'node.deleted.own';
         }
 
         return $rights;
     }
 
-    public function hookEntityCreated($idNode, $entity, $req, $user)
-    {
+    public function hookEntityCreated(
+        int $idNode,
+        string $entity,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): array {
         $node = $this->getNode($idNode);
 
         return $this->hookNodeCreated($node[ 'type' ]);
     }
 
-    public function hookEntityEdited($idNode, $entity, $idEntity, $req, $user)
-    {
+    public function hookEntityEdited(
+        int $idNode,
+        string $entity,
+        int $idEntity,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): ?array {
         return $this->hookNodeEdited($idNode, $req, $user);
     }
 
-    public function hookEntityDeleted($idNode, $entity, $idEntity, $req, $user)
-    {
+    public function hookEntityDeleted(
+        int $idNode,
+        string $entity,
+        int $idEntity,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): ?array {
         return $this->hookNodeDeleted($idNode, $req, $user);
     }
 
-    private function getNode($idNode)
+    private function getNode(int $idNode): array
     {
         if (isset($this->nodes[ $idNode ])) {
             return $this->nodes[ $idNode ];

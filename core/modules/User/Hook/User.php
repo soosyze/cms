@@ -1,26 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Hook;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Config;
+use SoosyzeCore\User\Services\User as ServiceUser;
 
 class User implements \SoosyzeCore\User\UserInterface
 {
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var User
+     * @var ServiceUser
      */
     private $user;
 
-    public function __construct($config, $user)
+    public function __construct(Config $config, ServiceUser $user)
     {
         $this->config = $config;
         $this->user   = $user;
     }
 
-    public function hookUserPermissionModule(array &$permissions)
+    public function hookUserPermissionModule(array &$permissions): void
     {
         $permissions[ 'User' ] = [
             'user.people.manage'     => 'Administer users',
@@ -29,6 +35,7 @@ class User implements \SoosyzeCore\User\UserInterface
             'user.edited'            => 'Edit your user account',
             'user.deleted'           => 'Delete your user account'
         ];
+
         $permissions[ 'User role' ][ 'role.all' ] = 'Assign all roles';
         foreach ($this->user->getRolesAttribuable() as $role) {
             $permissions[ 'User role' ][ 'role.' . $role[ 'role_id' ] ] = [
@@ -38,18 +45,21 @@ class User implements \SoosyzeCore\User\UserInterface
         }
     }
 
-    public function hookPermissionAdminister()
+    public function hookPermissionAdminister(): string
     {
         return 'user.permission.manage';
     }
 
-    public function hookPeopleAdminister()
+    public function hookPeopleAdminister(): string
     {
         return 'user.people.manage';
     }
 
-    public function hookUserShow($id, $req, $user)
-    {
+    public function hookUserShow(
+        int $id,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ) {
         if ($id == $user[ 'user_id' ]) {
             return true;
         }
@@ -57,8 +67,11 @@ class User implements \SoosyzeCore\User\UserInterface
         return [ 'user.people.manage', 'user.showed' ];
     }
 
-    public function hookUserEdited($id, $req, $user)
-    {
+    public function hookUserEdited(
+        $id,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): array {
         $output[] = 'user.people.manage';
         if ($id == $user[ 'user_id' ]) {
             $output[] = 'user.edited';
@@ -67,8 +80,11 @@ class User implements \SoosyzeCore\User\UserInterface
         return $output;
     }
 
-    public function hookUserDeleted($id, $req, $user)
-    {
+    public function hookUserDeleted(
+        $id,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): array {
         $output[] = 'user.people.manage';
         if ($id == $user[ 'user_id' ]) {
             $output[] = 'user.deleted';
@@ -77,27 +93,35 @@ class User implements \SoosyzeCore\User\UserInterface
         return $output;
     }
 
-    public function hookRegister($req, $user)
+    public function hookRegister(?ServerRequestInterface $req, ?array $user): bool
     {
         return empty($user) && $this->config->get('settings.user_register');
     }
 
-    public function hookActivate($id, $token, $req, $user)
-    {
+    public function hookActivate(
+        int $id,
+        string $token,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): bool {
         return empty($user) && $this->config->get('settings.user_register');
     }
 
-    public function hookLogin($url, $req, $user)
-    {
-        if ($this->user->isConnectUrl($url)) {
-            return false;
-        }
-
-        return empty($user);
+    public function hookLogin(
+        string $url,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): bool {
+        return $this->user->isConnectUrl($url)
+            ? false
+            : empty($user);
     }
 
-    public function hookLoginCheck($url, $req, $user)
-    {
+    public function hookLoginCheck(
+        string $url,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): bool {
         if ($this->user->isConnectUrl($url)) {
             return false;
         }
@@ -117,13 +141,16 @@ class User implements \SoosyzeCore\User\UserInterface
         return $this->user->getGranted($userActived, 'system.config.maintenance');
     }
 
-    public function hookLogout($req, $user)
+    public function hookLogout(?ServerRequestInterface $req, ?array $user): bool
     {
         return !empty($user);
     }
 
-    public function hookRelogin($url, $req, $user)
-    {
+    public function hookRelogin(
+        string $url,
+        ?ServerRequestInterface $req,
+        ?array $user
+    ): bool {
         if ($this->user->isConnectUrl($url)) {
             return false;
         }
@@ -141,7 +168,7 @@ class User implements \SoosyzeCore\User\UserInterface
         return 'user.people.manage';
     }
 
-    public function hookUserApiSelect($req, $user)
+    public function hookUserApiSelect(?ServerRequestInterface $req, ?array $user): bool
     {
         return !empty($user);
     }

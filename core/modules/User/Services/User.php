@@ -272,26 +272,26 @@ class User
      * Si la session existe renvoie l'utilisateur,
      * sinon s'il y a correspondance dans les autres cas renvoie faux.
      *
-     * @return bool|array
+     * @return null|array
      */
-    public function isConnected()
+    public function isConnected(): ?array
     {
         if ($this->connect) {
             return $this->connect;
         }
         if (!empty($_SESSION[ 'token_connected' ])) {
             if (!($user = $this->getUserActivedToken($_SESSION[ 'token_connected' ]))) {
-                return false;
+                return null;
             }
 
             $this->connect = $_SESSION[ 'token_connected' ] == $user[ 'token_connected' ]
                 ? $user
-                : false;
+                : null;
 
             return $this->connect;
         }
 
-        return false;
+        return null;
     }
 
     public function isConnectUrl($url)
@@ -370,6 +370,9 @@ class User
     {
         if (\is_bool($permissions)) {
             return $permissions;
+        }
+        if ($permissions === null) {
+            return false;
         }
         if (\is_string($permissions)) {
             return $this->isGranted($permissions);

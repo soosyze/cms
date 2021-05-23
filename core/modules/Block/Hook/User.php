@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Block\Hook;
 
 class User implements \SoosyzeCore\User\UserInterface
 {
-    public function hookUserPermissionModule(array &$permissions)
+    public function hookUserPermissionModule(array &$permissions): void
     {
         $permissions[ 'Block' ] = [
             'block.administer' => 'See the block administration page',
@@ -14,22 +16,22 @@ class User implements \SoosyzeCore\User\UserInterface
         ];
     }
 
-    public function hookBlockAdmin()
+    public function hookBlockAdmin(): string
     {
         return 'block.administer';
     }
 
-    public function hookBlockCreated()
+    public function hookBlockCreated(): string
     {
         return 'block.created';
     }
 
-    public function hookBlockEdited()
+    public function hookBlockEdited(): string
     {
         return 'block.edited';
     }
 
-    public function hookBlockDeleted()
+    public function hookBlockDeleted(): string
     {
         return 'block.deleted';
     }
