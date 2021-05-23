@@ -73,7 +73,7 @@ class NodeUser
         $query = clone $this->query;
 
         return $query->from('node')
-            ->leftJoin('node_type', 'type', 'node_type.node_type');
+            ->leftJoin('node_type', 'type', '=', 'node_type.node_type');
     }
 
     public function whereNodes(&$nodeQuery)
@@ -89,7 +89,7 @@ class NodeUser
 
             if ($typePublish || $typeNotPublish) {
                 $nodeQuery->orWhere(static function ($query) use ($type, $typePublish, $typeNotPublish) {
-                    $query->where('type', $type[ 'node_type' ])
+                    $query->where('type', '=', $type[ 'node_type' ])
                         ->where(static function ($query) use ($typePublish, $typeNotPublish) {
                             if ($typePublish) {
                                 $query->where('node_status_id', '==', 1);
@@ -159,7 +159,7 @@ class NodeUser
         $user = $this->query
             ->select('bio', 'firstname', 'picture', 'name', 'username')
             ->from('user')
-            ->where('user_id', $node[ 'user_id' ])
+            ->where('user_id', '=', $node[ 'user_id' ])
             ->fetch();
 
         if ($this->user->isGranted('user.showed')) {

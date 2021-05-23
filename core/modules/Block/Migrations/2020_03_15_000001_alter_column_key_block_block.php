@@ -13,7 +13,7 @@ return [
         $blocks = $req->from('block')->where('hook', 'like', 'news.%')->fetchAll();
         foreach ($blocks as $block) {
             $req->update('block', [ 'key_block' => $block[ 'hook' ] ])
-                ->where('block_id', $block[ 'block_id' ])
+                ->where('block_id', '=', $block[ 'block_id' ])
                 ->execute();
         }
     }

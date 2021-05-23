@@ -8,7 +8,7 @@ return [
         $req->update('role_permission', [
                 'permission_id' => 'filemanager.permission.admin'
             ])
-            ->where('permission_id', 'filemanager.profil.admin')
+            ->where('permission_id', '=', 'filemanager.profil.admin')
             ->execute();
     }
 ];

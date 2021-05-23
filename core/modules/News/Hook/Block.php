@@ -70,7 +70,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         $data = $this->query
             ->from('node')
             ->where('node_status_id', '==', 1)
-            ->where('type', 'article')
+            ->where('type', '=', 'article')
             ->fetchAll();
 
         $query      = $this->router->parseQueryFromRequest();
@@ -150,7 +150,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         $data = $this->query
             ->from('node')
             ->where('node_status_id', '==', 1)
-            ->where('type', 'article')
+            ->where('type', '=', 'article')
             ->fetchAll();
 
         $query = $this->router->parseQueryFromRequest();
@@ -239,8 +239,8 @@ class Block implements \SoosyzeCore\Block\BlockInterface
     {
         $news = $this->query
             ->from('node')
-            ->where('node_status_id', 1)
-            ->where('type', 'article')
+            ->where('node_status_id', '=', 1)
+            ->where('type', '=', 'article')
             ->orderBy('sticky', SORT_DESC)
             ->orderBy('date_created', SORT_DESC)
             ->limit($options[ 'limit' ] + 1, $options[ 'offset' ])

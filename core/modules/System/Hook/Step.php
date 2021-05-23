@@ -423,7 +423,7 @@ class Step
         ]);
 
         /* Add children Home */
-        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', 7)->execute();
+        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', '=', 7)->execute();
 
         $ci->query()->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
             ->values([ 4, $idMenuBasic ])
@@ -673,7 +673,7 @@ class Step
         ]);
 
         /* Add children Project */
-        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', $idNodeProjects)->execute();
+        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', '=', $idNodeProjects)->execute();
 
         $ci->query()
             ->insertInto('system_alias_url', [ 'source', 'alias' ])
@@ -705,7 +705,7 @@ class Step
             'node.show', '', 'Project 4', 'project/4', 'node/' . $idNodeProject4, 'menu-main', 7, $idMenuProjects
         ]);
 
-        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', $idMenuProjects)->execute();
+        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', '=', $idMenuProjects)->execute();
 
         $ci->query()->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
             ->values([ $idNodeEducation, $idMenuEducation ])

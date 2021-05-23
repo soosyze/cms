@@ -25,7 +25,7 @@ class Cron
         if ($this->config->get('settings.node_cron', false)) {
             $this->query
                 ->update('node', [ 'node_status_id' => 1 ])
-                ->where('node_status_id', 2)
+                ->where('node_status_id', '=', 2)
                 ->where('date_created', '<=', time())
                 ->execute();
         }

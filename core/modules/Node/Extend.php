@@ -24,8 +24,8 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         $ci->schema()
             ->createTableIfNotExists('node', static function (TableBuilder $table) {
                 $table->increments('id')
-                ->integer('date_changed')
-                ->integer('date_created')
+                ->string('date_changed')
+                ->string('date_created')
                 ->integer('entity_id')->nullable()
                 ->string('meta_description')->valueDefault('')
                 ->boolean('meta_noarchive')->valueDefault(false)

@@ -186,7 +186,7 @@ class FilePermission extends \Soosyze\Controller
                 ->update('profil_file', $data)
                 ->where('profil_file_id', '==', $id)
                 ->execute();
-            $this->updateProfilRole($validator, $id);
+            $this->updateProfilRole($validator, (int) $id);
             $this->container->callHook('filemanager.permission.update.after', [
                 $validator, $id
             ]);

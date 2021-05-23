@@ -8,7 +8,7 @@ return [
         $req->update('node_type', [
                 'node_type_icon' => 'fas fa-newspaper'
             ])
-            ->where('node_type', 'article')
+            ->where('node_type', '=', 'article')
             ->execute();
     }
 ];

@@ -13,7 +13,7 @@ return [
         $req->update('user', [
                 'password' => password_hash('Soosyze2020&', PASSWORD_DEFAULT)
             ])
-            ->where('user_id', 1)
+            ->where('user_id', '=', 1)
             ->execute();
     }
 ];

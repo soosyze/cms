@@ -172,7 +172,7 @@ class Migration
         $this->query
             ->delete()
             ->from('migration')
-            ->where('extension', $extension)
+            ->where('extension', '=', $extension)
             ->execute();
     }
 }

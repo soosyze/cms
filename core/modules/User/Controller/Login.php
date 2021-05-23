@@ -186,7 +186,7 @@ class Login extends \Soosyze\Controller
                         'token_forget' => $token,
                         'time_reset'   =>  $timeReset->getTimestamp()
                     ])
-                    ->where('email', $validator->getInput('email'))
+                    ->where('email', '=', $validator->getInput('email'))
                     ->execute();
 
                 $urlReset = self::router()->getRoute('user.reset', [

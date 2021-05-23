@@ -73,7 +73,7 @@ class NodeUser
         $this->nodeuser->whereNodes($nodesQuery);
 
         $nodes = $nodesQuery
-            ->where('user_id', $user[ 'user_id' ])
+            ->where('user_id', '=', $user[ 'user_id' ])
             ->limit(20)
             ->fetchAll();
 

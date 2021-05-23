@@ -18,7 +18,7 @@ return [
                         'summary' => str_replace($search, $replace, $article[ 'summary' ]),
                         'image'   => str_replace($search, $replace, $article[ 'image' ])
                     ])
-                    ->where('article_id', $article[ 'article_id' ])
+                    ->where('article_id', '=', $article[ 'article_id' ])
                     ->execute();
             }
         }
@@ -29,7 +29,7 @@ return [
                 ->update('entity_page', [
                     'body'    => str_replace($search, $replace, $page[ 'body' ])
                 ])
-                ->where('page_id', $page[ 'page_id' ])
+                ->where('page_id', '=', $page[ 'page_id' ])
                 ->execute();
         }
 
@@ -42,7 +42,7 @@ return [
                 ->update('user', [
                     'picture' => str_replace($search, $replace, $user[ 'picture' ])
                 ])
-                ->where('user_id', $user[ 'user_id' ])
+                ->where('user_id', '=', $user[ 'user_id' ])
                 ->execute();
         }
 
@@ -53,7 +53,7 @@ return [
                     ->update('block', [
                         'content' => str_replace($search, $replace, $block[ 'content' ])
                     ])
-                    ->where('block_id', $block[ 'block_id' ])
+                    ->where('block_id', '=', $block[ 'block_id' ])
                     ->execute();
             }
         }

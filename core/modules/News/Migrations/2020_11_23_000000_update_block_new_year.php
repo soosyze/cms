@@ -11,7 +11,7 @@ return [
                 'key_block' => 'news.archive',
                 'options'   => json_encode([ 'expand' => true ])
             ])
-            ->where('key_block', 'news.month')
+            ->where('key_block', '=', 'news.month')
             ->execute();
 
         $req
@@ -20,7 +20,7 @@ return [
                 'key_block' => 'news.archive',
                 'options'   => json_encode([ 'expand' => false ])
             ])
-            ->where('key_block', 'news.year')
+            ->where('key_block', '=', 'news.year')
             ->execute();
     }
 ];

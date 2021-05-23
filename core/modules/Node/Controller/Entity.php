@@ -126,6 +126,8 @@ class Entity extends \Soosyze\Controller
                 $key = $value[ 'field_name' ];
                 if (in_array($value[ 'field_type' ], [ 'image', 'file' ])) {
                     $fields[ $key ] = '';
+                } elseif ($value[ 'field_type' ] === 'number') {
+                    $fields[ $key ] = (int) $validator->getInput($key, '');
                 } elseif ($value[ 'field_type' ] === 'checkbox') {
                     $fields[ $key ] = implode(',', $validator->getInput($key, []));
                 } else {
@@ -284,6 +286,8 @@ class Entity extends \Soosyze\Controller
                 $key = $value[ 'field_name' ];
                 if (in_array($value[ 'field_type' ], [ 'image', 'file' ])) {
                     $this->saveFile($node['type'], $idNode, $entity, $idEntity, $key, $validator);
+                } elseif ($value[ 'field_type' ] === 'number') {
+                    $fields[ $key ] = (int) $validator->getInput($key, '');
                 } elseif ($value[ 'field_type' ] === 'checkbox') {
                     $fields[ $key ] = implode(',', $validator->getInput($key, []));
                 } else {

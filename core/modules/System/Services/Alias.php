@@ -22,7 +22,7 @@ class Alias
 
     public function getAlias($source, $default = null)
     {
-        $alias = $this->query->from('system_alias_url')->where('source', $source)->fetch();
+        $alias = $this->query->from('system_alias_url')->where('source', '=', $source)->fetch();
 
         return empty($alias)
             ? $default
@@ -40,7 +40,7 @@ class Alias
             $default = $index;
         }
 
-        $source = $this->query->from('system_alias_url')->where('alias', $alias)->fetch();
+        $source = $this->query->from('system_alias_url')->where('alias', '=', $alias)->fetch();
 
         return empty($source)
             ? $default

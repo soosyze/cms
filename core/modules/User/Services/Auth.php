@@ -39,7 +39,7 @@ class Auth
         $_SESSION[ 'token_connected' ] = $token;
         $this->query
             ->update('user', [ 'token_connected' => $token, 'time_access' => time() ])
-            ->where('email', $email)
+            ->where('email', '=', $email)
             ->execute();
 
         return true;
@@ -89,8 +89,8 @@ class Auth
     {
         return $this->query
                 ->from('user')
-                ->where('email', $email)
-                ->where('actived', $actived)
+                ->where('email', '=', $email)
+                ->where('actived', '=', $actived)
                 ->fetch();
     }
 
@@ -98,8 +98,8 @@ class Auth
     {
         return $this->query
                 ->from('user')
-                ->where('token_connected', $token)
-                ->where('actived', $actived)
+                ->where('token_connected', '=', $token)
+                ->where('actived', '=', $actived)
                 ->fetch();
     }
 }

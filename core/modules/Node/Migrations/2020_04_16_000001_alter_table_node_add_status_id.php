@@ -17,7 +17,7 @@ return [
                 $req->update('node', [
                         'node_status_id' => 1
                     ])
-                    ->where('id', $node[ 'id' ])
+                    ->where('id', '=', $node[ 'id' ])
                     ->execute();
             }
         }

@@ -127,9 +127,9 @@ class Node
         $this->nodeTypeField[ $type ] = $this->query
             ->select('field_name', 'field_type', 'field_label', 'field_show_label', 'field_option', 'field_weight')
             ->from('node_type_field')
-            ->leftJoin('field', 'field_id', 'field.field_id')
-            ->where('node_type', $type)
-            ->where('field_show', true)
+            ->leftJoin('field', 'field_id', '=', 'field.field_id')
+            ->where('node_type', '=', $type)
+            ->where('field_show', '=', true)
             ->orderby('field_weight')
             ->fetchAll();
 
@@ -165,9 +165,9 @@ class Node
     {
         return $this->query
                 ->from('node_type_field')
-                ->leftJoin('field', 'field_id', 'field.field_id')
-                ->where('field_name', $entity)
-                ->where('field_type', 'one_to_many')
+                ->leftJoin('field', 'field_id', '=', 'field.field_id')
+                ->where('field_name', '=', $entity)
+                ->where('field_type', '=', 'one_to_many')
                 ->fetch();
     }
 
@@ -175,10 +175,10 @@ class Node
     {
         return $this->query
                 ->from('node_type')
-                ->leftJoin('node_type_field', 'node_type', 'node_type_field.node_type')
-                ->leftJoin('field', 'field_id', 'field.field_id')
-                ->where('field_show_form', true)
-                ->where('node_type', $type)
+                ->leftJoin('node_type_field', 'node_type', '=', 'node_type_field.node_type')
+                ->leftJoin('field', 'field_id', '=', 'field.field_id')
+                ->where('field_show_form', '=', true)
+                ->where('node_type', '=', $type)
                 ->fetchAll();
     }
 
@@ -186,10 +186,10 @@ class Node
     {
         return $this->query
                 ->from('node_type')
-                ->leftJoin('node_type_field', 'node_type', 'node_type_field.node_type')
-                ->leftJoin('field', 'field_id', 'field.field_id')
-                ->where('node_type', $type)
-                ->where('field_show_form', true)
+                ->leftJoin('node_type_field', 'node_type', '=', 'node_type_field.node_type')
+                ->leftJoin('field', 'field_id', '=', 'field.field_id')
+                ->where('node_type', '=', $type)
+                ->where('field_show_form', '=', true)
                 ->orderBy('field_weight')
                 ->fetchAll();
     }
@@ -197,7 +197,7 @@ class Node
     public function getFieldsEntity($entity)
     {
         return $this->getNodeTypeFieldsQuery($entity)
-                ->where('field_show_form', true)
+                ->where('field_show_form', '=', true)
                 ->orderBy('field_weight')
                 ->fetchAll();
     }
@@ -206,7 +206,7 @@ class Node
     {
         $nodes = $this->query
             ->from('node')
-            ->where('type', $nodeType)
+            ->where('type', '=', $nodeType)
             ->fetchAll();
 
         if (!empty($nodes)) {
@@ -215,7 +215,7 @@ class Node
                 ->delete();
 
             foreach ($nodes as $node) {
-                $this->query->orWhere('source', 'node/' . $node[ 'id' ]);
+                $this->query->orWhere('source', '=', 'node/' . $node[ 'id' ]);
             }
 
             $this->query->execute();
@@ -235,7 +235,7 @@ class Node
             $this->query
                 ->from('node_type_field')
                 ->delete()
-                ->where('node_type', $nodeType)
+                ->where('node_type', '=', $nodeType)
                 ->execute();
 
             if (in_array($nodeTypeField[ 'field_name' ], $this->fieldsCore)) {
@@ -244,8 +244,8 @@ class Node
 
             $isUseOtherTable = $this->query
                 ->from('node_type_field')
-                ->where('field_id', $nodeTypeField[ 'field_id' ])
-                ->where('node_type', '!==', $nodeType)
+                ->where('field_id', '=', $nodeTypeField[ 'field_id' ])
+                ->where('node_type', '=', '!==', $nodeType)
                 ->fetch();
 
             /* Si le champ n'est pas utiliser dans une autre entityé, il est supprimé. */
@@ -253,7 +253,7 @@ class Node
                 $this->query
                     ->from('field')
                     ->delete()
-                    ->where('field_id', $nodeTypeField[ 'field_id' ])
+                    ->where('field_id', '=', $nodeTypeField[ 'field_id' ])
                     ->execute();
             }
         }
@@ -262,14 +262,14 @@ class Node
         $this->query
             ->from('node')
             ->delete()
-            ->where('type', $nodeType)
+            ->where('type', '=', $nodeType)
             ->execute();
 
         /* Supprime le type de contenu. */
         $this->query
             ->from('node_type')
             ->delete()
-            ->where('node_type', $nodeType)
+            ->where('node_type', '=', $nodeType)
             ->execute();
 
         /* Supprime la table de l'entité principal. */
@@ -282,14 +282,14 @@ class Node
         $entity = $this->getEntity($node[ 'type' ], $node[ 'entity_id' ]);
 
         $relationNode = $this->getNodeTypeFieldsQuery($node[ 'type' ])
-            ->where('field_type', 'one_to_many')
+            ->where('field_type', '=', 'one_to_many')
             ->fetchAll();
         foreach ($relationNode as $relation) {
             $options = json_decode($relation[ 'field_option' ], true);
             $this->query
                 ->from($options[ 'relation_table' ])
                 ->delete()
-                ->where($options[ 'foreign_key' ], $entity[ $options[ 'local_key' ] ])
+                ->where($options[ 'foreign_key' ], '=', $entity[ $options[ 'local_key' ] ])
                 ->execute();
         }
 
@@ -328,7 +328,7 @@ class Node
         }
         $data = $this->query
             ->from('entity_' . $entity)
-            ->where($foreignKey, $idNode)
+            ->where($foreignKey, '=', $idNode)
             ->limit($count + 1)
             ->fetchAll();
 
@@ -401,8 +401,8 @@ class Node
     {
         return $this->query
                 ->from('node_type_field')
-                ->leftJoin('field', 'field_id', 'field.field_id')
-                ->where('node_type', $nodeType);
+                ->leftJoin('field', 'field_id', '=', 'field.field_id')
+                ->where('node_type', '=', $nodeType);
     }
 
     private function makeFields($type, array $fields, array $data)

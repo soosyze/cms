@@ -14,7 +14,7 @@ return [
                 'link'       => 'admin/theme',
                 'title_link' => 'Themes'
             ])
-            ->where('link', 'admin/section/theme')
+            ->where('link', '=', 'admin/section/theme')
             ->execute();
 
         $req->insertInto('role_permission', [ 'role_id', 'permission_id' ])

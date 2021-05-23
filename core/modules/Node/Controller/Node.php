@@ -147,8 +147,8 @@ class Node extends \Soosyze\Controller
 
             /* Rassemble les champs personnalisés dans la node. */
             $node = [
-                'date_changed'     => time(),
-                'date_created'     => strtotime($validator->getInput('date_created')),
+                'date_changed'     => (string) time(),
+                'date_created'     => (string) strtotime($validator->getInput('date_created')),
                 'entity_id'        => self::schema()->getIncrement('entity_' . $type),
                 'meta_description' => $validator->getInput('meta_description'),
                 'meta_noarchive'   => (bool) $validator->getInput('meta_noarchive'),
@@ -156,7 +156,7 @@ class Node extends \Soosyze\Controller
                 'meta_noindex'     => (bool) $validator->getInput('meta_noindex'),
                 'meta_title'       => $validator->getInput('meta_title'),
                 'sticky'           => (bool) $validator->getInput('sticky'),
-                'node_status_id'   => $validator->getInput('node_status_id'),
+                'node_status_id'   => (int) $validator->getInput('node_status_id'),
                 'title'            => $validator->getInput('title'),
                 'type'             => $type,
                 'user_id'          => $validator->getInput('user_id') === ''
@@ -360,7 +360,7 @@ class Node extends \Soosyze\Controller
             ]);
 
             $value = [
-                'date_changed'     => time(),
+                'date_changed'     => (string) time(),
                 'date_created'     => strtotime($validator->getInput('date_created')),
                 'meta_description' => $validator->getInput('meta_description'),
                 'meta_noarchive'   => (bool) $validator->getInput('meta_noarchive'),
@@ -572,8 +572,8 @@ class Node extends \Soosyze\Controller
         unset($node[ 'id' ], $node[ 'node_status_id' ]);
         $node[ 'entity_id' ]    = $entityId;
         $node[ 'title' ]        .= ' clone';
-        $node[ 'date_created' ] = time();
-        $node[ 'date_changed' ] = time();
+        $node[ 'date_created' ] = (string) time();
+        $node[ 'date_changed' ] = (string) time();
 
         self::query()
             ->insertInto('node', array_keys($node))
@@ -621,8 +621,8 @@ class Node extends \Soosyze\Controller
 
                 $fieldsFile = self::query()
                     ->from('node_type_field')
-                    ->leftJoin('field', 'field_id', 'field.field_id')
-                    ->where('node_type', $fieldName)
+                    ->leftJoin('field', 'field_id', '=', 'field.field_id')
+                    ->where('node_type', '=', $fieldName)
                     ->in('field_type', [ 'file', 'image' ])
                     ->fetchAll();
 

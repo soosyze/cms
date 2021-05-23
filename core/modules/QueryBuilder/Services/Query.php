@@ -6,7 +6,7 @@ class Query extends \Queryflatfile\Request
 {
     private $listRequest = [];
 
-    public function fetchAll()
+    public function fetchAll(): array
     {
         $request   = (string) $this;
         $timeStart = microtime(true);

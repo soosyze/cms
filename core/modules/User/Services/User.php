@@ -65,7 +65,7 @@ class User
         return $this->query
                 ->from('user')
                 ->where('user_id', '==', $id)
-                ->where('actived', $actived)
+                ->where('actived', '=', $actived)
                 ->fetch();
     }
 
@@ -73,7 +73,7 @@ class User
     {
         return $this->query
                 ->from('user')
-                ->where('email', $email)
+                ->where('email', '=', $email)
                 ->fetch();
     }
 
@@ -81,7 +81,7 @@ class User
     {
         return $this->query
                 ->from('user')
-                ->where('username', $username)
+                ->where('username', '=', $username)
                 ->fetch();
     }
 
@@ -89,8 +89,8 @@ class User
     {
         return $this->query
                 ->from('user')
-                ->where('email', $email)
-                ->where('actived', $actived)
+                ->where('email', '=', $email)
+                ->where('actived', '=', $actived)
                 ->fetch();
     }
 
@@ -98,8 +98,8 @@ class User
     {
         return $this->query
                 ->from('user')
-                ->where('token_connected', $token)
-                ->where('actived', $actived)
+                ->where('token_connected', '=', $token)
+                ->where('actived', '=', $actived)
                 ->fetch();
     }
 
@@ -112,7 +112,7 @@ class User
     {
         return $this->query
                 ->from('user_role')
-                ->leftJoin('role', 'role_id', 'role.role_id')
+                ->leftJoin('role', 'role_id', '=', 'role.role_id')
                 ->where('user_id', '==', $idUser)
                 ->fetchAll();
     }
@@ -243,13 +243,13 @@ class User
 
         $this->granted = $this->query
             ->from('user_role')
-            ->leftJoin('role', 'role_id', 'role.role_id')
-            ->leftJoin('role_permission', 'role_id', 'role_permission.role_id')
-            ->where('user_id', $user[ 'user_id' ])
+            ->leftJoin('role', 'role_id', '=', 'role.role_id')
+            ->leftJoin('role_permission', 'role_id', '=', 'role_permission.role_id')
+            ->where('user_id', '=', $user[ 'user_id' ])
             ->lists('permission_id');
         $this->granted = array_merge($this->granted, $this->query
             ->from('role_permission')
-            ->where('role_id', 2)
+            ->where('role_id', '=', 2)
             ->lists('permission_id'));
 
         return in_array($idPermission, $this->granted);
@@ -262,7 +262,7 @@ class User
         }
 
         $this->granted = $this->query->from('role_permission')
-            ->where('role_id', 1)
+            ->where('role_id', '=', 1)
             ->lists('permission_id');
 
         return in_array($idPermission, $this->granted);

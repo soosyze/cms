@@ -13,7 +13,7 @@ return [
             $req->update('profil_file', [
                     'folder_show' => str_replace('%uid', ':user_id', $profil[ 'folder_show' ])
                 ])
-                ->where('profil_file_id', $profil[ 'profil_file_id' ])
+                ->where('profil_file_id', '=', $profil[ 'profil_file_id' ])
                 ->execute();
         }
     }

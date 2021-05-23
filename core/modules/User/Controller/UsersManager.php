@@ -72,7 +72,7 @@ class UsersManager extends \Soosyze\Controller
         $params = [];
         if (in_array($validator->getInput('actived'), [ '0', 0, '1', 1 ], true)) {
             $params[ 'actived' ] = $validator->getInput('actived');
-            self::query()->where('actived', (bool) $validator->getInput('actived'));
+            self::query()->where('actived', '=', (bool) $validator->getInput('actived'));
         }
         self::query()->where(function ($query) use ($validator, &$params) {
             if ($validator->getInput('firstname', '')) {

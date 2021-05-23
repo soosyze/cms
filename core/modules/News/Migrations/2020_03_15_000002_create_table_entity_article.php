@@ -14,10 +14,10 @@ return [
                     ->integer('reading_time')->comment('In minute');
         });
 
-        $idImage   = $req->from('field')->where('field_name', 'image')->fetch()[ 'field_id' ];
-        $idSummary = $req->from('field')->where('field_name', 'summary')->fetch()[ 'field_id' ];
-        $idBody    = $req->from('field')->where('field_name', 'body')->fetch()[ 'field_id' ];
-        $idReading = $req->from('field')->where('field_name', 'reading_time')->fetch()[ 'field_id' ];
+        $idImage   = $req->from('field')->where('field_name', '=', 'image')->fetch()[ 'field_id' ];
+        $idSummary = $req->from('field')->where('field_name', '=', 'summary')->fetch()[ 'field_id' ];
+        $idBody    = $req->from('field')->where('field_name', '=', 'body')->fetch()[ 'field_id' ];
+        $idReading = $req->from('field')->where('field_name', '=', 'reading_time')->fetch()[ 'field_id' ];
 
         $req->insertInto('node_type_field', [
                 'node_type', 'field_id', 'field_weight', 'field_label', 'field_rules',
@@ -70,7 +70,7 @@ return [
                 ->execute();
 
             $req->update('node', [ 'entity_id' => $i ])
-                ->where('id', $node[ 'id' ])
+                ->where('id', '=', $node[ 'id' ])
                 ->execute();
         }
     }

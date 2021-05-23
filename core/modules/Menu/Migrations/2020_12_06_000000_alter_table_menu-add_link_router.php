@@ -14,7 +14,7 @@ return [
 
         foreach ($links as $link) {
             $alias = $req->from('system_alias_url')
-                ->where('alias', $link[ 'link' ])
+                ->where('alias', '=', $link[ 'link' ])
                 ->fetch();
 
             $linkRouter = empty($alias)
@@ -24,7 +24,7 @@ return [
             $req->update('menu_link', [
                     'link_router' => $linkRouter
                 ])
-                ->where('link', $link[ 'link' ])
+                ->where('link', '=', $link[ 'link' ])
                 ->execute();
         }
     }

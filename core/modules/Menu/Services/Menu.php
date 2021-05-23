@@ -68,11 +68,11 @@ class Menu
             $this->query
                 ->from('menu_link')
                 ->delete()
-                ->where('id', $link['id'])
+                ->where('id', '=', $link['id'])
                 ->execute();
             $this->query
                 ->update('menu_link', [ 'parent' => $link[ 'parent' ] ])
-                ->where('parent', $link['id'])
+                ->where('parent', '=', $link['id'])
                 ->execute();
         }
     }
@@ -81,7 +81,7 @@ class Menu
     {
         return $this->query
                 ->from('menu')
-                ->where('name', $name);
+                ->where('name', '=', $name);
     }
 
     public function getAllMenu()
@@ -151,7 +151,7 @@ class Menu
         $query = $this->query
             ->from('menu_link')
             ->where('active', '==', 1)
-            ->where('menu', $nameMenu)
+            ->where('menu', '=', $nameMenu)
             ->where('parent', '==', $parent)
             ->orderBy('weight')
             ->fetchAll();
@@ -193,7 +193,7 @@ class Menu
         $query = $this->query
             ->from('menu_link')
             ->where('active', '==', 1)
-            ->where('menu', $nameMenu)
+            ->where('menu', '=', $nameMenu)
             ->where('parent', '==', $parent)
             ->orderBy('weight')
             ->fetchAll();

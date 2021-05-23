@@ -24,7 +24,7 @@
         "php": ">=5.5",
         "composer/semver": "~3.2",
         "soosyze/framework": "~3.0",
-        "soosyze/queryflatfile": "~1.4",
+        "soosyze/queryflatfile": "~2",
         "paragonie/random_compat": "<9.99",
         "phpmailer/phpmailer": "~6.1",
         "soosyze/kses": "^1.0"

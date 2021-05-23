@@ -28,7 +28,7 @@ return [
                 $req->update('node_type', [
                         'node_type_color' => $colors[ $type[ 'node_type' ] ]
                     ])
-                    ->where('node_type', $type[ 'node_type' ])
+                    ->where('node_type', '=', $type[ 'node_type' ])
                     ->execute();
             }
         }

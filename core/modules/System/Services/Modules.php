@@ -33,7 +33,7 @@ class Modules
     {
         return $this->query
                 ->from('module_active')
-                ->where('title', $title)
+                ->where('title', '=', $title)
                 ->fetch();
     }
 
@@ -48,8 +48,8 @@ class Modules
     {
         return $this->query
                 ->from('module_require')
-                ->where('title_module', $title)
-                ->where('title_required', 'Core')
+                ->where('title_module', '=', $title)
+                ->where('title_required', '=', 'Core')
                 ->lists('title_required');
     }
 
@@ -64,8 +64,8 @@ class Modules
     {
         $output = $this->query
             ->from('module_active')
-            ->leftJoin('module_require', 'title', 'module_require.title_required')
-            ->where('title', $title)
+            ->leftJoin('module_require', 'title', '=', 'module_require.title_required')
+            ->where('title', '=', $title)
             ->isNotNull('title_module')
             ->lists('title_module');
 
@@ -83,7 +83,7 @@ class Modules
     {
         return $this->query
                 ->from('module_active')
-                ->leftJoin('module_require', 'title', 'module_require.title_required')
+                ->leftJoin('module_require', 'title', '=', 'module_require.title_required')
                 ->isNull('title_module')
                 ->lists('title');
     }
@@ -98,19 +98,19 @@ class Modules
         $this->query
             ->from('module_active')
             ->delete()
-            ->where('title', $title)
+            ->where('title', '=', $title)
             ->execute();
 
         $this->query
             ->from('module_require')
             ->delete()
-            ->where('title_module', $title)
+            ->where('title_module', '=', $title)
             ->execute();
 
         $this->query
             ->from('module_controller')
             ->delete()
-            ->where('title', $title)
+            ->where('title', '=', $title)
             ->execute();
     }
 

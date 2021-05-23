@@ -105,7 +105,7 @@ class RoleManager extends \Soosyze\Controller
 
                 self::query()
                     ->update('role', $data)
-                    ->where('role_id', $role[ 'role_id' ])
+                    ->where('role_id', '=', $role[ 'role_id' ])
                     ->execute();
 
                 $this->container->callHook('user.role.admin.check.after', [ &$validator ]);

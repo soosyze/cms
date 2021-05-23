@@ -22,7 +22,7 @@ class Permission extends \Soosyze\Controller
         $permissionsByRole = self::query()
             ->select('permission_id', 'role_id')
             ->from('role')
-            ->leftJoin('role_permission', 'role_id', 'role_permission.role_id')
+            ->leftJoin('role_permission', 'role_id', '=', 'role_permission.role_id')
             ->fetchAll();
 
         $fetchRoles = self::query()->from('role')->orderBy('role_weight')->fetchAll();

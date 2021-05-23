@@ -89,7 +89,7 @@ class Menu extends \Soosyze\Controller
 
                 self::query()
                     ->update('menu_link', $linkUpdate)
-                    ->where('id', $link[ 'id' ])
+                    ->where('id', '=', $link[ 'id' ])
                     ->execute();
 
                 if ($linkUpdate[ 'parent' ] >= 1 && !in_array($linkUpdate[ 'parent' ], $updateParents)) {
@@ -100,7 +100,7 @@ class Menu extends \Soosyze\Controller
             foreach ($updateParents as $parent) {
                 self::query()
                     ->update('menu_link', [ 'has_children' => true ])
-                    ->where('id', $parent)
+                    ->where('id', '=', $parent)
                     ->execute();
             }
 
@@ -362,7 +362,7 @@ class Menu extends \Soosyze\Controller
     {
         $query = self::query()
             ->from('menu_link')
-            ->where('menu', $nameMenu)
+            ->where('menu', '=', $nameMenu)
             ->where('parent', '==', $parent)
             ->orderBy('weight')
             ->fetchAll();

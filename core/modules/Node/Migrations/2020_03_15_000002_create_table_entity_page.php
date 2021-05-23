@@ -11,7 +11,7 @@ return [
                     ->text('body');
         });
 
-        $nodes = $req->from('node')->where('type', 'page')->fetchAll();
+        $nodes = $req->from('node')->where('type', '=', 'page')->fetchAll();
         foreach ($nodes as $i => $node) {
             $field = unserialize($node[ 'field' ]);
 
@@ -25,7 +25,7 @@ return [
             $req->update('node', [
                     'entity_id' => $i
                 ])
-                ->where('id', $node[ 'id' ])
+                ->where('id', '=', $node[ 'id' ])
                 ->execute();
         }
     }

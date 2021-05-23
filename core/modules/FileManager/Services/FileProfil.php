@@ -22,7 +22,7 @@ class FileProfil
     public function find($profilId)
     {
         return $this->query->from('profil_file')
-                ->where('profil_file_id', (int) $profilId)
+                ->where('profil_file_id', '=', (int) $profilId)
                 ->fetch();
     }
 
@@ -30,15 +30,15 @@ class FileProfil
     {
         $profils = $userId === null
             ? $this->query->from('role')
-                ->leftJoin('profil_file_role', 'role_id', 'role.role_id')
-                ->rightJoin('profil_file', 'profil_file_id', 'profil_file.profil_file_id')
+                ->leftJoin('profil_file_role', 'role_id', '=', 'role.role_id')
+                ->rightJoin('profil_file', 'profil_file_id', '=', 'profil_file.profil_file_id')
                 ->where('role_id', '==', 1)
                 ->orderBy('profil_weight', SORT_DESC)
                 ->fetchAll()
             : $this->query->from('user_role')
-                ->leftJoin('role', 'role_id', 'role.role_id')
-                ->leftJoin('profil_file_role', 'role_id', 'role.role_id')
-                ->rightJoin('profil_file', 'profil_file_id', 'profil_file.profil_file_id')
+                ->leftJoin('role', 'role_id', '=', 'role.role_id')
+                ->leftJoin('profil_file_role', 'role_id', '=', 'role.role_id')
+                ->rightJoin('profil_file', 'profil_file_id', '=', 'profil_file.profil_file_id')
                 ->where('user_id', '==', $userId)
                 ->orderBy('profil_weight', SORT_DESC)
                 ->fetchAll();
@@ -57,7 +57,7 @@ class FileProfil
     public function getRolesUserByProfil($profilId)
     {
         return $this->query->from('profil_file_role')
-                ->leftJoin('role', 'role_id', 'role.role_id')
+                ->leftJoin('role', 'role_id', '=', 'role.role_id')
                 ->where('profil_file_id', '==', $profilId)
                 ->fetchAll();
     }

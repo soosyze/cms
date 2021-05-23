@@ -200,7 +200,7 @@ class Menu
                     'menu'       => $validator->getInput('menu_title'),
                     'title_link' => $validator->getInput('title_link')
                 ])
-                ->where('id', $nodeMenuLink[ 'menu_link_id' ])
+                ->where('id', '=', $nodeMenuLink[ 'menu_link_id' ])
                 ->execute();
         } elseif ($validator->hasInput('active') && !$nodeMenuLink) {
             $this->query->insertInto('menu_link', [
@@ -222,7 +222,7 @@ class Menu
             $linkId = $this->schema->getIncrement('menu_link');
 
             $this->query->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
-                ->values([ $id, $linkId ])
+                ->values([ (int) $id, (int) $linkId ])
                 ->execute();
         } elseif (!$validator->hasInput('active') && $nodeMenuLink) {
             $this->query->from('node_menu_link')

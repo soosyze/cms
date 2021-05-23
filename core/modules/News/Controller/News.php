@@ -36,8 +36,8 @@ class News extends \Soosyze\Controller
 
         $query = self::query()
             ->from('node')
-            ->where('node_status_id', 1)
-            ->where('type', 'article')
+            ->where('node_status_id', '=', 1)
+            ->where('type', '=', 'article')
             ->orderBy('sticky', SORT_DESC)
             ->orderBy('date_created', SORT_DESC)
             ->limit(self::$limit, self::$limit * ($page - 1))
@@ -62,8 +62,8 @@ class News extends \Soosyze\Controller
 
         $queryAll = self::query()
             ->from('node')
-            ->where('node_status_id', 1)
-            ->where('type', 'article')
+            ->where('node_status_id', '=', 1)
+            ->where('type', '=', 'article')
             ->fetchAll();
 
         $link = self::router()->getRoute('news.page', [], false);
@@ -127,8 +127,8 @@ class News extends \Soosyze\Controller
 
         $items = self::query()
             ->from('node')
-            ->where('node_status_id', 1)
-            ->where('type', 'article')
+            ->where('node_status_id', '=', 1)
+            ->where('type', '=', 'article')
             ->orderBy('date_created', SORT_DESC)
             ->limit(self::$limit)
             ->fetchAll();
@@ -215,9 +215,9 @@ class News extends \Soosyze\Controller
     {
         return self::query()
                 ->from('node')
-                ->where('type', 'article')
+                ->where('type', '=', 'article')
                 ->between('date_created', $dateCurrent, $dateNext)
-                ->where('node_status_id', 1)
+                ->where('node_status_id', '=', 1)
                 ->orderBy('sticky', SORT_DESC)
                 ->orderBy('date_created', SORT_DESC)
                 ->limit(self::$limit, $offset)
@@ -228,9 +228,9 @@ class News extends \Soosyze\Controller
     {
         return self::query()
                 ->from('node')
-                ->where('type', 'article')
+                ->where('type', '=', 'article')
                 ->between('date_created', $dateCurrent, $dateNext)
-                ->where('node_status_id', 1)
+                ->where('node_status_id', '=',  1)
                 ->fetchAll();
     }
 }

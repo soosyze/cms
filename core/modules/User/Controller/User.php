@@ -348,7 +348,7 @@ class User extends \Soosyze\Controller
             ]);
             self::query()->update('user', $value)->where('user_id', '==', $id)->execute();
 
-            $this->updateRole($validator, $id);
+            $this->updateRole($validator, (int) $id);
 
             $this->savePicture($id, $validator);
             $this->container->callHook('user.update.after', [ &$validator, $id ]);

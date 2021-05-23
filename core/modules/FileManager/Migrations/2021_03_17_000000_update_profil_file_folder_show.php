@@ -8,7 +8,7 @@ return [
         $req->update('profil_file', [
                 'folder_show' => '/download'
             ])
-            ->where('folder_show', '/dowload')
+            ->where('folder_show', '=', '/dowload')
             ->execute();
     }
 ];

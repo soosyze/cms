@@ -9,7 +9,7 @@ return [
             return;
         }
 
-        $blockMenus = $req->from('block')->where('hook', 'menu')->fetchAll();
+        $blockMenus = $req->from('block')->where('hook', '=', 'menu')->fetchAll();
 
         foreach ($blockMenus as $value) {
             $options             = json_decode($value[ 'options' ], true);
@@ -18,7 +18,7 @@ return [
             $req->update('block', [
                     'options' => json_encode($options)
                 ])
-                ->where('block_id', $value[ 'block_id' ])
+                ->where('block_id', '=', $value[ 'block_id' ])
                 ->execute();
         }
     }

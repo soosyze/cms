@@ -155,7 +155,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
     {
         $nodeType = $this->query
             ->from('node_type')
-            ->where('node_type', $type)
+            ->where('node_type', '=', $type)
             ->fetch();
 
         return isset($nodeType[ 'node_type' ])
@@ -171,9 +171,9 @@ class Block implements \SoosyzeCore\Block\BlockInterface
                     ->where('date_created', '>=', $node[ 'date_created' ])
                     ->where('id', '>', $node[ 'id' ]);
             })
-            ->where('type', $node[ 'type' ])
+            ->where('type', '=', $node[ 'type' ])
             ->where('id', '!=', $node[ 'id' ])
-            ->where('node_status_id', 1)
+            ->where('node_status_id', '=', 1)
             ->orderBy('date_created')
             ->fetch();
 
@@ -194,9 +194,9 @@ class Block implements \SoosyzeCore\Block\BlockInterface
                     ->where('date_created', '<=', $node[ 'date_created' ])
                     ->where('id', '<', $node[ 'id' ]);
             })
-            ->where('type', $node[ 'type' ])
+            ->where('type', '=', $node[ 'type' ])
             ->where('id', '!=', $node[ 'id' ])
-            ->where('node_status_id', 1)
+            ->where('node_status_id', '=', 1)
             ->orderBy('date_created', SORT_DESC)
             ->fetch();
 

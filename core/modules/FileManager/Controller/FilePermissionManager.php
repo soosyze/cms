@@ -102,7 +102,7 @@ class FilePermissionManager extends \Soosyze\Controller
 
                 self::query()
                     ->update('profil_file', $data)
-                    ->where('profil_file_id', $profil[ 'profil_file_id' ])
+                    ->where('profil_file_id', '=', $profil[ 'profil_file_id' ])
                     ->execute();
 
                 $this->container->callHook('filemanager.permission.admin.check.after', [

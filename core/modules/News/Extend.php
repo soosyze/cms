@@ -53,10 +53,10 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ])
             ->execute();
 
-        $idImage   = $ci->query()->from('field')->where('field_name', 'image')->fetch()[ 'field_id' ];
-        $idSummary = $ci->query()->from('field')->where('field_name', 'summary')->fetch()[ 'field_id' ];
-        $idBody    = $ci->query()->from('field')->where('field_name', 'body')->fetch()[ 'field_id' ];
-        $idReading = $ci->query()->from('field')->where('field_name', 'reading_time')->fetch()[ 'field_id' ];
+        $idImage   = $ci->query()->from('field')->where('field_name', '=', 'image')->fetch()[ 'field_id' ];
+        $idSummary = $ci->query()->from('field')->where('field_name', '=', 'summary')->fetch()[ 'field_id' ];
+        $idBody    = $ci->query()->from('field')->where('field_name', '=', 'body')->fetch()[ 'field_id' ];
+        $idReading = $ci->query()->from('field')->where('field_name', '=', 'reading_time')->fetch()[ 'field_id' ];
 
         $ci->query()
             ->insertInto('node_type_field', [
@@ -131,8 +131,8 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
 
         /* Création des Alias. */
-        $idFirstNews  = $ci->query()->from('node')->where('entity_id', 1)->where('type', 'article')->fetch()[ 'id' ];
-        $idSecondNews = $ci->query()->from('node')->where('entity_id', 2)->where('type', 'article')->fetch()[ 'id' ];
+        $idFirstNews  = $ci->query()->from('node')->where('entity_id', '=', 1)->where('type', '=', 'article')->fetch()[ 'id' ];
+        $idSecondNews = $ci->query()->from('node')->where('entity_id', '=', 2)->where('type', '=', 'article')->fetch()[ 'id' ];
 
         $Y = date('Y', $time);
         $m = date('m', $time);

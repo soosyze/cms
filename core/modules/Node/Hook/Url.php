@@ -95,12 +95,12 @@ class Url
             $this->query
                 ->delete()
                 ->from('system_alias_url')
-                ->where('alias', 'node/' . $idNode)
+                ->where('alias', '=', 'node/' . $idNode)
                 ->execute();
         } elseif ($link = $this->alias->getAlias('node/' . $idNode)) {
             $this->query
                 ->update('system_alias_url', [ 'alias' => $alias ])
-                ->where('source', 'node/' . $idNode)
+                ->where('source', '=', 'node/' . $idNode)
                 ->execute();
         } else {
             $this->query
@@ -113,7 +113,7 @@ class Url
     public function hookDeleteValid($validator, $idNode)
     {
         $this->query->from('system_alias_url')
-            ->where('source', 'node/' . $idNode)
+            ->where('source', '=', 'node/' . $idNode)
             ->delete()
             ->execute();
     }

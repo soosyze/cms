@@ -17,7 +17,7 @@ return [
                 $req->update('menu_link', [
                         'has_children' => true
                     ])
-                    ->where('id', $link[ 'parent' ])
+                    ->where('id', '=', $link[ 'parent' ])
                     ->execute();
             }
         }
