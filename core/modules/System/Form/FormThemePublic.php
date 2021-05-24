@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Form;
+
+use SoosyzeCore\FileSystem\Services\File;
 
 class FormThemePublic extends \Soosyze\Components\Form\FormBuilder
 {
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**
-     * @var
+     * @var File
      */
     private $file;
 
@@ -16,20 +20,20 @@ class FormThemePublic extends \Soosyze\Components\Form\FormBuilder
         'logo'    => ''
     ];
 
-    public function __construct(array $attr, $file)
+    public function __construct(array $attr, File $file)
     {
         parent::__construct($attr);
         $this->file = $file;
     }
 
-    public function setValues(array $values)
+    public function setValues(array $values): self
     {
         $this->values = array_replace($this->values, $values);
 
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         return $this->group('theme-fieldset', 'fieldset', function ($form) {
             $form->legend('theme-legend', t('Settings'))

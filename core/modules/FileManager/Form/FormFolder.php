@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Form;
 
 class FormFolder extends \Soosyze\Components\Form\FormBuilder
 {
     private $values = [ 'name' => '' ];
 
-    public function setValues(array $values)
+    public function setValues(array $values): self
     {
         $this->values = array_merge($this->values, $values);
 
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         $this
             ->group('folder-fieldset', 'fieldset', function ($form) {

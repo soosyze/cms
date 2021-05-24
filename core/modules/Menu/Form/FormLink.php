@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Menu\Form;
+
+use Soosyze\Components\Router\Router;
 
 class FormLink extends \Soosyze\Components\Form\FormBuilder
 {
@@ -9,7 +13,7 @@ class FormLink extends \Soosyze\Components\Form\FormBuilder
     private $isRewrite = false;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
@@ -22,20 +26,20 @@ class FormLink extends \Soosyze\Components\Form\FormBuilder
         'target_link' => false
     ];
 
-    public function __construct(array $attr, $router)
+    public function __construct(array $attr, Router $router)
     {
         parent::__construct($attr);
         $this->router = $router;
     }
 
-    public function setValues(array $values)
+    public function setValues(array $values): self
     {
         $this->values = array_merge($this->values, $values);
 
         return $this;
     }
 
-    public function setRewrite($isRewrite)
+    public function setRewrite(bool $isRewrite): self
     {
         $this->isRewrite = $isRewrite
             ? '?'
@@ -44,7 +48,7 @@ class FormLink extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         $this->group('link-fieldset', 'fieldset', function ($form) {
             $form->legend('link-legend', t('Add a link in the menu'))
@@ -111,7 +115,7 @@ class FormLink extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    private function getLinkValue()
+    private function getLinkValue(): string
     {
         $query = empty($this->values[ 'query' ])
             ? ''

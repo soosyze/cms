@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Form;
 
 class FormThemeAdmin extends \Soosyze\Components\Form\FormBuilder
@@ -10,14 +12,14 @@ class FormThemeAdmin extends \Soosyze\Components\Form\FormBuilder
         'theme_admin_dark' => ''
     ];
 
-    public function setValues(array $values)
+    public function setValues(array $values): self
     {
         $this->values = array_replace($this->values, $values);
 
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         return $this->group('fieldset-theme', 'fieldset', function ($form) {
             $form->legend('legend-theme', t('Settings'))

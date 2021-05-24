@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Menu\Form;
 
 class FormMenu extends \Soosyze\Components\Form\FormBuilder
@@ -11,14 +13,14 @@ class FormMenu extends \Soosyze\Components\Form\FormBuilder
         'description' => ''
     ];
 
-    public function setValues(array $values)
+    public function setValues(array $values): self
     {
         $this->values = array_merge($this->values, $values);
 
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         $this->group('menu-fieldset', 'fieldset', function ($form) {
             $form->legend('menu-legend', t('Fill in the following fields'))

@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Form;
+
+use Soosyze\Components\Router\Router;
 
 class FormNodeDelete extends \Soosyze\Components\Form\FormBuilder
 {
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
@@ -19,13 +23,13 @@ class FormNodeDelete extends \Soosyze\Components\Form\FormBuilder
 
     private $useInPath;
 
-    public function __construct(array $attr, $router)
+    public function __construct(array $attr, Router $router)
     {
         parent::__construct($attr);
         $this->router = $router;
     }
 
-    public function setValues(array $values, $useInPath)
+    public function setValues(array $values, bool $useInPath): self
     {
         $this->values    = array_merge($this->values, $values);
         $this->useInPath = $useInPath;
@@ -33,7 +37,7 @@ class FormNodeDelete extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         return $this->group('node-fieldset', 'fieldset', function ($form) {
             $form->legend('node-legend', t('Node deletion'))

@@ -1,6 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Form;
+
+use Soosyze\Components\Form\FormGroupBuilder;
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
+use SoosyzeCore\FileSystem\Services\File;
 
 class FormUser extends \Soosyze\Components\Form\FormBuilder
 {
@@ -19,23 +26,31 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         'roles'            => []
     ];
 
+    /**
+     * @var File
+     */
     private $file;
 
-    public function __construct(array $attr, $file = null, $config = null)
+    /**
+     * @var Config
+     */
+    private $config;
+
+    public function __construct(array $attr, ?File $file = null, ?Config $config = null)
     {
         parent::__construct($attr);
         $this->file   = $file;
         $this->config = $config;
     }
 
-    public function setValues(array $values)
+    public function setValues(array $values): self
     {
         $this->values = array_merge($this->values, $values);
 
         return $this;
     }
 
-    public function usernameGroup(&$form)
+    public function usernameGroup(FormGroupBuilder &$form): self
     {
         $form->group('username-group', 'div', function ($form) {
             $form->label('username-label', t('User name'))
@@ -50,7 +65,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function emailGroup(&$form)
+    public function emailGroup(FormGroupBuilder &$form): self
     {
         $form->group('email-group', 'div', function ($form) {
             $form->label('email-label', t('E-mail'))
@@ -66,7 +81,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function pictureGroup(&$form)
+    public function pictureGroup(FormGroupBuilder &$form): self
     {
         $form->group('picture-group', 'div', function ($form) {
             $form->label('picture-label', t('Picture'), [
@@ -79,7 +94,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function bioGroup(&$form)
+    public function bioGroup(FormGroupBuilder &$form): self
     {
         $form->group('bio-group', 'div', function ($form) {
             $form->label('bio-label', t('Biography'), [
@@ -96,7 +111,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function nameGroup(&$form)
+    public function nameGroup(FormGroupBuilder &$form): self
     {
         $form->group('name-group', 'div', function ($form) {
             $form->label('name-label', t('Last name'))
@@ -110,7 +125,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function firstnameGroup(&$form)
+    public function firstnameGroup(FormGroupBuilder &$form): self
     {
         $form->group('firstname-group', 'div', function ($form) {
             $form->label('firstname-label', t('First name'))
@@ -124,7 +139,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function eulaGroup(&$form, $router)
+    public function eulaGroup(FormGroupBuilder &$form, Router $router): self
     {
         if (!$this->config) {
             return $this;
@@ -159,14 +174,14 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function passwordCurrentGroup(&$form)
+    public function passwordCurrentGroup(FormGroupBuilder &$form): self
     {
         $this->password($form, 'password', t('Password'));
 
         return $this;
     }
 
-    public function passwordNewGroup(&$form)
+    public function passwordNewGroup(FormGroupBuilder &$form): self
     {
         $this->password(
             $form,
@@ -180,14 +195,14 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function passwordConfirmGroup(&$form)
+    public function passwordConfirmGroup(FormGroupBuilder &$form): self
     {
         $this->password($form, 'password_confirm', t('Confirmation of the new password'));
 
         return $this;
     }
 
-    public function password(&$form, $id, $label, array $attr = [])
+    public function password(&$form, $id, $label, array $attr = []): void
     {
         $form->group("$id-group", 'div', function ($form) use ($id, $label, $attr) {
             $form->label("$id-label", $label, [ 'for' => $id ])
@@ -207,7 +222,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         }, self::$attrGrp);
     }
 
-    public function informationsCreateFieldset()
+    public function informationsCreateFieldset(): self
     {
         return $this->group('informations-fieldset', 'fieldset', function ($form) {
             $form->legend('informations-legend', t('Information'));
@@ -216,7 +231,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         });
     }
 
-    public function informationsFieldset()
+    public function informationsFieldset(): self
     {
         return $this->group('informations-fieldset', 'fieldset', function ($form) {
             $form->legend('informations-legend', t('Information'));
@@ -226,7 +241,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         });
     }
 
-    public function profilFieldset()
+    public function profilFieldset(): self
     {
         return $this->group('profil-fieldset', 'fieldset', function ($form) {
             $form->legend('profil-legend', t('Profile'));
@@ -237,7 +252,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         });
     }
 
-    public function passwordFieldset()
+    public function passwordFieldset(): self
     {
         return $this->group('password-fieldset', 'fieldset', function ($form) {
             $form->legend('password-legend', t('Password'));
@@ -247,36 +262,29 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         });
     }
 
-    public function passwordPolicy(&$form)
+    public function passwordPolicy(FormGroupBuilder &$form): self
     {
-        if ($this->config && $this->config->get('settings.password_policy', true)) {
-            if (($length = (int) $this->config->get('settings.password_length', 8)) < 8) {
-                $length = 8;
-            }
-            if (($upper = (int) $this->config->get('settings.password_upper', 1)) < 1) {
-                $upper = 1;
-            }
-            if (($digit = (int) $this->config->get('settings.password_digit', 1)) < 1) {
-                $digit = 1;
-            }
-            if (($special = (int) $this->config->get('settings.password_special', 1)) < 1) {
-                $special = 1;
-            }
-
-            $content = '<li data-pattern=".{' . $length . ',}">' . t('Minimum length') . ' : ' . $length . '</li>'
-                . '<li data-pattern="(?=.*[A-Z]){' . $upper . ',}">' . t('Number of uppercase characters') . ' : ' . $upper . '</li>'
-                . '<li data-pattern="(?=.*\d){' . $digit . ',}">' . t('Number of numeric characters') . ' : ' . $digit . '</li>'
-                . '<li data-pattern="(?=.*\W){' . $special . ',}">' . t('Number of special characters') . ' : ' . $special . '</li>';
-
-            $form->html('password_policy', '<ul:attr>:content</ul>', [
-                ':content' => $content,
-            ]);
+        if (!$this->config || !$this->config->get('settings.password_policy', true)) {
+            return $this;
         }
+
+        $content = '';
+        foreach ($this->getPasswordPolicies() as $key => $passwordPolicy) {
+            [ $lenghtDefault, $pattern, $label ] = $passwordPolicy;
+
+            if (($length = (int) $this->config->get("settings.$key", $lenghtDefault)) < $lenghtDefault) {
+                $length = $lenghtDefault;
+            }
+            $content .= sprintf('<li data-pattern="(%s){%d}">%s : %d</li>', $pattern, $length, t($label), $length);
+        }
+        $form->html('password_policy', '<ul:attr>:content</ul>', [
+            ':content' => $content,
+        ]);
 
         return $this;
     }
 
-    public function activedFieldset()
+    public function activedFieldset(): self
     {
         return $this->group('actived-fieldset', 'fieldset', function ($form) {
             $form->legend('actived-legend', t('Status'))
@@ -288,7 +296,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         });
     }
 
-    public function rolesFieldset(array $roles)
+    public function rolesFieldset(array $roles): self
     {
         return $roles
             ? $this->group('role-fieldset', 'fieldset', function ($form) use ($roles) {
@@ -322,7 +330,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
      *
      * @return $this
      */
-    public function submitForm($label = 'Save', $cancel = false)
+    public function submitForm(string $label = 'Save', bool $cancel = false): self
     {
         $this->token('token_user_form')
             ->submit('submit', t($label), [ 'class' => 'btn btn-success' ]);
@@ -336,5 +344,13 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         }
 
         return $this;
+    }
+
+    private function getPasswordPolicies(): \Generator
+    {
+        yield 'password_length' => [ 8, '.', 'Minimum length' ];
+        yield 'password_upper' => [ 1, '?=.*[A-Z]', 'Number of uppercase characters' ];
+        yield 'password_digit' => [ 1, '?=.*\d', 'Number of numeric characters' ];
+        yield 'password_special' => [ 1, '?=.*\W', 'Number of special characters' ];
     }
 }

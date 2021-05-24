@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Block\Form;
 
 class FormBlock extends \Soosyze\Components\Form\FormBuilder
 {
-    const HIDE_BLOCK_PAGES = 0;
+    public const HIDE_BLOCK_PAGES = 0;
 
-    const SHOW_BLOCK_PAGES = 1;
+    public const SHOW_BLOCK_PAGES = 1;
 
-    const HIDE_BLOCK_ROLES = 0;
+    public const HIDE_BLOCK_ROLES = 0;
 
-    const SHOW_BLOCK_ROLES = 1;
+    public const SHOW_BLOCK_ROLES = 1;
 
     private static $attrGrp = [ 'class' => 'form-group' ];
 
@@ -28,7 +30,7 @@ class FormBlock extends \Soosyze\Components\Form\FormBuilder
         'roles'            => ''
     ];
 
-    public function setValues(array $values, $id, $rolesUser)
+    public function setValues(array $values, int $id, array $rolesUser): self
     {
         $this->values    = array_merge($this->values, $values);
         $this->id        = $id;
@@ -37,7 +39,7 @@ class FormBlock extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         $this->group('block-fieldset', 'fieldset', function ($form) {
             $form->legend('block-legend', t('Edit block'))

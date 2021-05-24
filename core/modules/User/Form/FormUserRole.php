@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Form;
+
+use Soosyze\Components\Form\FormGroupBuilder;
 
 class FormUserRole extends \Soosyze\Components\Form\FormBuilder
 {
@@ -14,14 +18,14 @@ class FormUserRole extends \Soosyze\Components\Form\FormBuilder
         'role_icon'        => 'fa fa-user'
     ];
 
-    public function setValues(array $values)
+    public function setValues(array $values): self
     {
         $this->values = array_merge($this->values, $values);
 
         return $this;
     }
 
-    public function labelGroup(&$form)
+    public function labelGroup(FormGroupBuilder &$form): self
     {
         $form->group('role_label-group', 'div', function ($form) {
             $form->label('role_label-label', t('Name'))
@@ -36,7 +40,7 @@ class FormUserRole extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function descriptionGroup(&$form)
+    public function descriptionGroup(FormGroupBuilder &$form): self
     {
         $form->group('role_description-group', 'div', function ($form) {
             $form->label('role_description-label', t('Description'))
@@ -50,7 +54,7 @@ class FormUserRole extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function weightGroup(&$form)
+    public function weightGroup(FormGroupBuilder &$form): self
     {
         $form->group('role_weight-group', 'div', function ($form) {
             $form->label('role_weight-label', t('Weight'), [
@@ -72,7 +76,7 @@ class FormUserRole extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function colorGroup(&$form)
+    public function colorGroup(FormGroupBuilder &$form): self
     {
         $form->group('role_color-group', 'div', function ($form) {
             $form->label('role_color-label', t('Color'), [ 'for' => 'role_color' ])
@@ -100,7 +104,7 @@ class FormUserRole extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function iconGroup(&$form)
+    public function iconGroup(FormGroupBuilder &$form): self
     {
         $form->group('role_icon-group', 'div', function ($form) {
             $form->label('role_icon-label', t('Icon'), [
@@ -126,7 +130,7 @@ class FormUserRole extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         $this->group('role-fieldset', 'fieldset', function ($form) {
             $form->legend('role-legend', t('Role overview'));
@@ -140,7 +144,7 @@ class FormUserRole extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function submitForm()
+    public function submitForm(): self
     {
         $this->token('token_role_submit')
             ->submit('submit', t('Save'), [ 'class' => 'btn btn-success' ])
@@ -154,7 +158,7 @@ class FormUserRole extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function makeFieldsDelete()
+    public function makeFieldsDelete(): self
     {
         $this->group('role-fieldset', 'fieldset', function ($form) {
             $form->legend('role-legend', t('Role deletion'))

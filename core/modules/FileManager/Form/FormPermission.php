@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Form;
 
 use Soosyze\Components\Util\Util;
@@ -33,21 +35,21 @@ class FormPermission extends \Soosyze\Components\Form\FormBuilder
 
     private $roles = [];
 
-    public function setValues(array $values)
+    public function setValues(array $values): self
     {
         $this->values = array_merge($this->values, $values);
 
         return $this;
     }
 
-    public function setRoles(array $roles)
+    public function setRoles(array $roles): self
     {
         $this->roles = array_merge($this->roles, $roles);
 
         return $this;
     }
 
-    public function makeFields()
+    public function makeFields(): self
     {
         $this->group('folder_show-fieldset', 'fieldset', function ($form) {
             $form->legend('folder_show-legend', t('Directory'))
