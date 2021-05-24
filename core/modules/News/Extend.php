@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\News;
 
 use Psr\Container\ContainerInterface;
@@ -15,22 +17,22 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         $this->pathContent = __DIR__ . '/Views/install/';
     }
 
-    public function getDir()
+    public function getDir(): string
     {
         return __DIR__;
     }
 
-    public function boot()
+    public function boot(): void
     {
         foreach ([ 'block', 'config', 'main' ] as $file) {
             $this->loadTranslation('fr', __DIR__ . "/Lang/fr/$file.json");
         }
     }
 
-    public function install(ContainerInterface $ci)
+    public function install(ContainerInterface $ci): void
     {
         $ci->schema()
-            ->createTableIfNotExists('entity_article', static function (TableBuilder $table) {
+            ->createTableIfNotExists('entity_article', static function (TableBuilder $table): void {
                 $table->increments('article_id')
                 ->string('image')
                 ->text('summary')
@@ -98,7 +100,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->set('settings.node_url_article', 'news/:date_created_year/:date_created_month/:date_created_day/:node_title');
     }
 
-    public function seeders(ContainerInterface $ci)
+    public function seeders(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('entity_article', [ 'image', 'summary', 'body', 'reading_time' ])
@@ -134,9 +136,9 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         $idFirstNews  = $ci->query()->from('node')->where('entity_id', '=', 1)->where('type', '=', 'article')->fetch()[ 'id' ];
         $idSecondNews = $ci->query()->from('node')->where('entity_id', '=', 2)->where('type', '=', 'article')->fetch()[ 'id' ];
 
-        $Y = date('Y', $time);
-        $m = date('m', $time);
-        $d = date('d', $time);
+        $Y = date('Y', (int) $time);
+        $m = date('m', (int) $time);
+        $d = date('d', (int) $time);
 
         $ci->query()
             ->insertInto('system_alias_url', [ 'source', 'alias' ])
@@ -145,7 +147,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function hookInstall(ContainerInterface $ci)
+    public function hookInstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Menu')) {
             $this->hookInstallMenu($ci);
@@ -155,7 +157,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookInstallMenu(ContainerInterface $ci)
+    public function hookInstallMenu(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('menu_link', [
@@ -165,7 +167,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function hookInstallUser(ContainerInterface $ci)
+    public function hookInstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('role_permission', [ 'role_id', 'permission_id' ])
@@ -174,13 +176,13 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function uninstall(ContainerInterface $ci)
+    public function uninstall(ContainerInterface $ci): void
     {
         $ci->node()->deleteAliasByType('article');
         $ci->node()->deleteByType('article');
     }
 
-    public function hookUninstall(ContainerInterface $ci)
+    public function hookUninstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Block')) {
             $this->hookUninstallBlock($ci);
@@ -193,7 +195,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookUninstallBlock(ContainerInterface $ci)
+    public function hookUninstallBlock(ContainerInterface $ci): void
     {
         $ci->query()
             ->from('block')
@@ -202,9 +204,9 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function hookUninstallMenu(ContainerInterface $ci)
+    public function hookUninstallMenu(ContainerInterface $ci): void
     {
-        $ci->menu()->deleteLinks(static function () use ($ci) {
+        $ci->menu()->deleteLinks(static function () use ($ci): array {
             return $ci->query()
                     ->from('menu_link')
                     ->where('key', 'like', 'news%')
@@ -212,7 +214,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         });
     }
 
-    public function hookUninstallUser(ContainerInterface $ci)
+    public function hookUninstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->from('role_permission')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User;
 
 use Psr\Container\ContainerInterface;
@@ -7,22 +9,22 @@ use Queryflatfile\TableBuilder;
 
 class Extend extends \SoosyzeCore\System\ExtendModule
 {
-    public function getDir()
+    public function getDir(): string
     {
         return __DIR__;
     }
 
-    public function boot()
+    public function boot(): void
     {
         foreach ([ 'config', 'main', 'permission' ] as $file) {
             $this->loadTranslation('fr', __DIR__ . "/Lang/fr/$file.json");
         }
     }
 
-    public function install(ContainerInterface $ci)
+    public function install(ContainerInterface $ci): void
     {
         $ci->schema()
-            ->createTableIfNotExists('user', static function (TableBuilder $table) {
+            ->createTableIfNotExists('user', static function (TableBuilder $table): void {
                 $table->increments('user_id')
                 ->string('email')
                 ->string('username')
@@ -44,7 +46,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
                 ->boolean('terms_of_service')->valueDefault(false)
                 ->text('timezone');
             })
-            ->createTableIfNotExists('role', static function (TableBuilder $table) {
+            ->createTableIfNotExists('role', static function (TableBuilder $table): void {
                 $table->increments('role_id')
                 ->string('role_description')->nullable()
                 ->string('role_label')
@@ -52,11 +54,11 @@ class Extend extends \SoosyzeCore\System\ExtendModule
                 ->string('role_icon')->nullable()
                 ->integer('role_weight')->valueDefault(1);
             })
-            ->createTableIfNotExists('user_role', static function (TableBuilder $table) {
+            ->createTableIfNotExists('user_role', static function (TableBuilder $table): void {
                 $table->integer('user_id')
                 ->integer('role_id');
             })
-            ->createTableIfNotExists('role_permission', static function (TableBuilder $table) {
+            ->createTableIfNotExists('role_permission', static function (TableBuilder $table): void {
                 $table->integer('role_id')
                 ->string('permission_id');
             });
@@ -102,18 +104,18 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->set('settings.password_reset_timeout', '1 day');
     }
 
-    public function seeders(ContainerInterface $ci)
+    public function seeders(ContainerInterface $ci): void
     {
     }
 
-    public function hookInstall(ContainerInterface $ci)
+    public function hookInstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Menu')) {
             $this->hookInstallMenu($ci);
         }
     }
 
-    public function hookInstallMenu(ContainerInterface $ci)
+    public function hookInstallMenu(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('menu_link', [
@@ -142,23 +144,23 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function uninstall(ContainerInterface $ci)
+    public function uninstall(ContainerInterface $ci): void
     {
         foreach ([ 'user_role', 'role_permission', 'user', 'role' ] as $table) {
             $ci->schema()->dropTableIfExists($table);
         }
     }
 
-    public function hookUninstall(ContainerInterface $ci)
+    public function hookUninstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Menu')) {
             $this->hookUninstallMenu($ci);
         }
     }
 
-    public function hookUninstallMenu(ContainerInterface $ci)
+    public function hookUninstallMenu(ContainerInterface $ci): void
     {
-        $ci->menu()->deleteLinks(static function () use ($ci) {
+        $ci->menu()->deleteLinks(static function () use ($ci): array {
             return $ci->query()
                     ->from('menu_link')
                     ->where('key', 'like', 'user%')

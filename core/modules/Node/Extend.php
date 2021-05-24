@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node;
 
 use Psr\Container\ContainerInterface;
@@ -7,22 +9,22 @@ use Queryflatfile\TableBuilder;
 
 class Extend extends \SoosyzeCore\System\ExtendModule
 {
-    public function getDir()
+    public function getDir(): string
     {
         return __DIR__;
     }
 
-    public function boot()
+    public function boot(): void
     {
         foreach ([ 'block', 'config', 'main', 'permission' ] as $file) {
             $this->loadTranslation('fr', __DIR__ . "/Lang/fr/$file.json");
         }
     }
 
-    public function install(ContainerInterface $ci)
+    public function install(ContainerInterface $ci): void
     {
         $ci->schema()
-            ->createTableIfNotExists('node', static function (TableBuilder $table) {
+            ->createTableIfNotExists('node', static function (TableBuilder $table): void {
                 $table->increments('id')
                 ->string('date_changed')
                 ->string('date_created')
@@ -38,24 +40,24 @@ class Extend extends \SoosyzeCore\System\ExtendModule
                 ->string('type', 32)
                 ->integer('user_id')->nullable();
             })
-            ->createTableIfNotExists('node_type', static function (TableBuilder $table) {
+            ->createTableIfNotExists('node_type', static function (TableBuilder $table): void {
                 $table->string('node_type')
                 ->string('node_type_name')
                 ->string('node_type_icon')
                 ->text('node_type_description')
                 ->string('node_type_color', 7)->valueDefault('#ddd');
             })
-            ->createTableIfNotExists('node_status', static function (TableBuilder $table) {
+            ->createTableIfNotExists('node_status', static function (TableBuilder $table): void {
                 $table->increments('node_status_id')
                 ->text('node_status_name');
             })
-            ->createTableIfNotExists('field', static function (TableBuilder $table) {
+            ->createTableIfNotExists('field', static function (TableBuilder $table): void {
                 $table->increments('field_id')
                 ->string('field_name')
                 ->string('field_type');
             })
             /* Table pivot. */
-            ->createTableIfNotExists('node_type_field', static function (TableBuilder $table) {
+            ->createTableIfNotExists('node_type_field', static function (TableBuilder $table): void {
                 $table->string('node_type')
                 ->integer('field_id')
                 ->string('field_label')
@@ -74,11 +76,11 @@ class Extend extends \SoosyzeCore\System\ExtendModule
                 /* Poisition de la donnée dans l'affichage. */
                 ->integer('field_weight_form')->valueDefault(1);
             })
-            ->createTableIfNotExists('entity_page', static function (TableBuilder $table) {
+            ->createTableIfNotExists('entity_page', static function (TableBuilder $table): void {
                 $table->increments('page_id')
                 ->text('body');
             })
-            ->createTableIfNotExists('entity_page_private', static function (TableBuilder $table) {
+            ->createTableIfNotExists('entity_page_private', static function (TableBuilder $table): void {
                 $table->increments('page_private_id')
                 ->text('body');
             });
@@ -140,11 +142,11 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->set('settings.node_cron', false);
     }
 
-    public function seeders(ContainerInterface $ci)
+    public function seeders(ContainerInterface $ci): void
     {
     }
 
-    public function hookInstall(ContainerInterface $ci)
+    public function hookInstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Menu')) {
             $this->hookInstallMenu($ci);
@@ -154,7 +156,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookInstallMenu(ContainerInterface $ci)
+    public function hookInstallMenu(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('menu_link', [
@@ -170,13 +172,13 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
 
         $ci->schema()
-            ->createTableIfNotExists('node_menu_link', static function (TableBuilder $table) {
+            ->createTableIfNotExists('node_menu_link', static function (TableBuilder $table): void {
                 $table->integer('node_id')
                 ->integer('menu_link_id');
             });
     }
 
-    public function hookInstallUser(ContainerInterface $ci)
+    public function hookInstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('role_permission', [ 'role_id', 'permission_id' ])
@@ -195,7 +197,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function uninstall(ContainerInterface $ci)
+    public function uninstall(ContainerInterface $ci): void
     {
         $types = $ci->query()->from('node_type')->lists('node_type');
         foreach ($types as $type) {
@@ -212,7 +214,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function hookUninstall(ContainerInterface $ci)
+    public function hookUninstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Block')) {
             $this->hookUninstallBlock($ci);
@@ -225,7 +227,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookUninstallBlock(ContainerInterface $ci)
+    public function hookUninstallBlock(ContainerInterface $ci): void
     {
         $ci->query()
             ->from('block')
@@ -234,12 +236,12 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function hookUninstallMenu(ContainerInterface $ci)
+    public function hookUninstallMenu(ContainerInterface $ci): void
     {
         $ci->schema()->dropTableIfExists('node_menu_link');
 
         if ($ci->module()->has('Menu')) {
-            $ci->menu()->deleteLinks(static function () use ($ci) {
+            $ci->menu()->deleteLinks(static function () use ($ci): array {
                 return $ci->query()
                         ->from('menu_link')
                         ->where('key', 'like', 'node%')
@@ -249,7 +251,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookUninstallUser(ContainerInterface $ci)
+    public function hookUninstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->from('role_permission')

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System;
 
 use Psr\Container\ContainerInterface;
@@ -8,7 +10,7 @@ abstract class ExtendModule
 {
     private $translations = [];
 
-    public function getTranslations()
+    public function getTranslations(): array
     {
         return $this->translations;
     }
@@ -20,35 +22,35 @@ abstract class ExtendModule
         return $this;
     }
 
-    abstract public function getDir();
+    abstract public function getDir(): string;
 
     /**
      * Chargement des Assets du module.
      */
-    abstract public function boot();
+    abstract public function boot(): void;
 
     /**
      * Script d'installation du module.
      */
-    abstract public function install(ContainerInterface $ci);
+    abstract public function install(ContainerInterface $ci): void;
 
     /**
      * Ajoute des données de demo.
      */
-    abstract public function seeders(ContainerInterface $ci);
+    abstract public function seeders(ContainerInterface $ci): void;
 
     /**
      * Script de dés-installation.
      */
-    abstract public function uninstall(ContainerInterface $ci);
+    abstract public function uninstall(ContainerInterface $ci): void;
 
     /**
      * Install ou créer des données si d'autre modules sont présent.
      */
-    abstract public function hookInstall(ContainerInterface $ci);
+    abstract public function hookInstall(ContainerInterface $ci): void;
 
     /**
      * Désinstall ou supprime des données si d'autre modules se déhinstall.
      */
-    abstract public function hookUninstall(ContainerInterface $ci);
+    abstract public function hookUninstall(ContainerInterface $ci): void;
 }

@@ -169,7 +169,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         return $nodeType[ 'node_type' ] ?? '';
     }
 
-    private function getNextNode(array $node): string
+    private function getNextNode(array $node): array
     {
         $next = $this->query->from('node')
             ->where(static function ($query) use ($node) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager;
 
 use Psr\Container\ContainerInterface;
@@ -7,22 +9,22 @@ use Queryflatfile\TableBuilder;
 
 class Extend extends \SoosyzeCore\System\ExtendModule
 {
-    public function getDir()
+    public function getDir(): string
     {
         return __DIR__;
     }
 
-    public function boot()
+    public function boot(): void
     {
         foreach ([ 'config', 'main', 'permission' ] as $file) {
             $this->loadTranslation('fr', __DIR__ . "/Lang/fr/$file.json");
         }
     }
 
-    public function install(ContainerInterface $ci)
+    public function install(ContainerInterface $ci): void
     {
         $ci->schema()
-            ->createTableIfNotExists('profil_file', static function (TableBuilder $table) {
+            ->createTableIfNotExists('profil_file', static function (TableBuilder $table): void {
                 $table
                 ->increments('profil_file_id')
                 ->text('folder_show')
@@ -42,7 +44,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
                 ->boolean('file_extensions_all')->valueDefault(false)
                 ->text('file_extensions')->valueDefault('');
             })
-            ->createTableIfNotExists('profil_file_role', static function (TableBuilder $table) {
+            ->createTableIfNotExists('profil_file_role', static function (TableBuilder $table): void {
                 $table
                 ->integer('profil_file_id')
                 ->integer('role_id');
@@ -55,7 +57,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function seeders(ContainerInterface $ci)
+    public function seeders(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('profil_file', [
@@ -178,7 +180,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function hookInstall(ContainerInterface $ci)
+    public function hookInstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('User')) {
             $this->hookInstallUser($ci);
@@ -188,7 +190,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookInstallUser(ContainerInterface $ci)
+    public function hookInstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('role_permission', [ 'role_id', 'permission_id' ])
@@ -196,7 +198,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function hookInstallMenu(ContainerInterface $ci)
+    public function hookInstallMenu(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('menu_link', [
@@ -209,14 +211,14 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function uninstall(ContainerInterface $ci)
+    public function uninstall(ContainerInterface $ci): void
     {
         foreach ([ 'profil_file_role', 'profil_file' ] as $table) {
             $ci->schema()->dropTableIfExists($table);
         }
     }
 
-    public function hookUninstall(ContainerInterface $ci)
+    public function hookUninstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Menu')) {
             $this->hookUninstallMenu($ci);
@@ -226,9 +228,9 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookUninstallMenu(ContainerInterface $ci)
+    public function hookUninstallMenu(ContainerInterface $ci): void
     {
-        $ci->menu()->deleteLinks(static function () use ($ci) {
+        $ci->menu()->deleteLinks(static function () use ($ci): array {
             return $ci->query()
                     ->from('menu_link')
                     ->where('key', 'like', 'filemanager%')
@@ -236,7 +238,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         });
     }
 
-    public function hookUninstallUser(ContainerInterface $ci)
+    public function hookUninstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->from('role_permission')

@@ -1,30 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Dashboard;
 
 use Psr\Container\ContainerInterface;
 
 class Extend extends \SoosyzeCore\System\ExtendModule
 {
-    public function getDir()
+    public function getDir(): string
     {
         return __DIR__;
     }
 
-    public function boot()
+    public function boot(): void
     {
         $this->loadTranslation('fr', __DIR__ . '/Lang/fr/main.json');
     }
 
-    public function install(ContainerInterface $ci)
+    public function install(ContainerInterface $ci): void
     {
     }
 
-    public function seeders(ContainerInterface $ci)
+    public function seeders(ContainerInterface $ci): void
     {
     }
 
-    public function hookInstall(ContainerInterface $ci)
+    public function hookInstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Menu')) {
             $this->hookInstallMenu($ci);
@@ -34,7 +36,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookInstallMenu(ContainerInterface $ci)
+    public function hookInstallMenu(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('menu_link', [
@@ -47,7 +49,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function hookInstallUser(ContainerInterface $ci)
+    public function hookInstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('role_permission', [ 'role_id', 'permission_id' ])
@@ -55,11 +57,11 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->execute();
     }
 
-    public function uninstall(ContainerInterface $ci)
+    public function uninstall(ContainerInterface $ci): void
     {
     }
 
-    public function hookUninstall(ContainerInterface $ci)
+    public function hookUninstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Menu')) {
             $this->hookUninstallMenu($ci);
@@ -69,9 +71,9 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         }
     }
 
-    public function hookUninstallMenu(ContainerInterface $ci)
+    public function hookUninstallMenu(ContainerInterface $ci): void
     {
-        $ci->menu()->deleteLinks(static function () use ($ci) {
+        $ci->menu()->deleteLinks(static function () use ($ci): array {
             return $ci->query()
                     ->from('menu_link')
                     ->where('key', 'like', 'dashboard%')
@@ -79,7 +81,7 @@ class Extend extends \SoosyzeCore\System\ExtendModule
         });
     }
 
-    public function hookUninstallUser(ContainerInterface $ci)
+    public function hookUninstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->from('role_permission')

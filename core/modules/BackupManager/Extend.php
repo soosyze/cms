@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\BackupManager;
 
 use Psr\Container\ContainerInterface;
 
 class Extend extends \SoosyzeCore\System\ExtendModule
 {
-    public function getDir()
+    public function getDir(): string
     {
         return __DIR__;
     }
 
-    public function boot()
+    public function boot(): void
     {
         foreach ([ 'config', 'main', 'permission' ] as $file) {
             $this->loadTranslation('fr', __DIR__ . "/Lang/fr/$file.json");
         }
     }
 
-    public function install(ContainerInterface $ci)
+    public function install(ContainerInterface $ci): void
     {
         /* Création du dossier de backup. */
         $dir = $ci->core()->getDir('backup_dir', '../soosyze_backups/default');
@@ -52,18 +54,18 @@ Options +FollowSymLinks
             ->set('settings.backup_cron', false);
     }
 
-    public function seeders(ContainerInterface $ci)
+    public function seeders(ContainerInterface $ci): void
     {
     }
 
-    public function hookInstall(ContainerInterface $ci)
+    public function hookInstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('User')) {
             $this->hookInstallUser($ci);
         }
     }
 
-    public function hookInstallUser(ContainerInterface $ci)
+    public function hookInstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->insertInto('role_permission', [ 'role_id', 'permission_id' ])
@@ -71,7 +73,7 @@ Options +FollowSymLinks
             ->execute();
     }
 
-    public function hookUninstall(ContainerInterface $ci)
+    public function hookUninstall(ContainerInterface $ci): void
     {
         if ($ci->module()->has('Menu')) {
             $this->hookUninstallMenu($ci);
@@ -81,9 +83,9 @@ Options +FollowSymLinks
         }
     }
 
-    public function hookUninstallMenu(ContainerInterface $ci)
+    public function hookUninstallMenu(ContainerInterface $ci): void
     {
-        $ci->menu()->deleteLinks(static function () use ($ci) {
+        $ci->menu()->deleteLinks(static function () use ($ci): array {
             return $ci->query()
                     ->from('menu_link')
                     ->where('key', 'like', 'backupmanager%')
@@ -91,7 +93,7 @@ Options +FollowSymLinks
         });
     }
 
-    public function hookUninstallUser(ContainerInterface $ci)
+    public function hookUninstallUser(ContainerInterface $ci): void
     {
         $ci->query()
             ->from('role_permission')
@@ -100,7 +102,7 @@ Options +FollowSymLinks
             ->execute();
     }
 
-    public function uninstall(ContainerInterface $ci)
+    public function uninstall(ContainerInterface $ci): void
     {
         $dir = $ci->core()->getDir('backup_dir', '../soosyze_backups');
         if (!is_dir($dir)) {
