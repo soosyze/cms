@@ -1,6 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Services;
+
+use SoosyzeCore\QueryBuilder\Services\Query;
 
 class FileProfil
 {
@@ -10,23 +14,23 @@ class FileProfil
     private $profil = [];
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
-    public function __construct($query)
+    public function __construct(Query $query)
     {
         $this->query = $query;
     }
 
-    public function find($profilId)
+    public function find(int $profilId): array
     {
         return $this->query->from('profil_file')
                 ->where('profil_file_id', '=', (int) $profilId)
                 ->fetch();
     }
 
-    public function getProfil($userId)
+    public function getProfil(?int $userId): array
     {
         $profils = $userId === null
             ? $this->query->from('role')
@@ -54,7 +58,7 @@ class FileProfil
         return $profils;
     }
 
-    public function getRolesUserByProfil($profilId)
+    public function getRolesUserByProfil(int $profilId): array
     {
         return $this->query->from('profil_file_role')
                 ->leftJoin('role', 'role_id', '=', 'role.role_id')
@@ -62,7 +66,7 @@ class FileProfil
                 ->fetchAll();
     }
 
-    public function getIdRolesUser($profilId)
+    public function getIdRolesUser(int $profilId): array
     {
         $data = $this->getRolesUserByProfil($profilId);
 
@@ -71,7 +75,7 @@ class FileProfil
             : [];
     }
 
-    public function getProfilsFileByUser($userId)
+    public function getProfilsFileByUser(int $userId): array
     {
         if (empty($this->profil[ $userId ])) {
             $this->profil[ $userId ] = $this->getProfil($userId);

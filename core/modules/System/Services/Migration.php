@@ -1,6 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Services;
+
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\QueryBuilder\Services\Schema;
 
 class Migration
 {
@@ -12,21 +18,21 @@ class Migration
     private $composer;
 
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Schema
+     * @var Schema
      */
     private $schema;
 
-    public function __construct($composer, $config, $query, $schema)
+    public function __construct(Composer $composer, Config $config, Query $query, Schema $schema)
     {
         $this->composer = $composer;
         $this->config   = $config;
@@ -39,7 +45,7 @@ class Migration
      *
      * @return bool
      */
-    public function isMigration()
+    public function isMigration(): bool
     {
         $titleModulesActive  = $this->query->from('module_active')->lists('title');
         $migrationsInstalled = $this->query->from('migration')->lists('migration');
@@ -73,7 +79,7 @@ class Migration
     /**
      * Installe les migrations non installé des modules actifs.
      */
-    public function migrate()
+    public function migrate(): void
     {
         $titleModulesActive  = $this->query->from('module_active')->lists('title');
         $migrationsInstalled = $this->query->from('migration')->lists('migration');
@@ -149,7 +155,7 @@ class Migration
      *
      * @return void
      */
-    public function installMigration($dir, $extension)
+    public function installMigration(string $dir, string $extension): void
     {
         if (!\is_dir($dir)) {
             return;
@@ -167,7 +173,7 @@ class Migration
         $this->query->execute();
     }
 
-    public function uninstallMigration($extension)
+    public function uninstallMigration(string $extension): void
     {
         $this->query
             ->delete()

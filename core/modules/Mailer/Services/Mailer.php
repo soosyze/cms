@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Mailer\Services;
 
 use PHPMailer\PHPMailer\Exception;
@@ -7,8 +9,14 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 class Mailer
 {
+    /**
+     * @var PHPMailer
+     */
     private $mailer;
 
+    /**
+     * @var array
+     */
     private $values = [
         'driver'          => 'mail',
         'smtp_encryption' => '',
@@ -28,7 +36,7 @@ class Mailer
                 : $this->mailer->isSMTP();
     }
 
-    public function isSMTP()
+    public function isSMTP(): void
     {
         $this->mailer->isSMTP();
 
@@ -42,75 +50,75 @@ class Mailer
         $this->mailer->Port       = $this->values[ 'smtp_port' ];
     }
 
-    public function to($email, $name = '')
+    public function to(string $address, string $name = ''): self
     {
-        $this->mailer->addAddress($email, $name);
+        $this->mailer->addAddress($address, $name);
 
         return $this;
     }
 
-    public function addAttachment($attachement)
+    public function addAttachment(string $attachement): self
     {
         $this->mailer->addAttachment($attachement);
 
         return $this;
     }
 
-    public function addCc($email, $name = '')
+    public function addCc(string $address, string $name = ''): self
     {
-        $this->mailer->addCC($email, $name);
+        $this->mailer->addCC($address, $name);
 
         return $this;
     }
 
-    public function addBcc($email, $name = '')
+    public function addBcc(string $address, string $name = ''): self
     {
-        $this->mailer->addBCC($email, $name);
+        $this->mailer->addBCC($address, $name);
 
         return $this;
     }
 
-    public function from($email, $name = '')
+    public function from(string $address, string $name = ''): self
     {
-        $this->mailer->setFrom($email, $name);
+        $this->mailer->setFrom($address, $name);
 
         return $this;
     }
 
-    public function replayTo($email, $name = '')
+    public function replayTo(string $address, string $name = ''): self
     {
-        $this->mailer->addReplyTo($email, $name);
+        $this->mailer->addReplyTo($address, $name);
 
         return $this;
     }
 
-    public function subject($subj)
+    public function subject(string $subject): self
     {
-        $this->mailer->Subject = $subj;
+        $this->mailer->Subject = $subject;
 
         return $this;
     }
 
-    public function message($msg)
+    public function message(string $body): self
     {
-        $this->mailer->Body = $msg;
+        $this->mailer->Body = $body;
 
         return $this;
     }
 
-    public function isHtml($bool = true)
+    public function isHtml(bool $isHtml = true): self
     {
-        $this->mailer->isHTML($bool);
+        $this->mailer->isHTML($isHtml);
 
         return $this;
     }
 
-    public function send()
+    public function send(): bool
     {
         try {
             return $this->mailer->send();
         } catch (Exception $e) {
-            return $this->mailer->ErrorInfo;
+            return (bool) $this->mailer->ErrorInfo;
         }
     }
 }

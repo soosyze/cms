@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Services;
 
+use Composer\Semver\Semver;
+use Soosyze\App;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\System\ExtendModule;
@@ -14,7 +18,7 @@ class Composer
     const TYPE_THEME = 'soosyze-theme';
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
@@ -38,7 +42,7 @@ class Composer
     private $moduleComposers = [];
 
     /**
-     * @var \Composer\Semver\Semver
+     * @var Semver
      */
     private $semver;
 
@@ -49,14 +53,14 @@ class Composer
      */
     private $themeComposers = [];
 
-    public function __construct($core, $module, $semver)
+    public function __construct(App $core, Modules $module, Semver $semver)
     {
         $this->core   = $core;
         $this->module = $module;
         $this->semver = $semver;
     }
 
-    public function validComposer($title, array $composers)
+    public function validComposer(string $title, array $composers): array
     {
         $data = $composers[ $title ];
 
@@ -74,7 +78,7 @@ class Composer
 
         if (!$validator->isValid()) {
             $errors += $validator->getKeyErrors();
-        } elseif (empty($data[ 'autoload' ][ 'psr-4' ]) || !is_array($data[ 'autoload' ][ 'psr-4' ])) {
+        } elseif (!is_array($data[ 'autoload' ][ 'psr-4' ] ?? null)) {
             $errors[] = t('The namespace information for the :title module does not exist.', [
                 ':title' => $title
             ]);
@@ -90,7 +94,7 @@ class Composer
         return $errors;
     }
 
-    public function validComposerExtendModule($title, array $composers)
+    public function validComposerExtendModule(string $title, array $composers): array
     {
         $extendClass = $this->getExtendClass($title, $composers);
         if (new $extendClass() instanceof ExtendModule) {
@@ -104,7 +108,7 @@ class Composer
         ];
     }
 
-    public function validComposerExtendTheme($title, array $composers)
+    public function validComposerExtendTheme(string $title, array $composers): array
     {
         $extendClass = $this->getExtendClass($title, $composers);
         if (new $extendClass() instanceof ExtendTheme) {
@@ -118,7 +122,7 @@ class Composer
         ];
     }
 
-    public function validRequirePhp($title, array $composers)
+    public function validRequirePhp(string $title, array $composers): array
     {
         $data = $composers[ $title ];
 
@@ -142,7 +146,7 @@ class Composer
         return $errors;
     }
 
-    public function validRequireExtLib($title, array $composers)
+    public function validRequireExtLib(string $title, array $composers): array
     {
         $data = $composers[ $title ];
 
@@ -165,12 +169,12 @@ class Composer
                         ':title'       => $title,
                         ':version_ext' => $version
                     ]);
-                } elseif (!$this->semver->satisfies(phpversion($require), $version)) {
+                } elseif (!$this->semver->satisfies(phpversion($moduleRequire), $version)) {
                     $errors[] = t('Le module :title nécessite le la bibliothèque PHP :ext_name (:version_ext) actuellement (:version_current_ext)', [
                         ':ext_name'            => $match[ 1 ],
                         ':title'               => $title,
                         ':version_ext'         => $version,
-                        ':version_current_ext' => phpversion($require)
+                        ':version_current_ext' => phpversion($moduleRequire)
                     ]);
                 }
             }
@@ -179,7 +183,7 @@ class Composer
         return $errors;
     }
 
-    public function validRequireModule($title, array $composers)
+    public function validRequireModule(string $title, array $composers): array
     {
         $data = $composers[ $title ];
 
@@ -220,14 +224,14 @@ class Composer
         return $errors;
     }
 
-    public function getVersionCore()
+    public function getVersionCore(): string
     {
         $coreComposer = $this->getComposerCore();
 
         return $coreComposer[ 'version' ];
     }
 
-    public function getComposerCore()
+    public function getComposerCore(): array
     {
         if (!$this->coreComposer) {
             $this->coreComposer = Util::getJson(ROOT . '/composer.json');
@@ -236,7 +240,7 @@ class Composer
         return $this->coreComposer;
     }
 
-    public function getThemeComposers($reload = false)
+    public function getThemeComposers(bool $reload = false): array
     {
         if (!empty($this->themeComposers) || $reload) {
             return $this->themeComposers;
@@ -251,16 +255,14 @@ class Composer
         return $this->themeComposers;
     }
 
-    public function getModuleComposer($title)
+    public function getModuleComposer(string $title): ?array
     {
         $this->getModuleComposers();
 
-        return empty($this->moduleComposers[ $title ])
-            ? null
-            : $this->moduleComposers[ $title ];
+        return $this->moduleComposers[ $title ] ?? null;
     }
 
-    public function getModuleComposers($reload = false)
+    public function getModuleComposers(bool $reload = false): array
     {
         if (!empty($this->moduleComposers) || $reload) {
             return $this->moduleComposers;
@@ -274,7 +276,7 @@ class Composer
         return $this->moduleComposers;
     }
 
-    public function getExtendClass($title, array $composers)
+    public function getExtendClass(string $title, array $composers): string
     {
         return array_keys($composers[ $title ][ 'autoload' ][ 'psr-4' ])[ 0 ] . 'Extend';
     }
@@ -286,11 +288,11 @@ class Composer
      *
      * @return array La liste des erreurs.
      */
-    public function validComposerExtraModule($title, array $composers)
+    public function validComposerExtraModule(string $title, array $composers): array
     {
         $data = $composers[ $title ];
 
-        if (!isset($data[ 'extra' ][ 'soosyze' ]) && !is_array($data[ 'extra' ][ 'soosyze' ])) {
+        if (!is_array($data[ 'extra' ][ 'soosyze' ] ?? null)) {
             return [ t('The :name module information does not exist.', [ ':name' => $title ]) ];
         }
 
@@ -323,11 +325,11 @@ class Composer
         return $validator->getKeyErrors();
     }
 
-    public function validComposerExtraTheme($title, array $composers)
+    public function validComposerExtraTheme(string $title, array $composers): array
     {
         $data = $composers[ $title ];
 
-        if (!isset($data[ 'extra' ][ 'soosyze' ]) && !is_array($data[ 'extra' ][ 'soosyze' ])) {
+        if (!is_array($data[ 'extra' ][ 'soosyze' ] ?? null)) {
             return [ t('The :name theme information does not exist.', [ ':name' => $title ]) ];
         }
 
@@ -344,7 +346,7 @@ class Composer
         return $validator->getKeyErrors();
     }
 
-    private function getComposer($dir, $type = 'soosyze-module')
+    private function getComposer(string $dir, string $type = 'soosyze-module'): array
     {
         $out = [];
 

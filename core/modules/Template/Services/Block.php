@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Template\Services;
 
 class Block extends \Soosyze\Components\Template\Template
 {
-    public function getBlockWithParent($parent)
+    public function getBlockWithParent(string $parent): Block
     {
         if ($block = strstr($parent, '.', true)) {
             return $this->getBlock($block)

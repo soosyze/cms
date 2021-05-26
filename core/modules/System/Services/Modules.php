@@ -1,22 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Services;
 
 use Soosyze\Components\Util\Util;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\Translate\Services\Translation;
 
 class Modules
 {
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \SoosyzeCore\Translate\Services\Translation
+     * @var Translation
      */
-    private $translate;
+    private $transalte;
 
-    public function __construct($query, $translate)
+    public function __construct(Query $query, Translation $translate)
     {
         $this->query     = $query;
         $this->transalte = $translate;
@@ -29,7 +33,7 @@ class Modules
      *
      * @return array
      */
-    public function has($title)
+    public function has(string $title): array
     {
         return $this->query
                 ->from('module_active')
@@ -44,7 +48,7 @@ class Modules
      *
      * @return array
      */
-    public function isRequiredCore($title)
+    public function isRequiredCore(string $title): array
     {
         return $this->query
                 ->from('module_require')
@@ -60,7 +64,7 @@ class Modules
      *
      * @return array
      */
-    public function isRequiredForModule($title)
+    public function isRequiredForModule(string $title): array
     {
         $output = $this->query
             ->from('module_active')
@@ -72,14 +76,14 @@ class Modules
         return array_unique($output);
     }
 
-    public function listModuleActive()
+    public function listModuleActive(): array
     {
         return $this->query
             ->from('module_active')
             ->fetchAll();
     }
 
-    public function listModuleActiveNotRequire()
+    public function listModuleActiveNotRequire(): array
     {
         return $this->query
                 ->from('module_active')
@@ -93,7 +97,7 @@ class Modules
      *
      * @param string $title Nom du module.
      */
-    public function uninstallModule($title)
+    public function uninstallModule(string $title): void
     {
         $this->query
             ->from('module_active')
@@ -119,7 +123,7 @@ class Modules
      *
      * @param array $composer Données du module.
      */
-    public function create(array $composer)
+    public function create(array $composer): void
     {
         $module = $composer[ 'extra' ][ 'soosyze' ];
         /* Enregistrement du module. */
@@ -154,7 +158,7 @@ class Modules
      * @param array $composers Liste de tous les fichiers composer
      * @param bool  $crushed   Si la mise à jour de la traduction ne prend pas en compte existante.
      */
-    public function loadTranslations(array $composers, $crushed = true)
+    public function loadTranslations(array $composers, bool $crushed = true): void
     {
         $path = $this->transalte->getPath();
 

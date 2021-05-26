@@ -1,23 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Template\Services;
 
+use Soosyze\App;
 use Soosyze\Components\Http\Stream;
 use Soosyze\Components\Util\Util;
+use Soosyze\Config;
 
 class Templating extends \Soosyze\Components\Http\Response
 {
-    const THEME_PUBLIC = 'theme';
+    public const THEME_PUBLIC = 'theme';
 
-    const THEME_ADMIN = 'theme_admin';
+    public const THEME_ADMIN = 'theme_admin';
 
     /**
-     * @var type
+     * @var array
      */
     private static $scriptsGlobal = [];
 
     /**
-     * @var type
+     * @var array
      */
     private static $stylesGlobal = [];
 
@@ -27,7 +31,7 @@ class Templating extends \Soosyze\Components\Http\Response
     private $template;
 
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
@@ -37,7 +41,7 @@ class Templating extends \Soosyze\Components\Http\Response
     private $configJs = [];
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
@@ -90,9 +94,22 @@ class Templating extends \Soosyze\Components\Http\Response
      */
     private $meta = [];
 
+    /**
+     * @var bool
+     */
     private $isDarkTheme = false;
 
-    public function __construct($core, $config)
+    /**
+     * @var string
+     */
+    private $pathViews;
+
+    /**
+     * @var string
+     */
+    private $basePath;
+
+    public function __construct(App $core, Config $config)
     {
         parent::__construct();
 
@@ -106,7 +123,7 @@ class Templating extends \Soosyze\Components\Http\Response
         $this->loadAssets();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $scriptsInline = $this->getBlock('this')->getVar('scripts_inline');
         $this->view('this', [
@@ -122,7 +139,7 @@ class Templating extends \Soosyze\Components\Http\Response
         return parent::__toString();
     }
 
-    public function init()
+    public function init(): void
     {
         $this->loadComposer();
         $messages = $this->createBlock('messages.php', $this->pathViews)
@@ -163,7 +180,7 @@ class Templating extends \Soosyze\Components\Http\Response
             ->addVars($this->core->getSettings());
     }
 
-    public function getTheme($theme = self::THEME_PUBLIC)
+    public function getTheme(string $theme = self::THEME_PUBLIC): self
     {
         $granted = $this->core->callHook('app.granted', [ 'template.admin' ]);
 
@@ -187,7 +204,7 @@ class Templating extends \Soosyze\Components\Http\Response
         return $this;
     }
 
-    public function isTheme($themeName)
+    public function isTheme(string $themeName): bool
     {
         return $this->defaultThemeName === $themeName;
     }
@@ -200,7 +217,7 @@ class Templating extends \Soosyze\Components\Http\Response
      *
      * @return $this
      */
-    public function view($parent, array $vars)
+    public function view(string $parent, array $vars): self
     {
         $this->getBlock($parent)->addVars($vars);
 
@@ -211,42 +228,42 @@ class Templating extends \Soosyze\Components\Http\Response
      * Ajoute un bloc à la template courante ou une sous template.
      * Ce bloc peut recevoir des variables fournit en dernier paramètre de la fonction.
      *
-     * @param sring  $parent
+     * @param sring  $selector
      * @param string $tpl
      * @param string $tplPath
      * @param array  $vars
      *
      * @return $this
      */
-    public function make($selector, $tpl, $tplPath, array $vars = [])
+    public function make(string $selector, string $tpl, string $tplPath, array $vars = []): self
     {
         $template = $this->createBlock($tpl, $tplPath);
 
         return $this->addBlock($selector, $template, $vars);
     }
 
-    public function addFilterVar($selector, $key, callable $function)
+    public function addFilterVar(string $selector, string $key, callable $function): self
     {
         $this->getBlock($selector)->addFilterVar($key, $function);
 
         return $this;
     }
 
-    public function addFilterBlock($selector, $key, callable $function)
+    public function addFilterBlock(string $selector, string $key, callable $function): self
     {
         $this->getBlock($selector)->addFilterBlock($key, $function);
 
         return $this;
     }
 
-    public function addFilterOutput($selector, $key, callable $function)
+    public function addFilterOutput(string $selector, string $key, callable $function): self
     {
         $this->getBlock($selector)->addFilterOutput($key, $function);
 
         return $this;
     }
 
-    public function override($selector, array $templates)
+    public function override(string $selector, array $templates): self
     {
         $this->getBlock($selector)->setNamesOverride($templates);
 
@@ -258,7 +275,7 @@ class Templating extends \Soosyze\Components\Http\Response
      *
      * @return \Soosyze\Components\Template\Template
      */
-    public function getBlock($selector)
+    public function getBlock(string $selector): \Soosyze\Components\Template\Template
     {
         return $this->getThemplate()->getBlockWithParent($selector);
     }
@@ -266,7 +283,7 @@ class Templating extends \Soosyze\Components\Http\Response
     /**
      * @return Block
      */
-    public function createBlock($tpl, $tplPath)
+    public function createBlock(string $tpl, string $tplPath): Block
     {
         return (new Block($tpl, $tplPath))
                 ->addVars([
@@ -276,7 +293,7 @@ class Templating extends \Soosyze\Components\Http\Response
                 ->addPathOverride($this->getPathTheme());
     }
 
-    public function addBlock($selector, Block $template, array $vars = [])
+    public function addBlock(string $selector, ?Block $template, array $vars = []): self
     {
         if ($template !== null) {
             $template->addVars($vars);
@@ -293,25 +310,23 @@ class Templating extends \Soosyze\Components\Http\Response
         return $this;
     }
 
-    public function getPathTheme()
+    public function getPathTheme(): string
     {
         return is_dir(ROOT . $this->defaultThemePath)
             ? ROOT . $this->defaultThemePath . '/'
             : $this->defaultThemePath;
     }
 
-    public function getSections()
+    public function getSections(): array
     {
         if (!$this->composer) {
             $this->loadComposer();
         }
 
-        return !empty($this->composer[ 'extra' ][ 'soosyze' ][ 'sections' ])
-            ? $this->composer[ 'extra' ][ 'soosyze' ][ 'sections' ]
-            : [];
+        return $this->composer[ 'extra' ][ 'soosyze' ][ 'sections' ] ?? [];
     }
 
-    public function loadComposer()
+    public function loadComposer(): void
     {
         $pathTheme = $this->getPathTheme();
         if (is_file($pathTheme . 'composer.json')) {
@@ -319,52 +334,52 @@ class Templating extends \Soosyze\Components\Http\Response
         }
     }
 
-    public function addMetas(array $meta)
+    public function addMetas(array $meta): self
     {
         $this->meta = array_merge($this->meta, $meta);
 
         return $this;
     }
 
-    public function addMeta(array $meta)
+    public function addMeta(array $meta): self
     {
         $this->meta[] = $meta;
 
         return $this;
     }
 
-    public function addScript($name, $href, array $attr = [])
+    public function addScript(string $name, string $href, array $attr = []): self
     {
         $this->scripts[$name] = [ 'src' => $href, 'type' => 'text/javascript' ] + $attr;
 
         return $this;
     }
 
-    public function addStyle($name, $src, array $attr= [])
+    public function addStyle(string $name, string $src, array $attr= []): self
     {
         $this->styles[ $name ] = [ 'href' => $src, 'rel' => 'stylesheet' ] + $attr;
 
         return $this;
     }
 
-    public function addConfigJs($name, $value)
+    public function addConfigJs(string $name, array $value): self
     {
         $this->configJs[ $name ] = $value;
 
         return $this;
     }
 
-    public static function setStylesGlobal($styles)
+    public static function setStylesGlobal(array $styles): void
     {
         self::$stylesGlobal = $styles;
     }
 
-    public static function setScriptsGlobal($scritps)
+    public static function setScriptsGlobal(array $scritps): void
     {
         self::$scriptsGlobal = $scritps;
     }
 
-    private function loadAssets()
+    private function loadAssets(): void
     {
         $vendor = $this->core->getPath('modules', 'modules/core', false) . '/Template/Assets';
 
@@ -375,7 +390,7 @@ class Templating extends \Soosyze\Components\Http\Response
         ];
     }
 
-    private function makeBalise($type, array $data, $orphan = true)
+    private function makeBalise(string $type, array $data, bool $orphan = true): string
     {
         $out = '';
         foreach ($data as $attrs) {
@@ -387,12 +402,12 @@ class Templating extends \Soosyze\Components\Http\Response
         return $out;
     }
 
-    private function makeConfigJs()
+    private function makeConfigJs(): string
     {
         return sprintf('<script>var config =%s</script>', json_encode($this->configJs)) . PHP_EOL;
     }
 
-    private function renderAttrInput(array $attr)
+    private function renderAttrInput(array $attr): string
     {
         $html = '';
         foreach ($attr as $key => $value) {
@@ -402,7 +417,7 @@ class Templating extends \Soosyze\Components\Http\Response
         return $html;
     }
 
-    private function getThemplate()
+    private function getThemplate(): Block
     {
         if ($this->template) {
             return $this->template;

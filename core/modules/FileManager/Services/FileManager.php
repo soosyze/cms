@@ -2,11 +2,20 @@
 
 namespace SoosyzeCore\FileManager\Services;
 
+use Soosyze\App;
+use Soosyze\Components\Router\Router;
 use Soosyze\Components\Util\Util;
-use SoosyzeCore\FileManager\Hook\Config;
+use Soosyze\Config;
+use SoosyzeCore\FileManager\Hook\Config as HookConfig;
+use SoosyzeCore\FileManager\Hook\User as HookUser;
+use SoosyzeCore\Template\Services\Block;
+use SoosyzeCore\Template\Services\Templating;
 
 class FileManager
 {
+    /**
+     * @var array
+     */
     private static $extAllowed = [
         '7z',
         'ai', 'avi',
@@ -34,12 +43,12 @@ class FileManager
     private $copyFileLink;
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
     /**
-     * @var \SoosyzeCore\FileManager\Hook\User
+     * @var HookUser
      */
     private $hookUser;
 
@@ -49,29 +58,35 @@ class FileManager
     private $pathViews;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($core, $hookUser, $router)
-    {
-        $this->core     = $core;
-        $this->hookUser = $hookUser;
-        $this->router   = $router;
+    /**
+     * @var Templating
+     */
+    private $templating;
 
-        $this->copyFileLink = $core->get('config')->get('settings.copy_link_file', 1) === Config::COPY_ABSOLUTE
+    public function __construct(App $core, Config $config, HookUser $hookUser, Router $router, Templating $templating)
+    {
+        $this->core       = $core;
+        $this->hookUser   = $hookUser;
+        $this->router     = $router;
+        $this->templating = $templating;
+
+        $this->copyFileLink = $config->get('settings.copy_link_file', 1) === HookConfig::COPY_ABSOLUTE
             ? $this->core->getPath('files_public', 'public/files')
             : '/' . $this->core->getSettingEnv('files_public', 'public/files');
 
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public static function getExtAllowed()
+    public static function getExtAllowed(): array
     {
         return self::$extAllowed;
     }
 
-    public function getBreadcrumb($path, $keyRoute = 'filemanager.show')
+    public function getBreadcrumb(string $path, string $keyRoute = 'filemanager.show'): array
     {
         $path       = rtrim($path, '/');
         $nextPath   = '';
@@ -102,10 +117,10 @@ class FileManager
 
     public function parseDir(
         \SplFileInfo $dir,
-        $path,
-        $name = '',
-        $keyRoute = 'filemanager.show'
-    ) {
+        string $path,
+        string $name = '',
+        string $keyRoute = 'filemanager.show'
+    ): array {
         $info = self::parseRecursive($dir->getPathname());
 
         return [
@@ -125,7 +140,7 @@ class FileManager
         ];
     }
 
-    public function parseFile(\SplFileInfo $file, $path)
+    public function parseFile(\SplFileInfo $file, string $path): array
     {
         $path = Util::cleanPath($path);
 
@@ -150,7 +165,7 @@ class FileManager
         ];
     }
 
-    public function getActionsFolder($path, $name = '')
+    public function getActionsFolder(string $path, string $name = ''): array
     {
         $actions = [];
         if ($this->hookUser->hookFolderUpdate("$path$name")) {
@@ -179,14 +194,13 @@ class FileManager
         return $actions;
     }
 
-    public function getFileSubmenu($keyRoute, \SplFileInfo $file, $path)
+    public function getFileSubmenu(string $keyRoute, \SplFileInfo $file, string $path): Block
     {
         $menu = $this->getActionsFile($file, $path);
 
         $this->core->callHook('filemanager.file.submenu', [ &$menu ]);
 
-        return $this->core
-                ->get('template')
+        return $this->templating
                 ->getTheme('theme_admin')
                 ->createBlock('filemanager/modal-submenu.php', $this->pathViews)
                 ->addVars([
@@ -195,14 +209,13 @@ class FileManager
         ]);
     }
 
-    public function getFolderSubmenu($keyRoute, $path)
+    public function getFolderSubmenu(string $keyRoute, string $path): Block
     {
         $menu = $this->getActionsFolder($path);
 
         $this->core->callHook('filemanager.folder.submenu', [ &$menu ]);
 
-        return $this->core
-                ->get('template')
+        return $this->templating
                 ->getTheme('theme_admin')
                 ->createBlock('filemanager/modal-submenu.php', $this->pathViews)
                 ->addVars([
@@ -211,7 +224,7 @@ class FileManager
         ]);
     }
 
-    public function getActionsFile(\SplFileInfo $file, $path)
+    public function getActionsFile(\SplFileInfo $file, string $path): array
     {
         $actions = [];
         $name    = '/' . $file->getBasename('.' . $file->getExtension());
@@ -291,7 +304,7 @@ class FileManager
         return $actions;
     }
 
-    public static function parseRecursive($dir)
+    public static function parseRecursive(string $dir): array
     {
         $dirIterator = new \RecursiveDirectoryIterator($dir);
         $iterator    = new \RecursiveIteratorIterator($dirIterator);

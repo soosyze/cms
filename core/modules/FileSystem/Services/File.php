@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileSystem\Services;
 
 use Psr\Http\Message\UploadedFileInterface;
+use Soosyze\App;
+use Soosyze\Components\Form\FormGroupBuilder;
 use Soosyze\Components\Util\Util;
 
 class File
@@ -106,9 +110,9 @@ class File
     private $root;
 
     /**
-     * @param \Soosyze\App $core
+     * @param App $core
      */
-    public function __construct($core)
+    public function __construct(App $core)
     {
         $this->basePath = $core->getRequest()->getBasePath();
         $this->dir      = $core->getDir('files_public', 'app/files');
@@ -116,7 +120,7 @@ class File
         $this->root     = $core->getSetting('root', '');
     }
 
-    public function inputFile($name, &$form, $filePath = '', $type = 'image')
+    public function inputFile(string $name, FormGroupBuilder &$form, ?string $filePath = '', string $type = 'image'): void
     {
         $this->getThumbnail($name, $form, $filePath, $type);
 
@@ -152,7 +156,7 @@ class File
         }, [ 'class' => 'form-group-flex' ]);
     }
 
-    public function add(UploadedFileInterface $file, $fileHidden = '')
+    public function add(UploadedFileInterface $file, string $fileHidden = ''): self
     {
         $clone             = clone $this;
         $clone->file       = $file;
@@ -163,7 +167,7 @@ class File
         return $clone;
     }
 
-    public function setName($name)
+    public function setName(string $name): self
     {
         $clone       = clone $this;
         $clone->name = Util::strSlug($name);
@@ -171,7 +175,7 @@ class File
         return $clone;
     }
 
-    public function setPath($path)
+    public function setPath(string $path): self
     {
         $clone       = clone $this;
         $clone->dir  .= $path;
@@ -180,7 +184,7 @@ class File
         return $clone;
     }
 
-    public function isResolvePath($resolve = true, $mode = 0755)
+    public function isResolvePath(bool $resolve = true, int $mode = 0755): self
     {
         $clone               = clone $this;
         $clone->isResolveDir = $resolve;
@@ -189,7 +193,7 @@ class File
         return $clone;
     }
 
-    public function isResolveName()
+    public function isResolveName(): self
     {
         if (
             !$this->name &&
@@ -213,7 +217,7 @@ class File
         return $clone;
     }
 
-    public function callGet(callable $callback)
+    public function callGet(callable $callback): self
     {
         $clone          = clone $this;
         $clone->callGet = $callback;
@@ -221,7 +225,7 @@ class File
         return $clone;
     }
 
-    public function callMove(callable $callback)
+    public function callMove(callable $callback): self
     {
         $clone           = clone $this;
         $clone->callMove = $callback;
@@ -229,7 +233,7 @@ class File
         return $clone;
     }
 
-    public function callDelete(callable $callback)
+    public function callDelete(callable $callback): self
     {
         $clone             = clone $this;
         $clone->callDelete = $callback;
@@ -237,10 +241,10 @@ class File
         return $clone;
     }
 
-    public function save()
+    public function save(): self
     {
         if (!($this->file instanceof UploadedFileInterface)) {
-            throw new Exception('A file must be present to be saved.');
+            throw new \Exception('A file must be present to be saved.');
         }
 
         if ($this->file->getError() === UPLOAD_ERR_OK) {
@@ -270,10 +274,10 @@ class File
         return $this;
     }
 
-    public function saveOne()
+    public function saveOne(): self
     {
         if (!($this->file instanceof UploadedFileInterface)) {
-            throw new Exception('A file must be present to be saved.');
+            throw new \Exception('A file must be present to be saved.');
         }
 
         if ($this->file->getError() === UPLOAD_ERR_OK) {
@@ -291,7 +295,7 @@ class File
         return $this;
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->nameResolved
             ? $this->nameResolved
@@ -303,7 +307,7 @@ class File
      *
      * @return string
      */
-    public function getMoveDir()
+    public function getMoveDir(): string
     {
         $filename = $this->getName();
 
@@ -315,7 +319,7 @@ class File
      *
      * @return string
      */
-    public function getMovePath()
+    public function getMovePath(): string
     {
         $filename = $this->getName();
 
@@ -327,14 +331,14 @@ class File
      *
      * @return string
      */
-    public function getMovePathAbsolute()
+    public function getMovePathAbsolute(): string
     {
         $filename = $this->getName();
 
         return "{$this->basePath}{$this->path}/{$filename}.{$this->ext}";
     }
 
-    private function getThumbnail($name, &$form, $filePath, $type)
+    private function getThumbnail(string $name, FormGroupBuilder &$form, ?string $filePath, string $type): void
     {
         $src = is_file($this->root . $filePath)
             ? $this->basePath . $filePath
@@ -355,7 +359,7 @@ class File
         }, [ 'class' => 'form-group' ]);
     }
 
-    private function resolveDir()
+    private function resolveDir(): void
     {
         if ($this->isResolveDir && !is_dir($this->dir)) {
             mkdir($this->dir, $this->mode, true);

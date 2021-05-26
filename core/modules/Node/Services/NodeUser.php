@@ -1,9 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Services;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Router\Router;
 use Soosyze\Components\Util\Util;
+use Soosyze\Config;
+use SoosyzeCore\Node\Hook\User as HookUser;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\System\Services\Alias;
+use SoosyzeCore\User\Services\User;
 
 class NodeUser
 {
@@ -13,12 +21,12 @@ class NodeUser
     public $title = '';
 
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
@@ -33,32 +41,32 @@ class NodeUser
     private $grantedNotPublish;
 
     /**
-     * @var \SoosyzeCore\Node\Hook\User
+     * @var HookUser
      */
     private $hookUser;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
     /**
-     * @var \SoosyzeCore\User\Services\User
+     * @var User
      */
     private $user;
 
     public function __construct(
-        $alias,
-        $config,
-        $hookUser,
-        $query,
-        $router,
-        $user
+        Alias $alias,
+        Config $config,
+        HookUser $hookUser,
+        Query $query,
+        Router $router,
+        User $user
     ) {
         $this->alias    = $alias;
         $this->config   = $config;
@@ -68,7 +76,7 @@ class NodeUser
         $this->user     = $user;
     }
 
-    public function getNodesQuery()
+    public function getNodesQuery(): Query
     {
         $query = clone $this->query;
 
@@ -76,7 +84,7 @@ class NodeUser
             ->leftJoin('node_type', 'type', '=', 'node_type.node_type');
     }
 
-    public function whereNodes(&$nodeQuery)
+    public function whereNodes(Query &$nodeQuery): self
     {
         if ($this->isGrantedAdmin()) {
             return $this;
@@ -107,7 +115,7 @@ class NodeUser
         return $this;
     }
 
-    public function hydrateNodesLinks(array &$nodes)
+    public function hydrateNodesLinks(array &$nodes): void
     {
         $nodeAdminister = $this->user->isGranted('node.administer');
 
@@ -150,7 +158,7 @@ class NodeUser
         unset($node);
     }
 
-    public function getInfosUser(array $node)
+    public function getInfosUser(array $node): ?array
     {
         if (empty($node[ 'user_id' ])) {
             return null;
@@ -171,7 +179,7 @@ class NodeUser
         return $user;
     }
 
-    public function orWhereNodesUser(&$nodeQuery, $userId)
+    public function orWhereNodesUser(Query &$nodeQuery, int $userId): self
     {
         if (!$this->isGrantedAdmin() && $this->user->isGranted('node.show.own')) {
             $nodeQuery->orWhere('user_id', '===', $userId);
@@ -180,7 +188,7 @@ class NodeUser
         return $this;
     }
 
-    public function orderNodes(&$nodeQuery, ServerRequestInterface $req)
+    public function orderNodes(Query &$nodeQuery, ServerRequestInterface $req): self
     {
         $get = $req->getQueryParams();
 
@@ -201,7 +209,7 @@ class NodeUser
         return $this;
     }
 
-    private function isGrantedAdmin()
+    private function isGrantedAdmin(): bool
     {
         $this->grantedPublish    = $this->user->isGranted('node.show.published');
         $this->grantedNotPublish = $this->user->isGranted('node.show.not_published');

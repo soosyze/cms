@@ -1,11 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Translate\Services;
 
 class Translation extends \Soosyze\Config
 {
+    /**
+     * @var string
+     */
     private $lang;
 
+    /**
+     * @var array
+     */
     private $iso639_1 = [
         'aa'  => 'Afar',
         'ab'  => 'Abkhazian',
@@ -196,7 +204,7 @@ class Translation extends \Soosyze\Config
         'zu'  => 'Zulu'
     ];
 
-    public function __construct(\ArrayAccess $config, $dir, $langDefault = 'en')
+    public function __construct(\ArrayAccess $config, string $dir, string $langDefault = 'en')
     {
         parent::__construct($dir);
         $this->lang = isset($config[ 'settings.lang' ])
@@ -207,9 +215,9 @@ class Translation extends \Soosyze\Config
         }
     }
 
-    public function t($str, array $vars = [])
+    public function t(string $str, array $vars = []): string
     {
-        if (empty($str) || !\is_string($str)) {
+        if (empty($str)) {
             return '';
         }
         $subject = $this->get($str, $str);
@@ -218,7 +226,7 @@ class Translation extends \Soosyze\Config
         return htmlspecialchars($out);
     }
 
-    public function getLang()
+    public function getLang(): array
     {
         $path = $this->getPath();
 

@@ -1,35 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Services;
+
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
 
 class Alias
 {
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
-    public function __construct($config, $query)
+    public function __construct(Config $config, Query $query)
     {
         $this->config = $config;
         $this->query  = $query;
     }
 
-    public function getAlias($source, $default = null)
+    public function getAlias(string $source, ?string $default = null): string
     {
         $alias = $this->query->from('system_alias_url')->where('source', '=', $source)->fetch();
 
-        return empty($alias)
-            ? $default
-            : $alias[ 'alias' ];
+        return $alias['alias'] ?? $default;
     }
 
-    public function getSource($alias, $default = null)
+    public function getSource(string $alias, ?string $default = null): string
     {
         if ($alias === '/') {
             $index = $this->config[ 'settings.path_index' ];
@@ -42,8 +45,6 @@ class Alias
 
         $source = $this->query->from('system_alias_url')->where('alias', '=', $alias)->fetch();
 
-        return empty($source)
-            ? $default
-            : $source[ 'source' ];
+        return $source[ 'source' ] ?? $default;
     }
 }

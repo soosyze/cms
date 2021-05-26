@@ -1,47 +1,52 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Dashboard\Services;
+
+use Soosyze\App;
+use Soosyze\Config;
 
 class Dashboard
 {
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
-    public function __construct($config, $core)
+    public function __construct(Config $config, App $core)
     {
         $this->config = $config;
         $this->core   = $core;
     }
 
-    public function getSizeDatabase()
+    public function getSizeDatabase(): int
     {
         $host = $this->config->get('database.host');
 
         return $this->getSizeDirectoryInterator(ROOT . $host);
     }
 
-    public function getSizeFiles()
+    public function getSizeFiles(): int
     {
         $dir = $this->core->getDir('files_public');
 
         return $this->getSizeDirectoryInterator($dir);
     }
 
-    public function getSizeBackups()
+    public function getSizeBackups(): int
     {
         $dir = $this->core->getDir('backup_dir');
 
         return $this->getSizeDirectoryInterator($dir);
     }
 
-    public function getSizeDirectoryInterator($dir)
+    public function getSizeDirectoryInterator(string $dir): int
     {
         $size = 0;
         if (is_dir($dir)) {

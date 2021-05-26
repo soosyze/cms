@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Services;
+
+use SoosyzeCore\QueryBuilder\Services\Query;
 
 class Auth
 {
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
-    public function __construct($query)
+    public function __construct(Query $query)
     {
         $this->query = $query;
     }
@@ -22,7 +26,7 @@ class Auth
      *
      * @return bool
      */
-    public function login($email, $password)
+    public function login(string $email, string $password): bool
     {
         if (session_id() == '') {
             session_start([
@@ -45,7 +49,7 @@ class Auth
         return true;
     }
 
-    public function generateToken()
+    public function generateToken(): string
     {
         $now    = new \DateTime();
         $future = new \DateTime('now +2 hours');
@@ -55,37 +59,36 @@ class Auth
     }
 
     /**
-     * Attempt to find the user based on email and verify password
-     *
-     * @param $email
-     * @param $password
-     *
-     * @return bool|array
+     * Attempt to find the user based on email and verify password.
      */
-    public function attempt($email, $password)
+    public function attempt(string $email, string $password): ?array
     {
         if (!($user = $this->getUserActived($email))) {
-            return false;
+            return null;
         }
 
         if ($this->hashVerify($password, $user)) {
             return $user;
         }
 
-        return false;
+        return null;
     }
 
-    public function hashVerify($password, array $user)
+    public function hashVerify(string $password, array $user): bool
     {
         return password_verify($password, $user[ 'password' ]);
     }
 
-    public function hash($password)
+    public function hash(string $password): string
     {
-        return password_hash($password, PASSWORD_DEFAULT);
+        if ($hash = password_hash($password, PASSWORD_DEFAULT) === false) {
+            throw new \Exception();
+        }
+
+        return $hash;
     }
 
-    public function getUserActived($email, $actived = true)
+    public function getUserActived(string $email, bool $actived = true): array
     {
         return $this->query
                 ->from('user')
@@ -94,7 +97,7 @@ class Auth
                 ->fetch();
     }
 
-    public function getUserActivedToken($token, $actived = true)
+    public function getUserActivedToken(string $token, bool $actived = true): array
     {
         return $this->query
                 ->from('user')

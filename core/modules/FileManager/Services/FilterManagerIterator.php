@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Services;
+
+use SoosyzeCore\FileManager\Hook\User;
 
 class FilterManagerIterator extends \FilterIterator
 {
     /**
-     * @var \SoosyzeCore\FileManager\Hook\User
+     * @var User
      */
     private $hookUser;
 
@@ -14,12 +18,12 @@ class FilterManagerIterator extends \FilterIterator
      */
     private $path;
 
-    public function __construct($hookUser)
+    public function __construct(User $hookUser)
     {
         $this->hookUser = $hookUser;
     }
 
-    public function load($path, \Iterator $iterator)
+    public function load(string $path, \Iterator $iterator): self
     {
         parent::__construct($iterator);
         $this->path = $path;
@@ -27,7 +31,7 @@ class FilterManagerIterator extends \FilterIterator
         return $this;
     }
 
-    public function accept()
+    public function accept(): bool
     {
         $file   = $this->current();
         $accept = true;

@@ -1,16 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Block\Services;
+
+use Soosyze\App;
+use Soosyze\Config;
+use SoosyzeCore\Template\Services\Block as ServiceBlock;
 
 class Block
 {
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
@@ -19,14 +25,14 @@ class Block
      */
     private $pathViews;
 
-    public function __construct($config, $core)
+    public function __construct(Config $config, App $core)
     {
         $this->config    = $config;
         $this->core      = $core;
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function getBlocks()
+    public function getBlocks(): array
     {
         $blocks = [
             'button'  => [
@@ -97,7 +103,7 @@ class Block
         return $blocks;
     }
 
-    public function hookBlockSocial($tpl, array $options)
+    public function hookBlockSocial(ServiceBlock $tpl, array $options): ServiceBlock
     {
         return $tpl->addVar(
             'icon_socials',

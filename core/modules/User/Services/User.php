@@ -1,10 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Services;
 
 use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Soosyze\App;
 use Soosyze\Components\Http\Response;
 use Soosyze\Components\Http\Stream;
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
 use SoosyzeCore\Template\Services\Templating;
 
 class User
@@ -12,47 +19,60 @@ class User
     /**
      * Les données utilisateur courant ou false.
      *
-     * @var bool|array
+     * @var null|array
      */
-    private $connect = false;
+    private $connect = null;
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * La liste des permissions pour l'utilisateur courant.
+     *
      * @var array
      */
     private $granted     = [];
 
     /**
-     * La liste des permissions
+     * La liste des permissions.
+     *
      * @var array
      */
     private $permissions = [];
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($core, $query, $router)
+    /**
+     * @var string
+     */
+    private $pathViews;
+
+    public function __construct(App $core, Config $config, Query $query, Router $router)
     {
         $this->core   = $core;
+        $this->config = $config;
         $this->query  = $query;
         $this->router = $router;
 
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function find($id)
+    public function find(int $id): array
     {
         return $this->query
                 ->from('user')
@@ -60,7 +80,7 @@ class User
                 ->fetch();
     }
 
-    public function findActived($id, $actived = true)
+    public function findActived(int $id, bool $actived = true): array
     {
         return $this->query
                 ->from('user')
@@ -69,7 +89,7 @@ class User
                 ->fetch();
     }
 
-    public function getUser($email)
+    public function getUser(string $email): array
     {
         return $this->query
                 ->from('user')
@@ -77,7 +97,7 @@ class User
                 ->fetch();
     }
 
-    public function getUserByUsername($username)
+    public function getUserByUsername(string $username): array
     {
         return $this->query
                 ->from('user')
@@ -85,7 +105,7 @@ class User
                 ->fetch();
     }
 
-    public function getUserActived($email, $actived = true)
+    public function getUserActived(string $email, bool $actived = true): array
     {
         return $this->query
                 ->from('user')
@@ -94,7 +114,7 @@ class User
                 ->fetch();
     }
 
-    public function getUserActivedToken($token, $actived = true)
+    public function getUserActivedToken(string $token, bool $actived = true): array
     {
         return $this->query
                 ->from('user')
@@ -103,12 +123,12 @@ class User
                 ->fetch();
     }
 
-    public function getUsers()
+    public function getUsers(): array
     {
         return $this->query->from('user')->fetchAll();
     }
 
-    public function getRolesUser($idUser)
+    public function getRolesUser(int $idUser): array
     {
         return $this->query
                 ->from('user_role')
@@ -117,12 +137,12 @@ class User
                 ->fetchAll();
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         return $this->query->from('role')->fetchAll();
     }
 
-    public function getRolesAttribuable()
+    public function getRolesAttribuable(): array
     {
         return $this->query
             ->from('role')
@@ -131,7 +151,7 @@ class User
             ->fetchAll();
     }
 
-    public function getIdRolesUser($idUser)
+    public function getIdRolesUser(int $idUser): array
     {
         $data = $this->getRolesUser($idUser);
 
@@ -143,7 +163,7 @@ class User
         return $out;
     }
 
-    public function getUserSubmenu($keyRoute, $id)
+    public function getUserSubmenu(string $keyRoute, int $id): array
     {
         $menu = [
             [
@@ -187,7 +207,7 @@ class User
         ];
     }
 
-    public function getUserManagerSubmenu($keyRoute)
+    public function getUserManagerSubmenu(string $keyRoute): array
     {
         $menu = [
             [
@@ -220,7 +240,7 @@ class User
         return [ 'key_route' => $keyRoute, 'menu' => $menu ];
     }
 
-    public function hasPermission($idPermission)
+    public function hasPermission(string $idPermission): bool
     {
         if (!empty($this->permissions)) {
             return isset($this->permissions[ $idPermission ]);
@@ -235,7 +255,7 @@ class User
         return isset($this->permissions[ $idPermission ]);
     }
 
-    public function getGranted($user, $idPermission)
+    public function getGranted(array $user, string $idPermission): bool
     {
         if (!empty($this->granted)) {
             return in_array($idPermission, $this->granted);
@@ -255,7 +275,7 @@ class User
         return in_array($idPermission, $this->granted);
     }
 
-    public function getGrantedAnonymous($idPermission)
+    public function getGrantedAnonymous(string $idPermission): bool
     {
         if (!empty($this->granted)) {
             return in_array($idPermission, $this->granted);
@@ -294,25 +314,25 @@ class User
         return null;
     }
 
-    public function isConnectUrl($url)
+    public function isConnectUrl(string $url): bool
     {
-        $connectUrl = $this->core->get('config')->get('settings.connect_url', '');
+        $connectUrl = $this->config->get('settings.connect_url', '');
 
         return !empty($connectUrl) && $url !== '/' . $connectUrl;
     }
 
-    public function passwordPolicy()
+    public function passwordPolicy(): string
     {
-        if (($length = (int) $this->core->get('config')->get('settings.password_length', 8)) < 8) {
+        if (($length = (int) $this->config->get('settings.password_length', 8)) < 8) {
             $length = 8;
         }
-        if (($upper = (int) $this->core->get('config')->get('settings.password_upper', 1)) < 1) {
+        if (($upper = (int) $this->config->get('settings.password_upper', 1)) < 1) {
             $upper = 1;
         }
-        if (($digit = (int) $this->core->get('config')->get('settings.password_digit', 1)) < 1) {
+        if (($digit = (int) $this->config->get('settings.password_digit', 1)) < 1) {
             $digit = 1;
         }
-        if (($special = (int) $this->core->get('config')->get('settings.password_special', 1)) < 1) {
+        if (($special = (int) $this->config->get('settings.password_special', 1)) < 1) {
             $special = 1;
         }
 
@@ -321,13 +341,8 @@ class User
 
     /**
      * Vérifie les droits d'accès aux contrôleurs.
-     *
-     * @param type $key
-     * @param type $grant
-     *
-     * @return type
      */
-    public function isGranted($key, &$grant = false)
+    public function isGranted(string $key, bool &$grant = false): bool
     {
         /* Si la permission n'existe pas. */
         if (!$this->hasPermission($key)) {
@@ -345,7 +360,7 @@ class User
         return $grant;
     }
 
-    public function isGrantedRequest(RequestInterface $request)
+    public function isGrantedRequest(RequestInterface $request): bool
     {
         $route = $this->router->parse($request);
 
@@ -366,7 +381,10 @@ class User
         return $this->isGrantedPermission($permissions);
     }
 
-    public function isGrantedPermission($permissions)
+    /**
+     * @param bool|null|string|array $permissions
+     */
+    public function isGrantedPermission($permissions): bool
     {
         if (\is_bool($permissions)) {
             return $permissions;
@@ -389,20 +407,15 @@ class User
     /**
      * Fonctionnement par défaut de l'application.
      * Défini les règles du déclenchement d'un retour 403 à l'aide des hooks.
-     *
-     * @param Request  $request
-     * @param Response $response
-     *
-     * @return Response
      */
-    public function hookResponseBefore(RequestInterface &$request, &$response)
+    public function hookResponseBefore(RequestInterface &$request, ResponseInterface &$response): void
     {
         if (!$this->isGrantedRequest($request)) {
             $response = new Response(403, new Stream('Error HTTP 403 Forbidden'));
         }
     }
 
-    public function hookResponseAfter(RequestInterface $request, &$response)
+    public function hookResponseAfter(RequestInterface $request, ResponseInterface &$response): void
     {
         if (!($response instanceof Templating)) {
             return;

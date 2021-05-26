@@ -10,12 +10,12 @@ if (\Core::getInstance()->get('config')->get('settings.lang') === 'fr') {
     );
 }
 
-function t($str, $vars = [])
+function t(string $str, array $vars = []): string
 {
     return \Core::getInstance()->get('translate')->t($str, $vars);
 }
 
-function xss($str)
+function xss(string $str): string
 {
     return \Core::getInstance()->get('xss')->filter($str);
 }

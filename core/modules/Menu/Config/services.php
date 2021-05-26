@@ -3,7 +3,7 @@
 return [
     'menu' => [
         'class' => 'SoosyzeCore\Menu\Services\Menu',
-        'arguments' => ['@alias', '@config', '@core', '@query', '@router']
+        'arguments' => ['@alias', '@config', '@core', '@query', '@router', '@template']
     ],
     'menu.extend' => [
         'class' => 'SoosyzeCore\Menu\Extend',

@@ -3,7 +3,7 @@
 return [
     'filemanager' => [
         'class' => 'SoosyzeCore\FileManager\Services\FileManager',
-        'arguments' => ['@core', '@filemanager.hook.user', '@router']
+        'arguments' => ['@core', '@config', '@filemanager.hook.user', '@router', '@template']
     ],
     'fileprofil' => [
         'class' => 'SoosyzeCore\FileManager\Services\FileProfil',

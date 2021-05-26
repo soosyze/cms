@@ -1,16 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Services;
+
+use Soosyze\App;
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\QueryBuilder\Services\Schema;
+use SoosyzeCore\Template\Services\Templating;
 
 class Node
 {
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
@@ -47,21 +55,21 @@ class Node
     private $pathViews;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Schema
+     * @var Schema
      */
     private $schema;
 
     /**
-     * @var \SoosyzeCore\Template\Services\Templating
+     * @var Templating
      */
     private $tpl;
 
-    public function __construct($config, $core, $query, $schema, $tpl)
+    public function __construct(Config $config, App $core, Query $query, Schema $schema, Templating $tpl)
     {
         $this->config = $config;
         $this->core   = $core;
@@ -72,7 +80,7 @@ class Node
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function makeFieldsByData($type, array $data)
+    public function makeFieldsByData(string $type, array $data): array
     {
         $out = [];
         foreach ($data as $value) {
@@ -82,7 +90,7 @@ class Node
         return $out;
     }
 
-    public function makeFieldsById($entity, $idEntity)
+    public function makeFieldsById(string $entity, int $idEntity): array
     {
         $data         = $this->getEntity($entity, $idEntity);
         $data[ 'id' ] = $idEntity;
@@ -90,7 +98,7 @@ class Node
         return $this->makeFields($entity, $this->getFields($entity), $data);
     }
 
-    public function makeFieldsByEntity($entity, array $data, array $options)
+    public function makeFieldsByEntity(string $entity, array $data, array $options): array
     {
         $this->query
             ->from('entity_' . $entity)
@@ -118,7 +126,7 @@ class Node
         return $out;
     }
 
-    public function getFields($type)
+    public function getFields(string $type): array
     {
         if (isset($this->nodeTypeField[ $type ])) {
             return $this->nodeTypeField[ $type ];
@@ -136,7 +144,7 @@ class Node
         return $this->nodeTypeField[ $type ];
     }
 
-    public function getCurrentNode($idNode = null)
+    public function getCurrentNode(?int $idNode = null): ?array
     {
         if (!$this->nodeCurrent && $idNode !== null) {
             $this->nodeCurrent = $this->byId($idNode);
@@ -145,7 +153,7 @@ class Node
         return $this->nodeCurrent;
     }
 
-    public function byId($idNode)
+    public function byId(int $idNode): array
     {
         return $this->query
                 ->from('node')
@@ -153,7 +161,7 @@ class Node
                 ->fetch();
     }
 
-    public function getEntity($entity, $idEntity)
+    public function getEntity(string $entity, int $idEntity): array
     {
         return $this->query
                 ->from('entity_' . $entity)
@@ -161,7 +169,7 @@ class Node
                 ->fetch();
     }
 
-    public function getFieldRelationByEntity($entity)
+    public function getFieldRelationByEntity(string $entity): array
     {
         return $this->query
                 ->from('node_type_field')
@@ -171,7 +179,7 @@ class Node
                 ->fetch();
     }
 
-    public function getFieldsForm($type)
+    public function getFieldsForm(string $type): array
     {
         return $this->query
                 ->from('node_type')
@@ -182,7 +190,7 @@ class Node
                 ->fetchAll();
     }
 
-    public function getFieldsDisplay($type)
+    public function getFieldsDisplay(string $type): array
     {
         return $this->query
                 ->from('node_type')
@@ -194,7 +202,7 @@ class Node
                 ->fetchAll();
     }
 
-    public function getFieldsEntity($entity)
+    public function getFieldsEntity(string $entity): array
     {
         return $this->getNodeTypeFieldsQuery($entity)
                 ->where('field_show_form', '=', true)
@@ -202,7 +210,7 @@ class Node
                 ->fetchAll();
     }
 
-    public function deleteAliasByType($nodeType)
+    public function deleteAliasByType(string $nodeType): void
     {
         $nodes = $this->query
             ->from('node')
@@ -222,7 +230,7 @@ class Node
         }
     }
 
-    public function deleteByType($nodeType)
+    public function deleteByType(string $nodeType): void
     {
         $nodeTypeFields = $this->getNodeTypeFieldsQuery($nodeType)->fetchAll();
 
@@ -245,7 +253,7 @@ class Node
             $isUseOtherTable = $this->query
                 ->from('node_type_field')
                 ->where('field_id', '=', $nodeTypeField[ 'field_id' ])
-                ->where('node_type', '=', '!==', $nodeType)
+                ->where('node_type', '=', $nodeType)
                 ->fetch();
 
             /* Si le champ n'est pas utiliser dans une autre entityé, il est supprimé. */
@@ -276,7 +284,7 @@ class Node
         $this->schema->dropTableIfExists("entity_$nodeType");
     }
 
-    public function deleteRelation($node)
+    public function deleteRelation(array $node): void
     {
         /* Suppression des relations */
         $entity = $this->getEntity($node[ 'type' ], $node[ 'entity_id' ]);
@@ -301,7 +309,7 @@ class Node
             ->execute();
     }
 
-    public function deleteFile($type, $idNode)
+    public function deleteFile(string $type, int $idNode): void
     {
         $dir = $this->core->getSettingEnv('files_public', 'app/files') . "/node/$type/$idNode";
         if (!is_dir($dir)) {
@@ -321,7 +329,7 @@ class Node
         \rmdir($dir);
     }
 
-    public function isMaxEntity($entity, $foreignKey, $idNode, $count)
+    public function isMaxEntity(string $entity, string $foreignKey, int $idNode, int $count): bool
     {
         if ($count === 0) {
             return false;
@@ -335,7 +343,7 @@ class Node
         return count($data) >= $count;
     }
 
-    public function getRules($field)
+    public function getRules(array $field): array
     {
         $out = [];
         if (preg_match('/^(.*\|)?required(\|.*)?/', $field[ 'field_rules' ])) {
@@ -355,7 +363,7 @@ class Node
         return $out;
     }
 
-    public function getPathSettings()
+    public function getPathSettings(): array
     {
         return [
             [
@@ -397,7 +405,7 @@ class Node
         ];
     }
 
-    private function getNodeTypeFieldsQuery($nodeType)
+    private function getNodeTypeFieldsQuery(string $nodeType): Query
     {
         return $this->query
                 ->from('node_type_field')
@@ -405,7 +413,7 @@ class Node
                 ->where('node_type', '=', $nodeType);
     }
 
-    private function makeFields($type, array $fields, array $data)
+    private function makeFields(string $type, array $fields, array $data): array
     {
         $out = [];
 

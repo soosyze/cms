@@ -3,7 +3,7 @@
 return [
     'user' => [
         'class' => 'SoosyzeCore\User\Services\User',
-        'arguments' => ['@core', '@query', '@router'],
+        'arguments' => ['@core', '@config', '@query', '@router'],
         'hooks' => [
             'app.granted' => 'isGranted',
             'app.granted.request' => 'isGrantedRequest',

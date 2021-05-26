@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\QueryBuilder\Services;
 
 class Query extends \Queryflatfile\Request
 {
+    /**
+     * @var array
+     */
     private $listRequest = [];
 
     public function fetchAll(): array
@@ -20,7 +25,7 @@ class Query extends \Queryflatfile\Request
         return $output;
     }
 
-    public function getListeRequest()
+    public function getListeRequest(): array
     {
         return $this->listRequest;
     }

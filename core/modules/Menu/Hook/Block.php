@@ -8,7 +8,7 @@ use Soosyze\Components\Form\FormGroupBuilder;
 use Soosyze\Components\Router\Router;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Menu\Services\Menu;
-use SoosyzeCore\Template\Services\Block as TemplateBlock;
+use SoosyzeCore\Template\Services\Block as ServiceBlock;
 
 class Block implements \SoosyzeCore\Block\BlockInterface
 {
@@ -44,7 +44,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         }
     }
 
-    public function hookBlockMenu(TemplateBlock $tpl, array $options): TemplateBlock
+    public function hookBlockMenu(ServiceBlock $tpl, array $options): ServiceBlock
     {
         if ($menu = $this->menu->renderMenu($options[ 'name' ], $options[ 'parent' ])) {
             return $menu

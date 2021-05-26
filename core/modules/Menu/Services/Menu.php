@@ -1,23 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Menu\Services;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\UriInterface;
+use Soosyze\App;
 use Soosyze\Components\Http\Uri;
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\System\Services\Alias;
+use SoosyzeCore\Template\Services\Block;
+use SoosyzeCore\Template\Services\Templating;
 
 class Menu
 {
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
@@ -27,32 +38,38 @@ class Menu
     private $pathViews;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($alias, $config, $core, $query, $router)
+    /**
+     * @var Templating
+     */
+    private $templating;
+
+    public function __construct(Alias $alias, Config $config, App $core, Query $query, Router $router, Templating $templating)
     {
-        $this->alias  = $alias;
-        $this->config = $config;
-        $this->core   = $core;
-        $this->query  = $query;
-        $this->router = $router;
+        $this->alias      = $alias;
+        $this->config     = $config;
+        $this->core       = $core;
+        $this->query      = $query;
+        $this->router     = $router;
+        $this->templating = $templating;
 
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function getPathViews()
+    public function getPathViews(): string
     {
         return $this->pathViews;
     }
 
-    public function find($id)
+    public function find(int $id): array
     {
         return $this->query
                 ->from('menu_link')
@@ -60,7 +77,7 @@ class Menu
                 ->fetch();
     }
 
-    public function deleteLinks(callable $callable)
+    public function deleteLinks(callable $callable): void
     {
         $links = $callable();
 
@@ -77,21 +94,21 @@ class Menu
         }
     }
 
-    public function getMenu($name)
+    public function getMenu(string $name): Query
     {
         return $this->query
                 ->from('menu')
                 ->where('name', '=', $name);
     }
 
-    public function getAllMenu()
+    public function getAllMenu(): array
     {
         return $this->query
                 ->from('menu')
                 ->fetchAll();
     }
 
-    public function getLinkPerMenu($name)
+    public function getLinkPerMenu(string $name): Query
     {
         $menu = $this->getMenu($name)->fetch();
 
@@ -100,7 +117,7 @@ class Menu
                 ->where('menu', '==', $menu[ 'name' ]);
     }
 
-    public function getInfo($link, $request)
+    public function getInfo(string $link, RequestInterface $request): array
     {
         if (filter_var($link, FILTER_VALIDATE_URL)) {
             return [
@@ -134,9 +151,7 @@ class Menu
         $route = $this->router->parse($request->withUri($uriSource)->withMethod('get'));
 
         return [
-            'key'         => isset($route[ 'key' ])
-                ? $route[ 'key' ]
-                : null,
+            'key'         => $route[ 'key' ] ?? null,
             'link'        => $uri->getPath(),
             'link_router' => isset($route[ 'key' ]) && $linkSource !== $uri->getPath()
                 ? $linkSource
@@ -146,7 +161,7 @@ class Menu
         ];
     }
 
-    public function renderMenuSelect($nameMenu, $parent = -1, $level = 1)
+    public function renderMenuSelect(string $nameMenu, int $parent = -1, int $level = 1): array
     {
         $query = $this->query
             ->from('menu_link')
@@ -188,7 +203,7 @@ class Menu
         return $options;
     }
 
-    public function renderMenu($nameMenu, $parent = -1, $level = 1)
+    public function renderMenu(string $nameMenu, int $parent = -1, int $level = 1): ?Block
     {
         $query = $this->query
             ->from('menu_link')
@@ -210,8 +225,7 @@ class Menu
         }
         unset($link);
 
-        return $this->core
-                ->get('template')
+        return $this->templating
                 ->createBlock('menu.php', $this->pathViews)
                 ->addNameOverride($nameMenu . '.php')
                 ->addVars([
@@ -220,7 +234,7 @@ class Menu
         ]);
     }
 
-    public function rewiteUri($link)
+    public function rewiteUri(array $link): UriInterface
     {
         $basePath = $this->core->getRequest()->getBasePath();
         $uri      = Uri::create($basePath)->withFragment($link[ 'fragment' ]);
@@ -248,7 +262,7 @@ class Menu
      *
      * @return array
      */
-    private function getGrantedLink($query)
+    private function getGrantedLink(array $query): array
     {
         $route   = $this->router->parseQueryFromRequest();
         $request = $this->core->getRequest()->withMethod('GET');

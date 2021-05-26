@@ -1,30 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\BackupManager\Services;
+
+use Soosyze\App;
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
 
 class BackupManager
 {
     /**
      * ISO8601 adapté.
      */
-    const DATE_FORMAT = 'Y-m-d\TH-i-s';
+    public const DATE_FORMAT = 'Y-m-d\TH-i-s';
 
-    const DATE_REGEX = '2[\d]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][\d]|3[01])T([01][\d]|2[0-3])-[0-5][\d]-[0-5][\d]';
+    public const DATE_REGEX = '2[\d]{3}-(0[1-9]|1[0-2])-(0[1-9]|[12][\d]|3[01])T([01][\d]|2[0-3])-[0-5][\d]-[0-5][\d]';
 
-    const SUFFIX = 'soosyzecms.zip';
+    public const SUFFIX = 'soosyzecms.zip';
 
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
@@ -33,7 +39,7 @@ class BackupManager
      */
     private $repository;
 
-    public function __construct($config, $core, $router)
+    public function __construct(Config $config, App $core, Router $router)
     {
         $this->config = $config;
         $this->core   = $core;
@@ -42,17 +48,17 @@ class BackupManager
         $this->repository = $this->core->getDir('backup_dir', '../soosyze_backups');
     }
 
-    public function isRepository()
+    public function isRepository(): bool
     {
         return is_dir($this->repository);
     }
 
-    public function getRepository()
+    public function getRepository(): string
     {
         return $this->repository;
     }
 
-    public function listBackups()
+    public function listBackups(): array
     {
         if (!$this->isRepository()) {
             return [];
@@ -82,7 +88,7 @@ class BackupManager
         return $backups;
     }
 
-    public function doBackup()
+    public function doBackup(): bool
     {
         if (!($backup = $this->getFreshZip())) {
             return false;
@@ -93,7 +99,7 @@ class BackupManager
         return $backup->close();
     }
 
-    public function restore($date)
+    public function restore(string $date): bool
     {
         $file = $this->repository . DS . $date . self::SUFFIX;
         if (file_exists($file)) {
@@ -107,7 +113,7 @@ class BackupManager
         return false;
     }
 
-    public function delete($date)
+    public function delete(string $date): bool
     {
         $file = $this->repository . DS . $date . self::SUFFIX;
 
@@ -116,7 +122,7 @@ class BackupManager
             : false;
     }
 
-    public function deleteAll()
+    public function deleteAll(): bool
     {
         foreach (new \DirectoryIterator($this->repository) as $file) {
             if ($file->isDot() || $file->isDir() || $file->getExtension() != 'zip') {
@@ -128,20 +134,22 @@ class BackupManager
         return true;
     }
 
-    public function getBackup($date)
+    public function getBackup(string $date): ?string
     {
-        $file = $this->repository . DS . $date . self::SUFFIX;
+        if (!file_exists($file = $this->repository . DS . $date . self::SUFFIX)) {
+            return null;
+        }
 
-        return file_exists($file)
-            ? \file_get_contents($file)
-            : false;
+        return ($content = \file_get_contents($file)) === false
+            ? null
+            : $content;
     }
 
-    private function getFreshZip()
+    private function getFreshZip(): ?\ZipArchive
     {
         $maxBackups = $this->config->get('settings.max_backups');
         if (!$this->isRepository()) {
-            return false;
+            return null;
         }
 
         $dir = scandir($this->repository, SCANDIR_SORT_ASCENDING);
@@ -158,15 +166,15 @@ class BackupManager
             return $backup;
         }
 
-        return false;
+        return null;
     }
 
-    private function generateBackupName()
+    private function generateBackupName(): string
     {
         return \date(self::DATE_FORMAT) . self::SUFFIX;
     }
 
-    private function zipRecursivly($dir, \ZipArchive $zip)
+    private function zipRecursivly(string $dir, \ZipArchive $zip): \ZipArchive
     {
         $dit = new \DirectoryIterator($dir);
         foreach ($dit as $file) {
