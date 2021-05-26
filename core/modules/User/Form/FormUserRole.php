@@ -8,8 +8,14 @@ use Soosyze\Components\Form\FormGroupBuilder;
 
 class FormUserRole extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
+    /**
+     * @var array
+     */
     private $values = [
         'role_label'       => '',
         'role_description' => '',

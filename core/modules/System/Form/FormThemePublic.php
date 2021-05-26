@@ -8,6 +8,9 @@ use SoosyzeCore\FileSystem\Services\File;
 
 class FormThemePublic extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**
@@ -15,6 +18,9 @@ class FormThemePublic extends \Soosyze\Components\Form\FormBuilder
      */
     private $file;
 
+    /**
+     * @var array
+     */
     private $values = [
         'favicon' => '',
         'logo'    => ''

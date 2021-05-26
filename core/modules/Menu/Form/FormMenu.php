@@ -6,8 +6,14 @@ namespace SoosyzeCore\Menu\Form;
 
 class FormMenu extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
+    /**
+     * @var array
+     */
     private $values = [
         'title'       => '',
         'description' => ''

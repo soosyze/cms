@@ -12,6 +12,9 @@ use SoosyzeCore\QueryBuilder\Services\Query;
 
 class FormNode extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $fieldRules = [
         'email',
         'month',
@@ -24,10 +27,19 @@ class FormNode extends \Soosyze\Components\Form\FormBuilder
         'week'
     ];
 
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
+    /**
+     * @var array
+     */
     private static $attrGrpInline = [ 'class' => 'form-group-inline' ];
 
+    /**
+     * @var array
+     */
     private $values = [
         'title'            => '',
         'meta_description' => '',
@@ -42,6 +54,9 @@ class FormNode extends \Soosyze\Components\Form\FormBuilder
         'user_id'          => null
     ];
 
+    /**
+     * @var File
+     */
     private $file;
 
     /**
@@ -70,6 +85,11 @@ class FormNode extends \Soosyze\Components\Form\FormBuilder
      * @var array|null
      */
     private $userCurrent = null;
+
+    /**
+     * @var string
+     */
+    private $type;
 
     /**
      * Si l'utilisateur du contenu est modifiable.
@@ -380,7 +400,7 @@ class FormNode extends \Soosyze\Components\Form\FormBuilder
         return isset($options[ 'field_type_show' ]) && $options[ 'field_type_show' ] === 'image' && is_file($field[ $options[ 'field_type_show' ] ]);
     }
 
-    public function makeRadio(FormGroupBuilder &$form, $key, array $value, array $options): void
+    public function makeRadio(FormGroupBuilder &$form, string $key, array $value, array $options): void
     {
         $form->label("$key-label", t($value[ 'field_label' ]), [
             'data-tooltip' => t($value[ 'field_description' ])

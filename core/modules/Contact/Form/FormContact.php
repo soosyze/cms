@@ -6,8 +6,14 @@ namespace SoosyzeCore\Contact\Form;
 
 class FormContact extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
+    /**
+     * @var array
+     */
     private $values = [
         'name'    => '',
         'email'   => '',

@@ -11,8 +11,14 @@ use SoosyzeCore\FileSystem\Services\File;
 
 class FormUser extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
+    /**
+     * @var array
+     */
     private $values = [
         'username'         => '',
         'email'            => '',
@@ -27,12 +33,12 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
     ];
 
     /**
-     * @var File
+     * @var File|null
      */
     private $file;
 
     /**
-     * @var Config
+     * @var Config|null
      */
     private $config;
 
@@ -202,7 +208,7 @@ class FormUser extends \Soosyze\Components\Form\FormBuilder
         return $this;
     }
 
-    public function password(&$form, $id, $label, array $attr = []): void
+    public function password(FormGroupBuilder &$form, string $id, string $label, array $attr = []): void
     {
         $form->group("$id-group", 'div', function ($form) use ($id, $label, $attr) {
             $form->label("$id-label", $label, [ 'for' => $id ])

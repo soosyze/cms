@@ -6,6 +6,9 @@ namespace SoosyzeCore\FileManager\Form;
 
 class FormFolder extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private $values = [ 'name' => '' ];
 
     public function setValues(array $values): self

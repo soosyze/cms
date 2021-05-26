@@ -9,10 +9,19 @@ use SoosyzeCore\FileManager\Services\FileManager;
 
 class FormPermission extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
+    /**
+     * @var array
+     */
     private static $attrGrpFlex = [ 'class' => 'form-group-flex' ];
 
+    /**
+     * @var array
+     */
     private $values = [
         'folder_show'         => '/',
         'folder_show_sub'     => true,
@@ -33,6 +42,9 @@ class FormPermission extends \Soosyze\Components\Form\FormBuilder
         'file_extensions'     => []
     ];
 
+    /**
+     * @var array
+     */
     private $roles = [];
 
     public function setValues(array $values): self

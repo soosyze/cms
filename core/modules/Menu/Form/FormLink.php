@@ -8,15 +8,24 @@ use Soosyze\Components\Router\Router;
 
 class FormLink extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
-    private $isRewrite = false;
+    /**
+     * @var string
+     */
+    private $isRewrite = '';
 
     /**
      * @var Router
      */
     private $router;
 
+    /**
+     * @var array
+     */
     private $values = [
         'title_link'  => '',
         'link'        => '',

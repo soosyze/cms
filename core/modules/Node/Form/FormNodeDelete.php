@@ -8,6 +8,9 @@ use Soosyze\Components\Router\Router;
 
 class FormNodeDelete extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**
@@ -15,13 +18,19 @@ class FormNodeDelete extends \Soosyze\Components\Form\FormBuilder
      */
     private $router;
 
+    /**
+     * @var array
+     */
     private $values = [
         'current_path' => '',
         'files'        => 1,
         'path'         => ''
     ];
 
-    private $useInPath;
+    /**
+     * @var array|null
+     */
+    private $useInPath = null;
 
     public function __construct(array $attr, Router $router)
     {
@@ -29,7 +38,7 @@ class FormNodeDelete extends \Soosyze\Components\Form\FormBuilder
         $this->router = $router;
     }
 
-    public function setValues(array $values, bool $useInPath): self
+    public function setValues(array $values, ?array $useInPath): self
     {
         $this->values    = array_merge($this->values, $values);
         $this->useInPath = $useInPath;

@@ -6,8 +6,14 @@ namespace SoosyzeCore\System\Form;
 
 class FormThemeAdmin extends \Soosyze\Components\Form\FormBuilder
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
+    /**
+     * @var array
+     */
     private $values = [
         'theme_admin_dark' => ''
     ];

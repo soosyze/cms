@@ -14,12 +14,24 @@ class FormBlock extends \Soosyze\Components\Form\FormBuilder
 
     public const SHOW_BLOCK_ROLES = 1;
 
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
+    /**
+     * @var int
+     */
     private $id = 0;
 
+    /**
+     * @var array
+     */
     private $rolesUser = [];
 
+    /**
+     * @var array
+     */
     private $values = [
         'title'            => '',
         'content'          => '',
