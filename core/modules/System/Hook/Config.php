@@ -8,11 +8,14 @@ use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Router\Router;
 use Soosyze\Components\Validator\Validator;
-use SoosyzeCore\Filesystem\Services\File;
+use SoosyzeCore\FileSystem\Services\File;
 use SoosyzeCore\Translate\Services\Translation;
 
 final class Config implements \SoosyzeCore\Config\ConfigInterface
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**

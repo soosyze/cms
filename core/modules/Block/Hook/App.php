@@ -1,18 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Block\Hook;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Soosyze\App as SoosyzeApp;
+use Soosyze\Components\Router\Router;
+use SoosyzeCore\Block\Services\Block;
+use SoosyzeCore\QueryBuilder\Services\Query;
 use SoosyzeCore\Template\Services\Templating;
+use SoosyzeCore\User\Services\User;
 
 class App
 {
     /**
-     * @var \Soosyze\App
+     * @var SoosyzeApp
      */
     private $core;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Block
+     */
+    private $block;
+
+    /**
+     * @var Query
      */
     private $query;
 
@@ -27,7 +41,7 @@ class App
     private $roles = [];
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
@@ -43,12 +57,14 @@ class App
      */
     private $userCurrent;
 
-    public function __construct($core, $query, $router, $template, $user)
+    public function __construct(SoosyzeApp $core, Block $block, Query $query, Router $router, Templating $template, User $user)
     {
         $this->core   = $core;
+        $this->block  = $block;
         $this->query  = $query;
         $this->router = $router;
         $this->tpl    = $template;
+        $this->block  = $block;
 
         $this->pathViews = dirname(__DIR__) . '/Views/';
 
@@ -60,7 +76,7 @@ class App
         }
     }
 
-    public function hookResponseAfter($request, &$response)
+    public function hookResponseAfter(RequestInterface $request, ResponseInterface &$response): void
     {
         if (!($response instanceof Templating) || $response->getStatusCode() !== 200) {
             return;
@@ -90,7 +106,7 @@ class App
         }
     }
 
-    private function getNameTheme()
+    private function getNameTheme(): string
     {
         $query = $this->router->parseQueryFromRequest();
         if ($query === 'admin/theme/public/section') {
@@ -103,14 +119,14 @@ class App
         return '';
     }
 
-    private function getBlocks($isAdmin)
+    private function getBlocks(bool $isAdmin): array
     {
         $blocks = $this->query
             ->from('block')
             ->orderBy('weight')
             ->fetchAll();
 
-        $listBlock = $this->core->get('block')->getBlocks();
+        $listBlock = $this->block->getBlocks();
 
         $out = [];
         foreach ($blocks as $block) {
@@ -145,7 +161,7 @@ class App
         return $out;
     }
 
-    private function isVisibilityPages(array $block)
+    private function isVisibilityPages(array $block): bool
     {
         $path = $this->router->parseQueryFromRequest();
 
@@ -167,7 +183,7 @@ class App
         return !$visibility;
     }
 
-    private function isVisibilityRoles(array $block)
+    private function isVisibilityRoles(array $block): bool
     {
         $rolesBlock  = explode(',', $block[ 'roles' ]);
         $visibility  = $block[ 'visibility_roles' ];

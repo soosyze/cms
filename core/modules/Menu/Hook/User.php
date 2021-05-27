@@ -27,7 +27,7 @@ class User implements \SoosyzeCore\User\UserInterface
             : 'menu.administer';
     }
 
-    public function hookMenuApiShow(string $menu, ?ServerRequestInterface $req, ?array $user)
+    public function hookMenuApiShow(string $menu, ?ServerRequestInterface $req, ?array $user): bool
     {
         return !empty($user);
     }

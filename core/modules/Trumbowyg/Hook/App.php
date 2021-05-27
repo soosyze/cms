@@ -1,28 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Trumbowyg\Hook;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Soosyze\App as SoosyzeApp;
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
 use SoosyzeCore\Template\Services\Templating;
 
 class App
 {
     /**
-     * @var \Soosyze\App
+     * @var SoosyzeApp
      */
     private $core;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * @var Router
      */
     private $router;
 
-    public function __construct($core, $router)
+    public function __construct(SoosyzeApp $core, Config $config, Router $router)
     {
         $this->core   = $core;
+        $this->config = $config;
         $this->router = $router;
     }
 
-    public function getEditor($request, &$response)
+    public function getEditor(RequestInterface $request, ResponseInterface &$response): void
     {
         if (!($response instanceof Templating)) {
             return;
@@ -30,7 +43,7 @@ class App
 
         $assets = $this->core->getPath('modules', 'core/modules', false) . '/Trumbowyg/Assets';
         $vendor = $this->core->getPath('modules', 'core/modules', false) . '/Trumbowyg/vendor/trumbowyg/dist';
-        $lang   = $this->core->get('config')->get('settings.lang', 'en');
+        $lang   = $this->config->get('settings.lang', 'en');
 
         $response
             ->addConfigJs('trumbowyg', [

@@ -1,16 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Hook;
 
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\QueryBuilder\Services\Schema;
+use SoosyzeCore\System\Services\Alias;
 
 class Menu
 {
     const MENU_DEFAULT = 'menu-main';
 
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
@@ -22,16 +27,16 @@ class Menu
     private $isMenu;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Schema
+     * @var Schema
      */
     private $schema;
 
-    public function __construct($alias, $query, $schema)
+    public function __construct(Alias $alias, Query $query, Schema $schema)
     {
         $this->alias  = $alias;
         $this->query  = $query;
@@ -40,7 +45,7 @@ class Menu
         $this->isMenu = $this->schema->hasTable('menu');
     }
 
-    public function hookNodeFieldsetSubmenu(array &$menu)
+    public function hookNodeFieldsetSubmenu(array &$menu): void
     {
         if (!$this->isMenu) {
             return;
@@ -53,7 +58,7 @@ class Menu
         ];
     }
 
-    public function hookCreateFormData(array &$data)
+    public function hookCreateFormData(array &$data): void
     {
         if (!$this->isMenu) {
             return;
@@ -64,7 +69,7 @@ class Menu
         $data[ 'title_link' ] = '';
     }
 
-    public function hookEditFormData(array &$data, $idNode)
+    public function hookEditFormData(array &$data, int $idNode): void
     {
         if (!$this->isMenu) {
             return;
@@ -87,7 +92,7 @@ class Menu
         }
     }
 
-    public function hookCreateForm(FormBuilder $form, array $data)
+    public function hookCreateForm(FormBuilder $form, array $data): void
     {
         if (!$this->isMenu) {
             return;
@@ -135,7 +140,7 @@ class Menu
         });
     }
 
-    public function hookStoreValidator(Validator $validator)
+    public function hookStoreValidator(Validator $validator): void
     {
         if (!$this->isMenu || !$validator->hasInput('active')) {
             return;
@@ -149,7 +154,7 @@ class Menu
             ->addLabel('title_link', t('Link title'));
     }
 
-    public function hookStoreValid(Validator $validator)
+    public function hookStoreValid(Validator $validator): void
     {
         if (!$this->isMenu || !$validator->hasInput('active')) {
             return;
@@ -181,7 +186,7 @@ class Menu
             ->execute();
     }
 
-    public function hookUpdateValid(Validator $validator, $id)
+    public function hookUpdateValid(Validator $validator, int $id): void
     {
         if (!$this->isMenu) {
             return;
@@ -237,7 +242,7 @@ class Menu
         }
     }
 
-    public function hookDeleteValid(Validator $validator, $item)
+    public function hookDeleteValid(Validator $validator, int $item): void
     {
         if (!$this->isMenu) {
             return;
@@ -260,7 +265,7 @@ class Menu
         }
     }
 
-    public function hookLinkDeleteValid(Validator $validator, $id)
+    public function hookLinkDeleteValid(Validator $validator, int $id): void
     {
         $this->query->from('node_menu_link')
             ->where('menu_link_id', '==', $id)
@@ -268,7 +273,7 @@ class Menu
             ->execute();
     }
 
-    private function getOptions()
+    private function getOptions(): array
     {
         $menus = $this->query->from('menu')->fetchAll();
 
@@ -283,7 +288,7 @@ class Menu
         return $options;
     }
 
-    private function getListNamesMenu()
+    private function getListNamesMenu(): string
     {
         $menus = $this->query->from('menu')->fetchAll();
         $names = $menus

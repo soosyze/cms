@@ -55,9 +55,12 @@ class User implements \SoosyzeCore\User\UserInterface
         return 'user.people.manage';
     }
 
+    /**
+     * @return array|bool
+     */
     public function hookUserShow(
         int $id,
-        ?ServerRequestInterface $req,
+        ServerRequestInterface $req,
         ?array $user
     ) {
         if ($id == $user[ 'user_id' ]) {
@@ -68,8 +71,8 @@ class User implements \SoosyzeCore\User\UserInterface
     }
 
     public function hookUserEdited(
-        $id,
-        ?ServerRequestInterface $req,
+        int $id,
+        ServerRequestInterface $req,
         ?array $user
     ): array {
         $output[] = 'user.people.manage';
@@ -81,8 +84,8 @@ class User implements \SoosyzeCore\User\UserInterface
     }
 
     public function hookUserDeleted(
-        $id,
-        ?ServerRequestInterface $req,
+        int $id,
+        ServerRequestInterface $req,
         ?array $user
     ): array {
         $output[] = 'user.people.manage';
@@ -93,7 +96,7 @@ class User implements \SoosyzeCore\User\UserInterface
         return $output;
     }
 
-    public function hookRegister(?ServerRequestInterface $req, ?array $user): bool
+    public function hookRegister(ServerRequestInterface $req, ?array $user): bool
     {
         return empty($user) && $this->config->get('settings.user_register');
     }
@@ -101,7 +104,7 @@ class User implements \SoosyzeCore\User\UserInterface
     public function hookActivate(
         int $id,
         string $token,
-        ?ServerRequestInterface $req,
+        ServerRequestInterface $req,
         ?array $user
     ): bool {
         return empty($user) && $this->config->get('settings.user_register');
@@ -109,7 +112,7 @@ class User implements \SoosyzeCore\User\UserInterface
 
     public function hookLogin(
         string $url,
-        ?ServerRequestInterface $req,
+        ServerRequestInterface $req,
         ?array $user
     ): bool {
         return $this->user->isConnectUrl($url)
@@ -148,7 +151,7 @@ class User implements \SoosyzeCore\User\UserInterface
 
     public function hookRelogin(
         string $url,
-        ?ServerRequestInterface $req,
+        ServerRequestInterface $req,
         ?array $user
     ): bool {
         if ($this->user->isConnectUrl($url)) {
@@ -158,11 +161,11 @@ class User implements \SoosyzeCore\User\UserInterface
         return empty($user) && $this->config->get('settings.user_relogin');
     }
 
-    public function hookRoleDeleted($idRole)
+    public function hookRoleDeleted(int $idRole): ?string
     {
         /* Si le role est requis par le système, alors la suppression est interdite. */
         if (in_array($idRole, [ 1, 2, 3 ])) {
-            return false;
+            return null;
         }
 
         return 'user.people.manage';

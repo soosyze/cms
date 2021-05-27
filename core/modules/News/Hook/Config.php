@@ -11,6 +11,9 @@ use SoosyzeCore\FileSystem\Services\File;
 
 class Config implements \SoosyzeCore\Config\ConfigInterface
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**

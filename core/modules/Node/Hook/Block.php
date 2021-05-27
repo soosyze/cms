@@ -10,7 +10,7 @@ use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Node\Services\Node;
 use SoosyzeCore\QueryBuilder\Services\Query;
 use SoosyzeCore\System\Services\Alias;
-use SoosyzeCore\Template\Services\Block as TemplateBlock;
+use SoosyzeCore\Template\Services\Block as ServiceBlock;
 
 class Block implements \SoosyzeCore\Block\BlockInterface
 {
@@ -73,11 +73,11 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         ];
     }
 
-    public function hookBlockNextPrevious(TemplateBlock $tpl, array $options): TemplateBlock
+    public function hookBlockNextPrevious(ServiceBlock $tpl, array $options): ServiceBlock
     {
         $node = $this->node->getCurrentNode();
         if ($node === null || $node[ 'type' ] !== $options[ 'type' ]) {
-            return $tpl;
+            return $tpl->addVars(['next' => null, 'previous' => null]);
         }
 
         return $tpl->addVars([
@@ -135,7 +135,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         });
     }
 
-    public function hookNodeNextPreviousUpdateValidator(Validator &$validator, $id): void
+    public function hookNodeNextPreviousUpdateValidator(Validator &$validator, int $id): void
     {
         $validator
             ->addRule('display', 'required|inarray:' . $this->getListNameOptionsDisplay())
@@ -149,7 +149,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
             ->addLabel('type', t('Content type'));
     }
 
-    public function hookNodeNextPreviousUpdateBefore(Validator $validator, &$values, $id): void
+    public function hookNodeNextPreviousUpdateBefore(Validator $validator, array &$values, int $id): void
     {
         $values[ 'options' ] = json_encode([
             'display'       => $validator->getInput('display'),

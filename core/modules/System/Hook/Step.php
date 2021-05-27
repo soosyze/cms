@@ -1,10 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Hook;
 
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\App;
 use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Router\Router;
 use Soosyze\Components\Template\Template;
 use Soosyze\Components\Validator\Validator;
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\QueryBuilder\Services\Schema;
+use SoosyzeCore\Translate\Services\Translation;
 
 class Step
 {
@@ -24,17 +34,32 @@ class Step
     ];
 
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * @var Query
+     */
+    private $query;
+
+    /**
+     * @var Router
      */
     private $router;
 
     /**
-     * @var \SoosyzeCore\Translate\Services\Translation
+     * @var Schema
+     */
+    private $schema;
+
+    /**
+     * @var Translation
      */
     private $translate;
 
@@ -48,17 +73,26 @@ class Step
      */
     private $pathContent;
 
-    public function __construct($core, $router, $translate)
-    {
+    public function __construct(
+        App $core,
+        Config $config,
+        Query $query,
+        Router $router,
+        Schema $schema,
+        Translation $translate
+    ) {
         $this->core      = $core;
+        $this->config    = $config;
+        $this->query     = $query;
         $this->router    = $router;
+        $this->schema    = $schema;
         $this->translate = $translate;
 
         $this->pathViews   = dirname(__DIR__) . '/Views/install/';
         $this->pathContent = dirname(__DIR__) . '/Views/install/content/';
     }
 
-    public function hookStep(&$step)
+    public function hookStep(array &$step): void
     {
         $step[ 'language' ] = [
             'weight' => 1,
@@ -77,7 +111,7 @@ class Step
         ];
     }
 
-    public function getProfils()
+    public function getProfils(): array
     {
         $assets = $this->core->getPath('modules', 'core/modules', false) . '/System/Assets/img/';
         $profil = [
@@ -111,7 +145,7 @@ class Step
         return $profil;
     }
 
-    public function hookProfil($id)
+    public function hookProfil(string $id): Template
     {
         $content = [ 'profil' => '' ];
 
@@ -146,7 +180,7 @@ class Step
         ]);
     }
 
-    public function hookProfilCheck($id, $req)
+    public function hookProfilCheck(string $id, ServerRequestInterface $req): void
     {
         $profils   = array_keys($this->getProfils());
         $validator = (new Validator())
@@ -165,7 +199,7 @@ class Step
         }
     }
 
-    public function hookLanguage($id)
+    public function hookLanguage(string $id): Template
     {
         $optionLang         =  $this->translate->getLang();
         $optionLang[ 'en' ] = [ 'value' => 'en', 'label' => 'English' ];
@@ -221,7 +255,7 @@ class Step
                 ->addVar('form', $form);
     }
 
-    public function hookLanguageCheck($id, $req)
+    public function hookLanguageCheck(string $id, ServerRequestInterface $req): void
     {
         $langs     = implode(',', array_keys($this->translate->getLang())) . ',en';
         $validator = (new Validator())
@@ -244,7 +278,7 @@ class Step
         }
     }
 
-    public function hookUser($id)
+    public function hookUser(string $id): Template
     {
         $values = [
             'username'         => '',
@@ -329,7 +363,7 @@ class Step
                 ->addVar('form', $form);
     }
 
-    public function hookUserCheck($id, $req)
+    public function hookUserCheck(string $id, ServerRequestInterface $req): void
     {
         $validator = (new Validator())
             ->setRules([
@@ -357,22 +391,21 @@ class Step
         }
     }
 
-    public function hookModules(&$modules)
+    public function hookModules(array &$modules): void
     {
         $modules[ 'News' ] = 'SoosyzeCore\\News\\';
     }
 
-    public function hookSite($ci)
+    public function hookSite(ContainerInterface $ci): void
     {
-        $this->ci = $ci;
-        $ci->config()
+        $this->config
             ->set('settings.path_index', 'home')
             ->set('settings.path_no_found', 'node/8')
             ->set('settings.path_maintenance', 'node/9')
             ->set('settings.meta_title', 'Soosyze site')
             ->set('settings.logo', 'https://picsum.photos/id/30/200/200');
 
-        $ci->query()
+        $this->query
             ->insertInto('entity_page', [ 'body' ])
             ->values([ (new Template('block-features.php', $this->pathContent))->render() ])
             ->values([ (new Template('block-text.php', $this->pathContent))->render() ])
@@ -384,7 +417,7 @@ class Step
             ->execute();
 
         $time = (string) time();
-        $ci->query()
+        $this->query
             ->insertInto('node', self::$columnsNode)
             ->values([ 1, 'page', $time, $time, 1, t('Home'), 1 ]) // id = 3
             ->values([ 2, 'page', $time, $time, 1, t('Basic'), 1 ])
@@ -395,7 +428,7 @@ class Step
             ->values([ 7, 'page', $time, $time, 1, t('Maintenance'), 1 ])
             ->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('system_alias_url', [ 'source', 'alias' ])
             ->values([ 'node/3', 'home' ])
             ->values([ 'node/4', 'page/basic' ])
@@ -423,9 +456,9 @@ class Step
         ]);
 
         /* Add children Home */
-        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', '=', 7)->execute();
+        $this->query->update('menu_link', [ 'has_children' => true ])->where('id', '=', 7)->execute();
 
-        $ci->query()->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
+        $this->query->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
             ->values([ 4, $idMenuBasic ])
             ->values([ 5, $idMenuStandard ])
             ->values([ 6, $idMenuPremium ])
@@ -433,7 +466,7 @@ class Step
             ->execute();
 
         /* Block content */
-        $ci->query()
+        $this->query
             ->insertInto('block', [
                 'section', 'title',
                 'weight',
@@ -473,7 +506,7 @@ class Step
             ->execute();
 
         /* Block hook. */
-        $ci->query()
+        $this->query
             ->insertInto('block', [
                 'section', 'title',
                 'weight',
@@ -524,17 +557,16 @@ class Step
             ->execute();
     }
 
-    public function hookBlog($ci)
+    public function hookBlog(ContainerInterface $ci): void
     {
-        $this->ci = $ci;
-        $ci->config()
+        $this->config
             ->set('settings.path_index', 'news')
             ->set('settings.path_no_found', '')
             ->set('settings.path_maintenance', 'node/4')
             ->set('settings.meta_title', 'Soosyze blog')
             ->set('settings.logo', 'https://picsum.photos/id/30/200/200');
 
-        $ci->query()
+        $this->query
             ->insertInto('block', [ 'section', 'title', 'weight', 'content' ])
             ->values([
                 'footer_second', 'Lorem ipsum dolor', 1,
@@ -542,7 +574,7 @@ class Step
             ])
             ->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('block', [
                 'section', 'title',
                 'weight',
@@ -578,7 +610,7 @@ class Step
             ])
             ->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('entity_page', [ 'body' ])
             ->values([ (new Template('page-about.php', $this->pathContent))->render() ])
             ->values([ (new Template('page-not_found.php', $this->pathContent))->render() ])
@@ -605,7 +637,7 @@ class Step
             [ 3, 'page', $time, $time, 1, t('Maintenance'), 1 ]
         );
 
-        $ci->query()
+        $this->query
             ->insertInto('system_alias_url', [ 'source', 'alias' ])
             ->values([ 'node/' . $idNodeAbout, 'page/about' ])
             ->values([ 'node/' . $idNodeNotFound, 'page/about' ])
@@ -618,16 +650,14 @@ class Step
             [ 'node.show', '', 'About', 'page/about', 'node/' . $idNodeAbout, 'menu-main', 3, -1 ]
         );
 
-        $ci->query()->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
+        $this->query->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
             ->values([ $idNodeAbout, $idMenuAbout ])
             ->execute();
     }
 
-    public function hookPortfolio($ci)
+    public function hookPortfolio(ContainerInterface $ci): void
     {
-        $this->ci = $ci;
-
-        $ci->query()
+        $this->query
             ->insertInto('entity_page', [ 'body' ])
             ->values([ (new Template('page-about.php', $this->pathContent))->render() ])
             ->values([ (new Template('page-education.php', $this->pathContent))->render() ])
@@ -673,9 +703,9 @@ class Step
         ]);
 
         /* Add children Project */
-        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', '=', $idNodeProjects)->execute();
+        $this->query->update('menu_link', [ 'has_children' => true ])->where('id', '=', $idNodeProjects)->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('system_alias_url', [ 'source', 'alias' ])
             ->values([ 'node/' . $idNodeSite, 'home' ])
             ->values([ 'node/' . $idNodeEducation, 'education' ])
@@ -705,9 +735,9 @@ class Step
             'node.show', '', 'Project 4', 'project/4', 'node/' . $idNodeProject4, 'menu-main', 7, $idMenuProjects
         ]);
 
-        $ci->query()->update('menu_link', [ 'has_children' => true ])->where('id', '=', $idMenuProjects)->execute();
+        $this->query->update('menu_link', [ 'has_children' => true ])->where('id', '=', $idMenuProjects)->execute();
 
-        $ci->query()->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
+        $this->query->insertInto('node_menu_link', [ 'node_id', 'menu_link_id' ])
             ->values([ $idNodeEducation, $idMenuEducation ])
             ->values([ $idNodeProjects, $idMenuProjects ])
             ->values([ $idNodeProject1, $idMenuProject1 ])
@@ -716,7 +746,7 @@ class Step
             ->values([ $idNodeProject4, $idMenuProject4 ])
             ->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('block', [ 'section', 'title', 'weight', 'content' ])
             ->values([
                 'sidebar', '', 1,
@@ -724,7 +754,7 @@ class Step
             ])
             ->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('block', [
                 'section', 'title', 'weight', 'content', 'hook', 'key_block'
             ])
@@ -733,7 +763,7 @@ class Step
             ])
             ->execute();
 
-        $ci->config()
+        $this->config
             ->set('settings.path_index', 'node/1')
             ->set('settings.path_no_found', 'node/' . $idNodeNotFound)
             ->set('settings.path_maintenance', 'node/' . $idNodeMaintenance)
@@ -741,16 +771,15 @@ class Step
             ->set('settings.logo', 'https://picsum.photos/id/30/200/200');
     }
 
-    public function hookOnePage($ci)
+    public function hookOnePage(ContainerInterface $ci): void
     {
-        $this->ci = $ci;
-        $ci->config()
+        $this->config
             ->set('settings.path_index', 'node/1')
             ->set('settings.path_no_found', '')
             ->set('settings.meta_title', 'Soosyze One page')
             ->set('settings.logo', 'https://picsum.photos/id/30/200/200');
 
-        $ci->query()
+        $this->query
             ->insertInto('entity_page', [ 'body' ])
             ->values([ (new Template('block-features.php', $this->pathContent))->render() ])
             ->execute();
@@ -761,12 +790,12 @@ class Step
             1, 'page', $time, $time, 1, 'Ipsum sed adipiscing', 1
         ]);
 
-        $ci->query()
+        $this->query
             ->insertInto('system_alias_url', [ 'source', 'alias' ])
             ->values([ 'node/' . $idNodeSite, 'index' ])
             ->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('menu_link', [
                 'key', 'menu', 'link', 'link_router', 'weight', 'parent', 'title_link', 'fragment'
             ])
@@ -776,7 +805,7 @@ class Step
             ->values([ 'node.show', 'menu-main', '/', 'node/' . $idNodeSite, 6, -1, 'Social media', 'social' ])
             ->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('block', [
                 'section', 'title', 'weight', 'visibility_pages', 'pages', 'content'
             ])
@@ -801,7 +830,7 @@ class Step
             ])
             ->execute();
 
-        $ci->query()
+        $this->query
             ->insertInto('block', [
                 'section', 'title', 'weight', 'content', 'hook', 'key_block'
             ])
@@ -816,13 +845,13 @@ class Step
             ->execute();
     }
 
-    private function lastInsertId($table, array $columns, array $values)
+    private function lastInsertId(string $table, array $columns, array $values): int
     {
-        $this->ci->query()
+        $this->query
             ->insertInto($table, $columns)
             ->values($values)
             ->execute();
 
-        return $this->ci->schema()->getIncrement($table);
+        return $this->schema->getIncrement($table);
     }
 }

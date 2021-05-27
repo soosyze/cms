@@ -1,24 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Hook;
 
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Soosyze\App as SoosyzeApp;
 use Soosyze\Components\Http\Redirect;
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\System\Services\Alias;
 use SoosyzeCore\Template\Services\Templating;
 
 class App
 {
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \Soosyze\App
+     * @var SoosyzeApp
      */
     private $core;
 
@@ -28,12 +37,12 @@ class App
     private $pathViews;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
@@ -43,24 +52,24 @@ class App
     private $tpl;
 
     public function __construct(
-        $alias,
-        $config,
-        $core,
-        $query,
-        $route,
-        $template
+        Alias $alias,
+        Config $config,
+        SoosyzeApp $core,
+        Query $query,
+        Router $router,
+        Templating $template
     ) {
         $this->alias  = $alias;
         $this->config = $config;
         $this->core   = $core;
         $this->query  = $query;
-        $this->router = $route;
+        $this->router = $router;
         $this->tpl    = $template;
 
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function hookSys(&$request, &$response)
+    public function hookSys(RequestInterface &$request, ResponseInterface &$response): void
     {
         $path = $this->router->parseQueryFromRequest();
         $path = $this->alias->getSource($path, $path);
@@ -80,7 +89,7 @@ class App
         }
     }
 
-    public function hooks404($request, &$response)
+    public function hooks404(RequestInterface $request, ResponseInterface &$response): void
     {
         if (($path = $this->config->get('settings.path_no_found', '')) !== '') {
             $path = $this->alias->getSource($path, $path);
@@ -118,7 +127,7 @@ class App
         }
     }
 
-    public function hooks403($request, &$response)
+    public function hooks403(RequestInterface $request, ResponseInterface &$response): void
     {
         if (($path = $this->config->get('settings.path_access_denied', '')) !== '') {
             $path = $this->alias->getSource($path, $path);
@@ -151,7 +160,7 @@ class App
         }
     }
 
-    public function hooks503($request, &$response)
+    public function hooks503(RequestInterface $request, ResponseInterface &$response): void
     {
         if (($path = $this->config->get('settings.path_maintenance', '')) !== '') {
             $path = $this->alias->getSource($path, $path);
@@ -193,7 +202,7 @@ class App
         }
     }
 
-    public function hookResponseAfter($request, &$response)
+    public function hookResponseAfter(RequestInterface $request, ResponseInterface &$response): void
     {
         if (!($response instanceof Templating)) {
             return;

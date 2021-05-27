@@ -1,27 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Hook;
 
+use Psr\Http\Message\RequestInterface;
+use Soosyze\App;
 use Soosyze\Components\Form\FormBuilder;
+use Soosyze\Components\Router\Router;
+use SoosyzeCore\System\Services\Modules;
 
 class FileManager
 {
     /**
-     * @var \Soosyze\App
+     * @var App
      */
     private $core;
 
     /**
-     * @var bool
+     * @var array
      */
     private $hasFileManager;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
-    public function __construct($core, $module, $router)
+    public function __construct(App $core, Modules $module, Router $router)
     {
         $this->core   = $core;
         $this->router = $router;
@@ -29,7 +35,7 @@ class FileManager
         $this->hasFileManager = $module->has('FileManager');
     }
 
-    public function hookNodeCreateForm(FormBuilder &$form, $content, $type)
+    public function hookNodeCreateForm(FormBuilder &$form, string $content, string $type): void
     {
         if (!$this->hasFileManager) {
             return;
@@ -53,7 +59,7 @@ class FileManager
         });
     }
 
-    public function hookNodeEditForm(FormBuilder &$form, $content)
+    public function hookNodeEditForm(FormBuilder &$form, array $content): void
     {
         if (!$this->hasFileManager) {
             return;
@@ -65,7 +71,7 @@ class FileManager
         $this->getFileManager($form, $request);
     }
 
-    public function hookEntityForm(FormBuilder &$form, $content, $node, $entity)
+    public function hookEntityForm(FormBuilder &$form, string $content, array $node, string $entity): void
     {
         if (!$this->hasFileManager) {
             return;
@@ -77,7 +83,7 @@ class FileManager
         $this->getFileManager($form, $request);
     }
 
-    private function getFileManager(FormBuilder &$form, $request)
+    private function getFileManager(FormBuilder &$form, RequestInterface $request): void
     {
         $response = '<div class="col-md-12">'
             . '<div class="alert alert-info">'
@@ -86,6 +92,7 @@ class FileManager
             . '</div>';
 
         if ($this->core->callHook('app.granted.request', [ $request ])) {
+            /** @var array @route */
             $route    = $this->router->parse($request);
             $response = $this->router->execute($route, $request);
         }

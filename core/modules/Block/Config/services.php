@@ -10,7 +10,7 @@ return [
     ],
     'block.hook.app' => [
         'class' => 'SoosyzeCore\Block\Hook\App',
-        'arguments' => ['@core', '@query', '@router', '@template', '@user'],
+        'arguments' => ['@core', '@block', '@query', '@router', '@template', '@user'],
         'hooks' => [
             'app.response.after' => 'hookResponseAfter'
         ]

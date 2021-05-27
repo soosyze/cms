@@ -11,7 +11,7 @@ use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Node\Services\Node;
 use SoosyzeCore\QueryBuilder\Services\Query;
 use SoosyzeCore\System\Services\Alias;
-use SoosyzeCore\Template\Services\Block as TemplateBlock;
+use SoosyzeCore\Template\Services\Block as ServiceBlock;
 
 class Block implements \SoosyzeCore\Block\BlockInterface
 {
@@ -74,7 +74,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         ];
     }
 
-    public function hookBlockNewsArchiveSelect(TemplateBlock $tpl, array $options): TemplateBlock
+    public function hookBlockNewsArchiveSelect(ServiceBlock $tpl, array $options): ServiceBlock
     {
         $data = $this->query
             ->from('node')
@@ -154,7 +154,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         return $tpl->addVar('form', $form);
     }
 
-    public function hookBlockNewsArchive(TemplateBlock $tpl, array $options): TemplateBlock
+    public function hookBlockNewsArchive(ServiceBlock $tpl, array $options): ServiceBlock
     {
         $data = $this->query
             ->from('node')
@@ -199,7 +199,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
                         ':month' => $month,
                         ':id'    => ''
                     ]),
-                    'month'  => strftime('%b', $value[ 'date_created' ]),
+                    'month'  => strftime('%b', (int) $value[ 'date_created' ]),
                     'number' => 1,
                     'year'   => $year
                 ];
@@ -237,14 +237,14 @@ class Block implements \SoosyzeCore\Block\BlockInterface
             ->addLabel('expand', t('Expand archives per month'));
     }
 
-    public function hookNewsArchiveUpdateBefore(Validator $validator, array &$values, int $id)
+    public function hookNewsArchiveUpdateBefore(Validator $validator, array &$values, int $id): void
     {
         $values[ 'options' ] = json_encode([
             'expand' => (bool) $validator->getInput('expand')
         ]);
     }
 
-    public function hookBlockNewsLast(TemplateBlock $tpl, array $options): TemplateBlock
+    public function hookBlockNewsLast(ServiceBlock $tpl, array $options): ServiceBlock
     {
         $news = $this->query
             ->from('node')

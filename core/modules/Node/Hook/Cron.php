@@ -1,26 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Hook;
+
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
 
 class Cron
 {
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
-    public function __construct($config, $query)
+    public function __construct(Config $config, Query $query)
     {
         $this->config = $config;
         $this->query  = $query;
     }
 
-    public function hookCron()
+    public function hookCron(): void
     {
         if ($this->config->get('settings.node_cron', false)) {
             $this->query

@@ -1,13 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Hook;
 
+use Soosyze\Components\Router\Router;
+use Soosyze\Config;
+use SoosyzeCore\Template\Services\Block as ServiceBlock;
 use SoosyzeCore\User\Form\FormUser;
+use SoosyzeCore\User\Services\User;
 
 class Block implements \SoosyzeCore\Block\BlockInterface
 {
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
@@ -17,7 +23,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
     private $pathViews;
 
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
@@ -26,7 +32,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
      */
     private $user;
 
-    public function __construct($config, $router, $user)
+    public function __construct(Config $config, Router $router, User $user)
     {
         $this->config = $config;
         $this->router = $router;
@@ -35,7 +41,7 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function hookBlockCreateFormData(array &$blocks)
+    public function hookBlockCreateFormData(array &$blocks): void
     {
         $blocks[ 'user.login' ] = [
             'hook'  => 'user.login',
@@ -45,10 +51,10 @@ class Block implements \SoosyzeCore\Block\BlockInterface
         ];
     }
 
-    public function hookUserLogin($tpl, array $options)
+    public function hookUserLogin(ServiceBlock $tpl, array $options): ?ServiceBlock
     {
         if ($this->user->isConnected()) {
-            return;
+            return null;
         }
 
         $form = (new FormUser([

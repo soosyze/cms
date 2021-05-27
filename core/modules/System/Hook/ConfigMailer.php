@@ -10,6 +10,9 @@ use Soosyze\Components\Validator\Validator;
 
 class ConfigMailer implements \SoosyzeCore\Config\ConfigInterface
 {
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     public function defaultValues(): array

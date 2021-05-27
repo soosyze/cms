@@ -15,6 +15,9 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
 
     const DELETE_ACCOUNT_AND_ASSIGN = 2;
 
+    /**
+     * @var array
+     */
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**

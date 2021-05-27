@@ -1,26 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Hook;
+
+use Soosyze\Components\Router\Router;
+use SoosyzeCore\User\Services\User;
 
 class Menu
 {
     /**
-     * @var \Soosyze\Components\Router\Router
+     * @var Router
      */
     private $router;
 
     /**
-     * @var \SoosyzeCore\User\Services\User
+     * @var User
      */
     private $user;
 
-    public function __construct($router, $user)
+    public function __construct(Router $router, User $user)
     {
         $this->router = $router;
         $this->user   = $user;
     }
 
-    public function hookUsersMenu(array &$menu, $userId)
+    public function hookUsersMenu(array &$menu, int $userId): void
     {
         if (!$this->user->isConnected()) {
             return;
@@ -33,7 +38,7 @@ class Menu
         ];
     }
 
-    public function hookUserManagerSubmenu(array &$menu)
+    public function hookUserManagerSubmenu(array &$menu): void
     {
         $menu[] = [
             'key'        => 'filemanager.permission.admin',

@@ -1,32 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Hook;
 
+use Soosyze\Components\Form\FormGroupBuilder;
 use Soosyze\Components\Util\Util;
+use Soosyze\Components\Validator\Validator;
+use Soosyze\Config;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\QueryBuilder\Services\Schema;
+use SoosyzeCore\System\Services\Alias;
 
 class Url
 {
     /**
-     * @var \SoosyzeCore\System\Services\Alias
+     * @var Alias
      */
     private $alias;
 
     /**
-     * @var \Soosyze\Config
+     * @var Config
      */
     private $config;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Query
+     * @var Query
      */
     private $query;
 
     /**
-     * @var \SoosyzeCore\QueryBuilder\Services\Schema
+     * @var Schema
      */
     private $schema;
 
-    public function __construct($alias, $config, $query, $schema)
+    public function __construct(Alias $alias, Config $config, Query $query, Schema $schema)
     {
         $this->alias  = $alias;
         $this->config = $config;
@@ -34,17 +42,17 @@ class Url
         $this->schema = $schema;
     }
 
-    public function hookCreateFormData(array &$data)
+    public function hookCreateFormData(array &$data): void
     {
         $data[ 'meta_url' ] = '';
     }
 
-    public function hookEditFormData(array &$data, $idNode)
+    public function hookEditFormData(array &$data, int $idNode): void
     {
         $data[ 'meta_url' ] = $this->alias->getAlias('node/' . $idNode, '');
     }
 
-    public function hookCreateForm($form, array $data)
+    public function hookCreateForm(FormGroupBuilder $form, array $data): void
     {
         $form->before('seo-fieldset', function ($form) use ($data) {
             $form->group('url-fieldset', 'fieldset', function ($form) use ($data) {
@@ -65,7 +73,7 @@ class Url
         });
     }
 
-    public function hookStoreValidator($validator)
+    public function hookStoreValidator(Validator $validator): void
     {
         /* Caractère : pour les variables autorisées. */
         $validator->addRule('meta_url', '!required|string|max:255|regex:/^[-:\w\d_\/]+$/')
@@ -77,7 +85,7 @@ class Url
             ]);
     }
 
-    public function hookStoreAfter($validator)
+    public function hookStoreAfter(Validator $validator): void
     {
         if (!($alias = $this->makeAlias($validator))) {
             return;
@@ -89,7 +97,7 @@ class Url
             ->execute();
     }
 
-    public function hookUpdateValid($validator, $idNode)
+    public function hookUpdateValid(Validator $validator, int $idNode): void
     {
         if (!($alias = $this->makeAlias($validator))) {
             $this->query
@@ -110,7 +118,7 @@ class Url
         }
     }
 
-    public function hookDeleteValid($validator, $idNode)
+    public function hookDeleteValid(Validator $validator, int $idNode): void
     {
         $this->query->from('system_alias_url')
             ->where('source', '=', 'node/' . $idNode)
@@ -118,7 +126,7 @@ class Url
             ->execute();
     }
 
-    private function makeAlias($validator)
+    private function makeAlias(Validator $validator): string
     {
         $metaUrl = $validator->getInput('meta_url') !== ''
             ? $validator->getInput('meta_url')

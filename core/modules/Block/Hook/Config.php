@@ -10,6 +10,9 @@ use Soosyze\Components\Validator\Validator;
 
 final class Config implements \SoosyzeCore\Config\ConfigInterface
 {
+    /**
+     * @var array
+     */
     private $socials = [
         'blogger'    => 'Blogger',
         'codepen'    => 'Codepen',
@@ -72,7 +75,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         $validator->setLabels($this->socials);
     }
 
-    public function before(&$validator, array &$data, string $id): void
+    public function before(Validator &$validator, array &$data, string $id): void
     {
         $data[ 'icon_socials' ] = [];
         foreach (array_keys($this->socials) as $key) {

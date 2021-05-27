@@ -163,7 +163,7 @@ class User implements \SoosyzeCore\User\UserInterface
         return $this->rightExtension($ext, $right);
     }
 
-    public function hookFolderAdmin($req = null, ?array $user = null): bool
+    public function hookFolderAdmin(? ServerRequestInterface $req = null, ?array $user = null): bool
     {
         $profils = $this->fileProfil->getProfilsFileByUser($user[ 'user_id' ]);
 
