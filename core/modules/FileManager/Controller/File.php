@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Response;
 use Soosyze\Components\Http\Stream;
@@ -9,21 +13,34 @@ use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\FileManager\Hook\Config;
 use SoosyzeCore\FileManager\Services\FileManager;
+use SoosyzeCore\Template\Services\Block;
 
 class File extends \Soosyze\Controller
 {
+    /**
+     * @var array
+     */
     private static $extensionImage = [
         'gif', 'ico', 'jpg', 'jpeg', 'png'
     ];
 
+    /**
+     * @var array
+     */
     private static $extensionCode = [
         'css', 'csv', 'html', 'json', 'txt', 'xhtml', 'xml'
     ];
 
+    /**
+     * @var array
+     */
     private static $extensionVideo = [
         'mp4', 'mpeg'
     ];
 
+    /**
+     * @var array
+     */
     private static $extensionAudio = [
         'mp3'
     ];
@@ -33,7 +50,10 @@ class File extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function show($path, $name, $ext, $req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function show(string $path, string $name, string $ext, ServerRequestInterface $req)
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -62,10 +82,12 @@ class File extends \Soosyze\Controller
         ]);
     }
 
-    public function create($path, $req)
+    public function create(string $path): Block
     {
         $path = Util::cleanPath($path);
-        $max  = $this->get('filemanager.hook.user')->getMaxUpload($path);
+        /** @var \SoosyzeCore\FileManager\Hook\User $hookUser */
+        $hookUser = $this->get('filemanager.hook.user');
+        $max      = $hookUser->getMaxUpload($path);
 
         $form = (new FormBuilder([
                 'action'  => self::router()->getRoute('filemanager.file.store', [
@@ -106,7 +128,7 @@ class File extends \Soosyze\Controller
         ]);
     }
 
-    public function store($path, $req)
+    public function store(string $path, ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -123,7 +145,10 @@ class File extends \Soosyze\Controller
         }
 
         $dir    = self::core()->getDir('files_public', 'app/files') . $path;
-        $profil = $this->get('filemanager.hook.user')->getRight($path);
+        /** @var \SoosyzeCore\FileManager\Hook\User $hookUser */
+        $hookUser = $this->get('filemanager.hook.user');
+        $profil   = $hookUser->getRight($path);
+
         $rules  = [
             'file'   => 'required|file_extensions:',
             'folder' => '!required',
@@ -213,7 +238,10 @@ class File extends \Soosyze\Controller
         ]);
     }
 
-    public function edit($path, $name, $ext, $req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function edit(string $path, string $name, string $ext, ServerRequestInterface $req)
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -265,7 +293,7 @@ class File extends \Soosyze\Controller
         ]);
     }
 
-    public function update($path, $name, $ext, $req)
+    public function update(string $path, string $name, string $ext, ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -313,7 +341,10 @@ class File extends \Soosyze\Controller
         return $this->json(400, $out);
     }
 
-    public function remove($path, $name, $ext, $req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function remove(string $path, string $name, string $ext, ServerRequestInterface $req)
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -355,7 +386,7 @@ class File extends \Soosyze\Controller
         ]);
     }
 
-    public function delete($path, $name, $ext, $req)
+    public function delete(string $path, string $name, string $ext, ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -388,7 +419,7 @@ class File extends \Soosyze\Controller
         return $this->json(400, $out);
     }
 
-    public function download($path, $name, $ext, $req)
+    public function download(string $path, string $name, string $ext, ServerRequestInterface $req): ResponseInterface
     {
         $file = self::core()->getDir('files_public', 'app/files') . "$path$name$ext";
         if (!is_file($file)) {
@@ -406,7 +437,7 @@ class File extends \Soosyze\Controller
                 ->withHeader('expires', '0');
     }
 
-    private function visualizeFile(array $info, $path)
+    private function visualizeFile(array $info, string $path): array
     {
         self::template()->getTheme('theme_admin');
 

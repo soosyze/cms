@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\Template\Services\Block;
 
 class Manager extends \Soosyze\Controller
 {
@@ -15,7 +20,7 @@ class Manager extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($req)
+    public function admin(ServerRequestInterface $req): ResponseInterface
     {
         $user    = self::user()->isConnected();
         $profils = self::fileprofil()->getProfilsFileByUser($user[ 'user_id' ]);
@@ -25,6 +30,9 @@ class Manager extends \Soosyze\Controller
         }
 
         $filemanager = null;
+        /** @var \SoosyzeCore\FileManager\Hook\User $hookUser */
+        $hookUser = $this->get('filemanager.hook.user');
+        $path = '';
         /*
          * Le profil par défaut est derterminé par le premier profil trouvé.
          * Si aucun profil n'est trouvé, aucun aperçu du filemanager ne sera disponible.
@@ -36,7 +44,7 @@ class Manager extends \Soosyze\Controller
             $path = Util::strSlug($path, '-', '\/');
 
             /* Si le profil trouvé permet d'être vu. */
-            if ($this->get('filemanager.hook.user')->hookFolderShow($path)) {
+            if ($hookUser->hookFolderShow($path)) {
                 $filemanager = $this->getFileManager($path, $req);
 
                 break;
@@ -70,7 +78,7 @@ class Manager extends \Soosyze\Controller
                 ])->override('page', [ 'page-fuild.php' ]);
     }
 
-    public function showPublic($path, $req)
+    public function showPublic(string $path, ServerRequestInterface $req): ResponseInterface
     {
         return self::template()
                 ->view('page', [
@@ -83,12 +91,12 @@ class Manager extends \Soosyze\Controller
                 ])->override('page', [ 'content-file_manager-public.php' ]);
     }
 
-    public function show($path, $req)
+    public function show(string $path, ServerRequestInterface $req): Block
     {
         return $this->getFileManager($path, $req);
     }
 
-    public function filter($path, $req)
+    public function filter(string $path, ServerRequestInterface $req): Block
     {
         $path = Util::cleanPath('/' . $path);
 
@@ -116,7 +124,10 @@ class Manager extends \Soosyze\Controller
 
         if (is_dir($filesPublic)) {
             $dirIterator = new \DirectoryIterator($filesPublic);
-            $iterator    = $this->get('filemanager.filter.iterator')->load($path, $dirIterator);
+
+            /** @var \SoosyzeCore\FileManager\Services\FilterManagerIterator $iterator */
+            $iterator = $this->get('filemanager.filter.iterator');
+            $iterator = $iterator->load($path, $dirIterator);
             foreach ($iterator as $file) {
                 try {
                     $spl = $file->isDir()
@@ -151,6 +162,9 @@ class Manager extends \Soosyze\Controller
             });
         }
 
+        /** @var \SoosyzeCore\FileManager\Hook\User $hookUser */
+        $hookUser = $this->get('filemanager.hook.user');
+
         return self::template()
                 ->getTheme('theme_admin')
                 ->createBlock('filemanager/table-files.php', $this->pathViews)
@@ -164,20 +178,23 @@ class Manager extends \Soosyze\Controller
                     ]),
                     'nb_dir'      => $nbDir,
                     'nb_file'     => $nbFile,
-                    'profil'      => $this->get('filemanager.hook.user')->getRight($path),
+                    'profil'      => $hookUser->getRight($path),
                     'size_all'    => Util::strFileSizeFormatted($size)
         ]);
     }
 
-    private function getFileManager($path, $req)
+    private function getFileManager(string $path, ServerRequestInterface $req): Block
     {
         $path = Util::cleanPath('/' . $path);
+
+        /** @var \SoosyzeCore\FileManager\Hook\User $hookUser */
+        $hookUser = $this->get('filemanager.hook.user');
 
         $breadcrumb = self::template()
             ->getTheme('theme_admin')
             ->createBlock('filemanager/breadcrumb-file_manager-show.php', $this->pathViews)
             ->addVars([
-            'granted_folder_create' => $this->get('filemanager.hook.user')->hookFolderStore($path),
+            'granted_folder_create' => $hookUser->hookFolderStore($path),
             'links'                 => self::filemanager()->getBreadcrumb($path),
             'link_folder_create'    => self::router()->getRoute('filemanager.folder.create', [
                 ':path' => $path
@@ -188,7 +205,7 @@ class Manager extends \Soosyze\Controller
                 ->getTheme('theme_admin')
                 ->createBlock('filemanager/content-file_manager-show.php', $this->pathViews)
                 ->addVars([
-                    'granted_file_create' => $this->get('filemanager.hook.user')->hookFileStore($path),
+                    'granted_file_create' => $hookUser->hookFileStore($path),
                     'link_show'           => self::router()->getRoute('filemanager.show', [
                         ':path' => $path
                     ]),

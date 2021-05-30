@@ -1,9 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
+use Soosyze\Components\Http\Response;
+use Soosyze\Components\Http\Stream;
 use Soosyze\Components\Template\Template;
 use Soosyze\Components\Util\Util;
 
@@ -29,6 +34,8 @@ class Install extends \Soosyze\Controller
 
     /**
      * Liste des thèmes à installer.
+     *
+     * @array
      */
     private $themes = [
         'Fez'   => 'SoosyzeCore\\Theme\\Fez\\',
@@ -42,7 +49,7 @@ class Install extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/install/';
     }
 
-    public function index(ServerRequestInterface $req)
+    public function index(ServerRequestInterface $req): ResponseInterface
     {
         if (!($steps = $this->getSteps())) {
             return $this->get404($req);
@@ -55,7 +62,7 @@ class Install extends \Soosyze\Controller
         return $this->get404($req);
     }
 
-    public function step($id, ServerRequestInterface $req)
+    public function step(string $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($steps = $this->getSteps()) || !isset($steps[ $id ])) {
             return $this->get404($req);
@@ -74,7 +81,7 @@ class Install extends \Soosyze\Controller
         $blockMessages = (new Template('messages-install.php', $this->pathViews))
             ->addVars($messages);
 
-        return (new Template('html-install.php', $this->pathViews))
+        $blockHtml = (new Template('html-install.php', $this->pathViews))
                 ->addBlock('page', $blockPage)
                 ->addBlock('messages', $blockMessages)
                 ->addVars([
@@ -85,9 +92,11 @@ class Install extends \Soosyze\Controller
                     'style_soosyze' => self::core()->getPath('modules', 'core/modules', false) . '/System/Assets/css/soosyze.css'
                 ])
                 ->render();
+
+        return new Response(200, new Stream($blockHtml));
     }
 
-    public function stepCheck($id, ServerRequestInterface $req)
+    public function stepCheck(string $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($steps = $this->getSteps()) || !isset($steps[ $id ])) {
             return $this->get404($req);
@@ -112,7 +121,7 @@ class Install extends \Soosyze\Controller
         return new Redirect($route);
     }
 
-    private function getSteps()
+    private function getSteps(): array
     {
         $step = [];
         $this->container->callHook('step', [ &$step ]);
@@ -129,7 +138,7 @@ class Install extends \Soosyze\Controller
         return $step;
     }
 
-    private function installModule()
+    private function installModule(): void
     {
         $composer = [];
         $profil    = htmlspecialchars($_SESSION[ 'inputs' ][ 'profil' ][ 'profil' ]);
@@ -185,7 +194,7 @@ class Install extends \Soosyze\Controller
             ->execute();
     }
 
-    private function installThemes()
+    private function installThemes(): void
     {
         $composer = [];
 
@@ -212,7 +221,7 @@ class Install extends \Soosyze\Controller
             ->set('settings.logo', '');
     }
 
-    private function installMigration($dir, $title)
+    private function installMigration(string $dir, string $title): void
     {
         if (!\is_dir($dir)) {
             return;
@@ -229,7 +238,7 @@ class Install extends \Soosyze\Controller
         self::query()->execute();
     }
 
-    private function installFinish()
+    private function installFinish(): ResponseInterface
     {
         $saveLanguage = $_SESSION[ 'inputs' ][ 'language' ];
         $save         = $_SESSION[ 'inputs' ][ 'user' ];
@@ -279,7 +288,7 @@ class Install extends \Soosyze\Controller
         return new Redirect($route);
     }
 
-    private function loadContainer($composer)
+    private function loadContainer(array $composer): void
     {
         $obj  = new $composer[ 'extra' ][ 'soosyze' ][ 'controller' ]();
         if (!($path = $obj->getPathServices())) {
@@ -289,7 +298,7 @@ class Install extends \Soosyze\Controller
         $this->container->addServices(include_once $path);
     }
 
-    private function position(array &$array, $position)
+    private function position(array &$array, string $position): void
     {
         reset($array);
         do {

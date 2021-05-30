@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
@@ -13,7 +17,7 @@ class FilePermissionManager extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($req)
+    public function admin(): ResponseInterface
     {
         $values = self::query()->from('profil_file')->orderBy('profil_weight')->fetchAll();
 
@@ -73,7 +77,7 @@ class FilePermissionManager extends \Soosyze\Controller
                 ]);
     }
 
-    public function adminCheck($req)
+    public function adminCheck(ServerRequestInterface $req): ResponseInterface
     {
         $profils = self::query()->from('profil_file')->fetchAll();
 

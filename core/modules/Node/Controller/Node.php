@@ -1,13 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Http\Stream;
 use Soosyze\Components\Http\UploadedFile;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Node\Form\FormNode;
 use SoosyzeCore\Node\Form\FormNodeDelete;
+use SoosyzeCore\Template\Services\Block;
 
 class Node extends \Soosyze\Controller
 {
@@ -18,7 +23,7 @@ class Node extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function add($req)
+    public function add(ServerRequestInterface $req): ResponseInterface
     {
         $nodeType = self::query()
             ->from('node_type')
@@ -49,7 +54,7 @@ class Node extends \Soosyze\Controller
         ]);
     }
 
-    public function create($type, $req)
+    public function create(string $type, ServerRequestInterface $req): ResponseInterface
     {
         if (!$fields = self::node()->getFieldsDisplay($type)) {
             return $this->get404($req);
@@ -102,7 +107,7 @@ class Node extends \Soosyze\Controller
                 ->override('page.content', [ 'node/content-node-form_create.php' ]);
     }
 
-    public function store($type, $req)
+    public function store(string $type, ServerRequestInterface $req): ResponseInterface
     {
         if ($req->isMaxSize()) {
             $_SESSION[ 'messages' ][ 'errors' ] = [
@@ -202,7 +207,7 @@ class Node extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('node.create', [ ':node' => $type ]));
     }
 
-    public function show($idNode, $req)
+    public function show(int $idNode, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->getCurrentNode($idNode))) {
             return $this->get404($req);
@@ -250,7 +255,7 @@ class Node extends \Soosyze\Controller
         return $tpl;
     }
 
-    public function edit($idNode, $req)
+    public function edit(int $idNode, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->byId($idNode))) {
             return $this->get404($req);
@@ -304,7 +309,7 @@ class Node extends \Soosyze\Controller
                 ->override('page.content', [ 'node/content-node-form_edit.php' ]);
     }
 
-    public function update($idNode, $req)
+    public function update(int $idNode, ServerRequestInterface $req): ResponseInterface
     {
         if ($req->isMaxSize()) {
             $_SESSION[ 'messages' ][ 'errors' ] = [
@@ -403,7 +408,7 @@ class Node extends \Soosyze\Controller
         );
     }
 
-    public function remove($idNode, $req)
+    public function remove(int $idNode, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->byId($idNode))) {
             return $this->get404($req);
@@ -463,7 +468,7 @@ class Node extends \Soosyze\Controller
                 ->override('page.content', [ 'node/content-node-form_remove.php' ]);
     }
 
-    public function delete($idNode, $req)
+    public function delete(int $idNode, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->byId($idNode))) {
             return $this->get404($req);
@@ -541,7 +546,7 @@ class Node extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('node.remove', [ ':id_node' => $idNode ]));
     }
 
-    public function cloneNode($idNode, $req)
+    public function cloneNode(int $idNode, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->byId($idNode))) {
             return $this->get404($req);
@@ -666,12 +671,12 @@ class Node extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('node.admin'), 302);
     }
 
-    public static function getBasename($pathFile)
+    public static function getBasename(string $pathFile): string
     {
         return strtolower(pathinfo($pathFile, PATHINFO_BASENAME));
     }
 
-    public function getSubmenuNode($keyRoute, $idNode)
+    public function getSubmenuNode(string $keyRoute, int $idNode): array
     {
         $menu = [
             [
@@ -727,7 +732,7 @@ class Node extends \Soosyze\Controller
         return [ 'key_route' => $keyRoute, 'menu' => $menu ];
     }
 
-    public function getNodeFieldsetSubmenu()
+    public function getNodeFieldsetSubmenu(): Block
     {
         $menu = [
             [
@@ -760,7 +765,7 @@ class Node extends \Soosyze\Controller
                 ->addVar('menu', $menu);
     }
 
-    private function getValidator($req, $type, $fields, $idNode = null)
+    private function getValidator($req, string $type, array $fields, int $idNode = null): Validator
     {
         $node      = self::node()->getCurrentNode($idNode);
         /* Test les champs par defauts de la node. */
@@ -857,7 +862,7 @@ class Node extends \Soosyze\Controller
         return $validator;
     }
 
-    private function getMeta(array $node, array $fields)
+    private function getMeta(array $node, array $fields): array
     {
         if (!empty($node[ 'meta_description' ])) {
             $description = $node[ 'meta_description' ];
@@ -914,7 +919,7 @@ class Node extends \Soosyze\Controller
         return $meta;
     }
 
-    private function cleanDescription($str)
+    private function cleanDescription(string $str): string
     {
         $str = strip_tags($str);
         $str = htmlentities($str);
@@ -924,7 +929,7 @@ class Node extends \Soosyze\Controller
         return mb_strcut($str, 0, 200);
     }
 
-    private function updateWeightEntity(array $field, array $data)
+    private function updateWeightEntity(array $field, array $data): void
     {
         $options = json_decode($field[ 'field_option' ], true);
         if ($options[ 'sort' ] !== 'weight') {
@@ -940,14 +945,14 @@ class Node extends \Soosyze\Controller
         }
     }
 
-    private function getListUsersId()
+    private function getListUsersId(): string
     {
         $usersId = self::query()->from('user')->lists('user_id');
 
         return implode(',', $usersId);
     }
 
-    private function saveFile($node, $nameField, $validator)
+    private function saveFile(array $node, string $nameField, Validator $validator): void
     {
         self::file()
             ->add($validator->getInput($nameField), $validator->getInput("file-$nameField-name"))

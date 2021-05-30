@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Trumbowyg\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Validator\Validator;
 
 class Trumbowyg extends \Soosyze\Controller
@@ -12,7 +16,7 @@ class Trumbowyg extends \Soosyze\Controller
         $this->pathRoutes   = dirname(__DIR__) . '/Config/routes.php';
     }
 
-    public function upload($req)
+    public function upload(ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             $post = $req->getParsedBody();

@@ -1,10 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Controller;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class UserApi extends \Soosyze\Controller
 {
-    public function select($req)
+    public function select(ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);

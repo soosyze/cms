@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
@@ -15,7 +19,7 @@ class FilePermission extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function create($req)
+    public function create(ServerRequestInterface $req): ResponseInterface
     {
         $values = [];
         if (isset($_SESSION[ 'inputs' ])) {
@@ -56,7 +60,7 @@ class FilePermission extends \Soosyze\Controller
         ]);
     }
 
-    public function store($req)
+    public function store(ServerRequestInterface $req): ResponseInterface
     {
         $validator = $this->getValidator($req);
 
@@ -102,7 +106,7 @@ class FilePermission extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('filemanager.permission.create'));
     }
 
-    public function edit($id, $req)
+    public function edit(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($values = self::fileprofil()->find($id))) {
             return $this->get404($req);
@@ -153,7 +157,7 @@ class FilePermission extends \Soosyze\Controller
                 ]);
     }
 
-    public function update($id, $req)
+    public function update(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::fileprofil()->find($id)) {
             return $this->get404($req);
@@ -200,12 +204,14 @@ class FilePermission extends \Soosyze\Controller
         $_SESSION[ 'messages' ][ 'errors' ] = $validator->getKeyErrors();
         $_SESSION[ 'errors_keys' ]          = $validator->getKeyInputErrors();
 
-        return new Redirect(self::router()->getRoute('filemanager.permission.edit', [
+        return new Redirect(
+            self::router()->getRoute('filemanager.permission.edit', [
                 ':id' => $id
-        ]));
+            ])
+        );
     }
 
-    public function remove($id, $req)
+    public function remove(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::fileprofil()->find($id)) {
             $this->get404($req);
@@ -252,7 +258,7 @@ class FilePermission extends \Soosyze\Controller
                 ]);
     }
 
-    public function delete($id, $req)
+    public function delete(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::fileprofil()->find($id)) {
             $this->get404($req);
@@ -287,12 +293,14 @@ class FilePermission extends \Soosyze\Controller
         $_SESSION[ 'inputs' ]               = $validator->getInputs();
         $_SESSION[ 'messages' ][ 'errors' ] = $validator->getKeyErrors();
 
-        return new Redirect(self::router()->getRoute('filemanager.permission.remove', [
+        return new Redirect(
+            self::router()->getRoute('filemanager.permission.remove', [
                 ':id' => $id
-        ]));
+            ])
+        );
     }
 
-    private function storeProfilRole($validator, $profilFileId)
+    private function storeProfilRole(Validator $validator, int $profilFileId): void
     {
         self::query()->insertInto('profil_file_role', [
             'profil_file_id', 'role_id'
@@ -303,7 +311,7 @@ class FilePermission extends \Soosyze\Controller
         self::query()->execute();
     }
 
-    private function updateProfilRole($validator, $profilFileId)
+    private function updateProfilRole(Validator $validator, int $profilFileId): void
     {
         self::query()
             ->from('profil_file_role')
@@ -317,7 +325,7 @@ class FilePermission extends \Soosyze\Controller
         self::query()->execute();
     }
 
-    private function getValidator($req)
+    private function getValidator(ServerRequestInterface $req): Validator
     {
         $validator = (new Validator())
             ->setRules([
@@ -370,7 +378,7 @@ class FilePermission extends \Soosyze\Controller
         return $validator;
     }
 
-    private function getData($validator)
+    private function getData(Validator $validator): array
     {
         return [
             'folder_show'         => $validator->getInput('folder_show'),
@@ -394,7 +402,7 @@ class FilePermission extends \Soosyze\Controller
         ];
     }
 
-    private function getPermissionSubmenu($keyRoute, $idPermission)
+    private function getPermissionSubmenu(string $keyRoute, int $idPermission): array
     {
         $menu = [
             [

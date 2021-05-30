@@ -1,16 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Paginate\Paginator;
 use Soosyze\Components\Validator\Validator;
 
 class NodeManager extends \Soosyze\Controller
 {
+    /**
+     * @var int
+     */
     private static $limit = 25;
 
+    /**
+     * @var int
+     */
     private static $page = 1;
 
+    /**
+     * @var bool
+     */
     private $admin = false;
 
     public function __construct()
@@ -18,7 +31,7 @@ class NodeManager extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($req)
+    public function admin(ServerRequestInterface $req): ResponseInterface
     {
         $messages = [];
         if (isset($_SESSION[ 'messages' ])) {
@@ -50,12 +63,12 @@ class NodeManager extends \Soosyze\Controller
                 ->addBlock('content.table', $this->filterPage(1, $req));
     }
 
-    public function filter($req)
+    public function filter(ServerRequestInterface $req)
     {
         return $this->filterPage(1, $req);
     }
 
-    public function filterPage($page, $req)
+    public function filterPage(int $page, ServerRequestInterface $req)
     {
         if (!$req->isAjax() && !$this->admin) {
             return $this->get404($req);
@@ -172,7 +185,7 @@ class NodeManager extends \Soosyze\Controller
         ]);
     }
 
-    private function getSortParams($req)
+    private function getSortParams(ServerRequestInterface $req): array
     {
         $get = $req->getQueryParams();
 

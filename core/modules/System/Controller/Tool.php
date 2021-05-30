@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 
 class Tool extends \Soosyze\Controller
@@ -11,7 +15,7 @@ class Tool extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin()
+    public function admin(): ResponseInterface
     {
         $tools = [];
         $this->container->callHook('tools.admin', [ &$tools ]);
@@ -46,7 +50,7 @@ class Tool extends \Soosyze\Controller
                 ->view('page.messages', $messages);
     }
 
-    public function cron($req)
+    public function cron(ServerRequestInterface $req): ResponseInterface
     {
         $this->container->callHook('app.cron', [ $req ]);
 
@@ -55,7 +59,7 @@ class Tool extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('system.tool.admin'), 302);
     }
 
-    public function updateTranslations($req)
+    public function updateTranslations(): ResponseInterface
     {
         $extensions   = array_column(self::module()->listModuleActive(), 'title');
         $extensions[] = self::config()->get('settings.theme');

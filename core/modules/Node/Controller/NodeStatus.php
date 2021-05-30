@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Controller;
+
+use Psr\Http\Message\ResponseInterface;
 
 class NodeStatus extends \Soosyze\Controller
 {
-    public function search()
+    public function search(): ResponseInterface
     {
         $data = self::query()
             ->from('node_status')

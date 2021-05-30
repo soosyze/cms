@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Node\Form\FormNodeDelete;
 
@@ -12,7 +16,7 @@ class NodeApi extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function remove($idNode, $req)
+    public function remove(int $idNode, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->byId($idNode))) {
             return $this->get404($req);
@@ -67,7 +71,7 @@ class NodeApi extends \Soosyze\Controller
         ]);
     }
 
-    public function delete($idNode, $req)
+    public function delete(int $idNode, ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);

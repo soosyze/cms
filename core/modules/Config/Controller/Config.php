@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Config\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
@@ -15,7 +19,7 @@ class Config extends \Soosyze\Controller
         $this->pathRoutes   = dirname(__DIR__) . '/Config/routes.php';
     }
 
-    public function admin($req)
+    public function admin(ServerRequestInterface $req): ResponseInterface
     {
         if (($menu = $this->getMenuConfig()) && !empty($menu)) {
             return $this->getConfig($menu, array_keys($menu)[ 0 ], $req);
@@ -32,7 +36,7 @@ class Config extends \Soosyze\Controller
         ]);
     }
 
-    public function edit($id, $req)
+    public function edit(string $id, ServerRequestInterface $req): ResponseInterface
     {
         if ($menu = $this->getMenuConfig()) {
             return $this->getConfig($menu, $id, $req);
@@ -41,7 +45,7 @@ class Config extends \Soosyze\Controller
         return $this->get404($req);
     }
 
-    public function update($id, $req)
+    public function update(string $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($menu = $this->getMenuConfig()) || !isset($menu[ $id ])) {
             return $this->get404($req);
@@ -94,7 +98,7 @@ class Config extends \Soosyze\Controller
         );
     }
 
-    private function getConfig($menu, $id, $req)
+    private function getConfig(array $menu, string $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!isset($menu[ $id ])) {
             return $this->get404($req);
@@ -105,9 +109,7 @@ class Config extends \Soosyze\Controller
         /* Replace les valeurs par défaut si la données et présente dans la config. */
         $data = array_replace_recursive(
             $config->defaultValues(),
-            self::config()->get(empty($menu[ $id ][ 'config' ])
-                ? 'settings'
-                : $menu[ $id ][ 'config' ], [])
+            self::config()->get($menu[ $id ][ 'config' ] ?? 'settings', [])
         );
 
         $this->container->callHook("config.edit.$id.form.data", [ &$data, $id ]);
@@ -154,7 +156,7 @@ class Config extends \Soosyze\Controller
         ]);
     }
 
-    private function getMenuConfig()
+    private function getMenuConfig(): array
     {
         $menu = [];
         $this->container->callHook('config.edit.menu', [ &$menu ]);
@@ -174,7 +176,7 @@ class Config extends \Soosyze\Controller
         return $menu;
     }
 
-    private function saveFile($key, $validator)
+    private function saveFile(string $key, Validator $validator): void
     {
         self::file()
             ->add($validator->getInput($key), $validator->getInput("file-$key-name"))

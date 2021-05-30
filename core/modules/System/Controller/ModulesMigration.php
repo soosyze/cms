@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use Soosyze\Components\Http\Redirect;
 
 class ModulesMigration extends \Soosyze\Controller
 {
-    public function check()
+    public function check(): ResponseInterface
     {
         if (self::migration()->isMigration()) {
             self::config()->set('settings.module_update', true);
@@ -17,7 +20,7 @@ class ModulesMigration extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('system.module.edit'), 302);
     }
 
-    public function update()
+    public function update(): ResponseInterface
     {
         try {
             self::migration()->migrate();

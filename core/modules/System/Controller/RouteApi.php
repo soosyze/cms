@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Controller;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class RouteApi extends \Soosyze\Controller
 {
     const LIMIT_ROUTE = 5;
 
-    public function index($req)
+    public function index(ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -14,17 +19,9 @@ class RouteApi extends \Soosyze\Controller
 
         $get = $req->getQueryParams();
 
-        $search = empty($get[ 'title' ])
-            ? ''
-            : $get[ 'title' ];
-
-        $exclude = empty($get[ 'exclude' ])
-            ? ''
-            : $get[ 'exclude' ];
-
-        $limit = empty($get[ 'limit' ])
-            ? self::LIMIT_ROUTE
-            : $get[ 'limit' ];
+        $search  = $get[ 'title' ] ?? '';
+        $exclude = $get[ 'exclude' ] ?? '';
+        $limit   = $get[ 'limit' ] ?? self::LIMIT_ROUTE;
 
         $routes = [];
         $this->container->callHook('api.route', [ &$routes, $search, $exclude, $limit ]);

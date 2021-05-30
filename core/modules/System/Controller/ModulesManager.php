@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
@@ -15,7 +19,7 @@ class ModulesManager extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function edit()
+    public function edit(): ResponseInterface
     {
         /* Récupère les modules en base de données. */
         $data = array_column(self::module()->listModuleActive(), 'title');
@@ -28,6 +32,7 @@ class ModulesManager extends \Soosyze\Controller
             'method' => 'post'
         ]);
 
+        $packages = [];
         foreach ($composer as $values) {
             $module = $values[ 'extra' ][ 'soosyze' ];
             $title  = htmlspecialchars($module[ 'title' ]);
@@ -104,7 +109,7 @@ class ModulesManager extends \Soosyze\Controller
         ]);
     }
 
-    public function update($req)
+    public function update(ServerRequestInterface $req): ResponseInterface
     {
         $route     = self::router()->getRoute('system.module.edit');
         $validator = (new Validator())
@@ -136,7 +141,7 @@ class ModulesManager extends \Soosyze\Controller
         return new Redirect($route);
     }
 
-    private function installModule($moduleActive, $data)
+    private function installModule(array $moduleActive, array $data): array
     {
         /* S'il n'y a pas de modules à installer. */
         if (!($diff = array_diff_key($data, $moduleActive))) {
@@ -211,7 +216,7 @@ class ModulesManager extends \Soosyze\Controller
         return [];
     }
 
-    private function uninstallModule($moduleActive, $data)
+    private function uninstallModule(array $moduleActive, array $data): array
     {
         /* S'il n'y a pas des modules à désinstaller. */
         if (!($diff = array_diff_key($moduleActive, $data))) {
@@ -260,7 +265,7 @@ class ModulesManager extends \Soosyze\Controller
      *
      * @return array
      */
-    private function isRequired(array $module, array $composer, array $data)
+    private function isRequired(array $module, array $composer, array $data): array
     {
         if (empty($module[ 'require' ])) {
             return [];
@@ -294,7 +299,7 @@ class ModulesManager extends \Soosyze\Controller
      *
      * @return array
      */
-    private function isRequiredForModule($title)
+    private function isRequiredForModule(string $title): array
     {
         /* Si le module est requis par le core. */
         if ($isRequiredForModule = self::module()->isRequiredCore($title)) {
@@ -309,7 +314,7 @@ class ModulesManager extends \Soosyze\Controller
         return [];
     }
 
-    private function loadContainer(array $composer)
+    private function loadContainer(array $composer): void
     {
         $obj  = new $composer[ 'extra' ][ 'soosyze' ][ 'controller' ]();
         if (!($path = $obj->getPathServices())) {

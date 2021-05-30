@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\User\Form\FormUserRole;
@@ -13,7 +17,7 @@ class Role extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function create($req)
+    public function create(ServerRequestInterface $req): ResponseInterface
     {
         $values = [];
         $this->container->callHook('role.create.form.data', [ &$values ]);
@@ -54,7 +58,7 @@ class Role extends \Soosyze\Controller
         ]);
     }
 
-    public function store($req)
+    public function store(ServerRequestInterface $req): ResponseInterface
     {
         $validator = $this->getValidator($req);
 
@@ -94,7 +98,7 @@ class Role extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('user.role.create'));
     }
 
-    public function edit($id, $req)
+    public function edit(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($values = $this->find($id))) {
             return $this->get404($req);
@@ -139,7 +143,7 @@ class Role extends \Soosyze\Controller
                 ]);
     }
 
-    public function update($id, $req)
+    public function update(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!$this->find($id)) {
             return $this->get404($req);
@@ -177,7 +181,7 @@ class Role extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('user.role.edit', [ ':id' => $id ]));
     }
 
-    public function remove($id, $req)
+    public function remove(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($data = $this->find($id))) {
             return $this->get404($req);
@@ -221,7 +225,7 @@ class Role extends \Soosyze\Controller
                 ]);
     }
 
-    public function delete($id, $req)
+    public function delete(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!$this->find($id)) {
             return $this->get404($req);
@@ -271,7 +275,7 @@ class Role extends \Soosyze\Controller
         ]));
     }
 
-    public function getValidator($req)
+    public function getValidator(ServerRequestInterface $req): Validator
     {
         return (new Validator())
                 ->setRules([
@@ -292,12 +296,12 @@ class Role extends \Soosyze\Controller
                 ->setInputs($req->getParsedBody());
     }
 
-    private function find($id)
+    private function find(int $id): array
     {
         return self::query()->from('role')->where('role_id', '==', $id)->fetch();
     }
 
-    private function getRoleSubmenu($keyRoute, $idRole)
+    private function getRoleSubmenu(string $keyRoute, int $idRole): array
     {
         $menu = [
             [

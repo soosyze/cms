@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Menu\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Menu\Form\FormLink;
@@ -13,7 +17,7 @@ class Link extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function create($nameMenu, $req)
+    public function create(string $nameMenu, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::menu()->getMenu($nameMenu)->fetch()) {
             return $this->get404($req);
@@ -56,7 +60,7 @@ class Link extends \Soosyze\Controller
         ]);
     }
 
-    public function store($nameMenu, $req)
+    public function store(string $nameMenu, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::menu()->getMenu($nameMenu)->fetch()) {
             return $this->get404($req);
@@ -108,7 +112,7 @@ class Link extends \Soosyze\Controller
         ]));
     }
 
-    public function edit($name, $id, $req)
+    public function edit(string $name, int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($values = self::menu()->find($id))) {
             return $this->get404($req);
@@ -154,7 +158,7 @@ class Link extends \Soosyze\Controller
         ]);
     }
 
-    public function update($nameMenu, $id, $req)
+    public function update(string $nameMenu, int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::menu()->find($id)) {
             return $this->get404($req);
@@ -205,7 +209,7 @@ class Link extends \Soosyze\Controller
         ]));
     }
 
-    public function delete($name, $id, $req)
+    public function delete(string $nameMenu, int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($linkMenu = self::menu()->find($id))) {
             return $this->get404($req);
@@ -216,7 +220,7 @@ class Link extends \Soosyze\Controller
                 'id'   => 'required|int',
                 'name' => 'required|string|max:255'
             ])
-            ->setInputs([ 'name' => $name, 'id' => $id ]);
+            ->setInputs([ 'name' => $nameMenu, 'id' => $id ]);
 
         $this->container->callHook('menu.link.delete.validator', [ &$validator, $id ]);
 
@@ -230,12 +234,12 @@ class Link extends \Soosyze\Controller
             $this->container->callHook('menu.link.delete.after', [ $validator, $id ]);
         }
 
-        $route = self::router()->getRoute('menu.show', [ ':menu' => $name ]);
+        $route = self::router()->getRoute('menu.show', [ ':menu' => $nameMenu ]);
 
         return new Redirect($route);
     }
 
-    private function getValidator($req)
+    private function getValidator(ServerRequestInterface $req): Validator
     {
         return (new Validator())
                 ->setRules([

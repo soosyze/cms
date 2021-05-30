@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 
 class Permission extends \Soosyze\Controller
@@ -11,7 +15,7 @@ class Permission extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($req)
+    public function admin(ServerRequestInterface $req): ResponseInterface
     {
         /* Récupère toutes les permissions par module. */
         $modules = [];
@@ -76,7 +80,7 @@ class Permission extends \Soosyze\Controller
                 ]);
     }
 
-    public function udpate($req)
+    public function udpate(ServerRequestInterface $req): ResponseInterface
     {
         $post = $req->getParsedBody();
 
@@ -101,12 +105,12 @@ class Permission extends \Soosyze\Controller
     }
 
     private function storePermission(
-        $idRole,
+        int $idRole,
         array $permission,
         array $newPermission
-    ) {
+    ): void {
         if (!($diffCreate = array_diff_key($newPermission, $permission))) {
-            return null;
+            return;
         }
 
         self::query()->insertInto('role_permission', [ 'role_id', 'permission_id' ]);
@@ -119,12 +123,12 @@ class Permission extends \Soosyze\Controller
     }
 
     private function deletePermission(
-        $idRole,
+        int $idRole,
         array $permission,
         array $newPermission
-    ) {
+    ): void {
         if (!($diffDelete = array_diff_key($permission, $newPermission))) {
-            return null;
+            return;
         }
 
         self::query()->from('role_permission')->delete()

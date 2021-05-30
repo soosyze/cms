@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Http\Response;
@@ -17,7 +21,7 @@ class User extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function account($req)
+    public function account(ServerRequestInterface $req): ResponseInterface
     {
         if ($user = self::user()->isConnected()) {
             return $this->show($user[ 'user_id' ], $req);
@@ -26,7 +30,7 @@ class User extends \Soosyze\Controller
         return new Response(403);
     }
 
-    public function show($id, $req)
+    public function show(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($user = self::user()->find($id))) {
             return $this->get404($req);
@@ -63,7 +67,7 @@ class User extends \Soosyze\Controller
                 ]);
     }
 
-    public function create()
+    public function create(): ResponseInterface
     {
         $values = [];
         $this->container->callHook('user.create.form.data', [ &$values ]);
@@ -109,7 +113,7 @@ class User extends \Soosyze\Controller
                 ]);
     }
 
-    public function store($req)
+    public function store(ServerRequestInterface $req): ResponseInterface
     {
         if ($req->isMaxSize()) {
             $_SESSION[ 'messages' ][ 'errors' ] = [
@@ -193,7 +197,7 @@ class User extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('user.create'));
     }
 
-    public function edit($id, $req)
+    public function edit(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($values = self::user()->find($id))) {
             return $this->get404($req);
@@ -250,7 +254,7 @@ class User extends \Soosyze\Controller
                 ]);
     }
 
-    public function update($id, $req)
+    public function update(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($user = self::user()->find($id))) {
             return $this->get404($req);
@@ -372,7 +376,7 @@ class User extends \Soosyze\Controller
         return new Redirect($route);
     }
 
-    public function remove($id, $req)
+    public function remove(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($user = self::user()->find($id))) {
             return $this->get404($req);
@@ -415,7 +419,7 @@ class User extends \Soosyze\Controller
                 ]);
     }
 
-    public function delete($id, $req)
+    public function delete(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!($user = self::user()->find($id))) {
             return $this->get404($req);
@@ -458,7 +462,7 @@ class User extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('user.admin'));
     }
 
-    private function validRole(array $roles = [])
+    private function validRole(array $roles = []): Validator
     {
         $validatorRoles = new Validator();
 
@@ -479,7 +483,7 @@ class User extends \Soosyze\Controller
         return $validatorRoles;
     }
 
-    private function getRoleByPermission()
+    private function getRoleByPermission(): array
     {
         $roles = self::user()->getRolesAttribuable();
 
@@ -494,7 +498,7 @@ class User extends \Soosyze\Controller
         return $roles;
     }
 
-    private function getValidator($req)
+    private function getValidator(ServerRequestInterface $req): Validator
     {
         return (new Validator())
                 ->setInputs($req->getParsedBody() + $req->getUploadedFiles())
@@ -528,7 +532,7 @@ class User extends \Soosyze\Controller
         ]);
     }
 
-    private function updateRole($validator, $idUser)
+    private function updateRole(Validator $validator, int $idUser): void
     {
         $this->container->callHook('user.update.role.before', [ &$validator, $idUser ]);
 
@@ -552,7 +556,7 @@ class User extends \Soosyze\Controller
         $this->container->callHook('user.update.role.after', [ $validator, $idUser ]);
     }
 
-    private function savePicture($id, $validator)
+    private function savePicture(int $id, Validator $validator): void
     {
         $key = 'picture';
 

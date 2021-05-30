@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Block\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Soosyze\Components\Http\Response;
 use Soosyze\Components\Validator\Validator;
 
 class Section extends \Soosyze\Controller
@@ -11,7 +16,7 @@ class Section extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($theme, $req)
+    public function admin(string $theme, ServerRequestInterface $req): ResponseInterface
     {
         $vendor = self::core()->getPath('modules', 'modules/core', false) . '/Block/Assets';
 
@@ -40,7 +45,7 @@ class Section extends \Soosyze\Controller
         ]);
     }
 
-    public function update($id, $req)
+    public function update(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::query()->from('block')->where('block_id', '==', $id)->fetch()) {
             return $this->get404($req);
@@ -62,5 +67,7 @@ class Section extends \Soosyze\Controller
                 ->where('block_id', '==', $id)
                 ->execute();
         }
+
+        return new Response(200);
     }
 }

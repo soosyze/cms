@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
@@ -13,7 +17,7 @@ class RoleManager extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($req)
+    public function admin(ServerRequestInterface $req): ResponseInterface
     {
         $values = self::query()->from('role')->orderBy('role_weight')->fetchAll();
 
@@ -77,7 +81,7 @@ class RoleManager extends \Soosyze\Controller
                 ]);
     }
 
-    public function adminCheck($req)
+    public function adminCheck(ServerRequestInterface $req): ResponseInterface
     {
         $roles = self::query()->from('role')->fetchAll();
 

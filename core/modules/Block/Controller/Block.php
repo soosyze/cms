@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Block\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Block\Form\FormBlock;
+use SoosyzeCore\Template\Services\Block as ServiceBlock;
 
 class Block extends \Soosyze\Controller
 {
@@ -16,9 +21,12 @@ class Block extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function show($id, $req)
+    /**
+     * @return ServiceBlock|ResponseInterface
+     */
+    public function show(int $id, ServerRequestInterface $req)
     {
-        if (!($block = self::query()->from('block')->where('block_id', '==', $id)->fetch())) {
+        if (!($block = $this->find($id))) {
             return $this->get404($req);
         }
 
@@ -46,7 +54,7 @@ class Block extends \Soosyze\Controller
                 ->addVars([ 'block' => $block ]);
     }
 
-    public function create($theme, $section)
+    public function create(string $theme, string $section): ServiceBlock
     {
         $data = self::block()->getBlocks();
 
@@ -71,9 +79,7 @@ class Block extends \Soosyze\Controller
 
                 $content = $this->container->callHook('block.' . $block[ 'hook' ], [
                     $tpl,
-                    empty($block[ 'options' ])
-                    ? []
-                    : $block[ 'options' ]
+                    $block[ 'options' ] ?? []
                 ]);
             }
 
@@ -116,7 +122,7 @@ class Block extends \Soosyze\Controller
         ]);
     }
 
-    public function store($theme, $section, $req)
+    public function store(string $theme, string $section, ServerRequestInterface $req): ResponseInterface
     {
         $blocks = self::block()->getBlocks();
 
@@ -173,7 +179,10 @@ class Block extends \Soosyze\Controller
         );
     }
 
-    public function edit($id, $req)
+    /**
+     * @return ServiceBlock|ResponseInterface
+     */
+    public function edit(int $id, ServerRequestInterface $req)
     {
         if (!($data = $this->find($id))) {
             return $this->get404($req);
@@ -222,7 +231,10 @@ class Block extends \Soosyze\Controller
         ]);
     }
 
-    public function update($id, $req)
+    /**
+     * @return ServiceBlock|ResponseInterface
+     */
+    public function update(int $id, ServerRequestInterface $req)
     {
         if (!($block = $this->find($id))) {
             return $this->get404($req);
@@ -310,7 +322,7 @@ class Block extends \Soosyze\Controller
         return $this->edit($id, $req);
     }
 
-    public function delete($id, $req)
+    public function delete(int $id, ServerRequestInterface $req): ResponseInterface
     {
         if (!$this->find($id)) {
             return $this->get404($req);
@@ -319,14 +331,16 @@ class Block extends \Soosyze\Controller
         $this->container->callHook('block.delete.before', [ $id ]);
         self::query()->from('block')->where('block_id', '==', $id)->delete()->execute();
         $this->container->callHook('block.delete.after', [ $id ]);
+
+        return $this->json();
     }
 
-    private function find($id)
+    private function find(int $id): array
     {
         return self::query()->from('block')->where('block_id', '==', $id)->fetch();
     }
 
-    private function getOptions($block, $default = [])
+    private function getOptions(array $block, array $default = []): array
     {
         return empty($block[ 'options' ])
                 ? $default

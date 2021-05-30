@@ -1,12 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Menu\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Menu\Form\FormMenu;
+use SoosyzeCore\Template\Services\Block;
 
 class Menu extends \Soosyze\Controller
 {
@@ -17,12 +22,12 @@ class Menu extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($req)
+    public function admin(ServerRequestInterface $req): ResponseInterface
     {
         return $this->show('menu-main', $req);
     }
 
-    public function show($name, $req)
+    public function show(string $name, ServerRequestInterface $req): ResponseInterface
     {
         if (!($menu = self::menu()->getMenu($name)->fetch())) {
             return $this->get404($req);
@@ -60,7 +65,7 @@ class Menu extends \Soosyze\Controller
         ]);
     }
 
-    public function check($name, $req)
+    public function check(string $name, ServerRequestInterface $req): ResponseInterface
     {
         $route = self::router()->getRoute('menu.show', [ ':menu' => $name ]);
         if (!($links = self::menu()->getLinkPerMenu($name)->fetchAll())) {
@@ -112,7 +117,7 @@ class Menu extends \Soosyze\Controller
         return new Redirect($route);
     }
 
-    public function create($req)
+    public function create(ServerRequestInterface $req): ResponseInterface
     {
         $values = [];
         $this->container->callHook('menu.create.form.data', [ &$values ]);
@@ -152,7 +157,7 @@ class Menu extends \Soosyze\Controller
         ]);
     }
 
-    public function store($req)
+    public function store(ServerRequestInterface $req): ResponseInterface
     {
         $validator = $this->getValidator($req);
 
@@ -186,7 +191,7 @@ class Menu extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('menu.create'));
     }
 
-    public function edit($menu, $req)
+    public function edit(string $menu, ServerRequestInterface $req): ResponseInterface
     {
         if (!($values = self::menu()->getMenu($menu)->fetch())) {
             return $this->get404($req);
@@ -232,7 +237,7 @@ class Menu extends \Soosyze\Controller
                 ]);
     }
 
-    public function update($menu, $req)
+    public function update(string $menu, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::menu()->getMenu($menu)->fetch()) {
             return $this->get404($req);
@@ -269,7 +274,7 @@ class Menu extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('menu.edit'));
     }
 
-    public function remove($name, $req)
+    public function remove(string $name, ServerRequestInterface $req): ResponseInterface
     {
         if (!($menu = self::menu()->getMenu($name)->fetch())) {
             return $this->get404($req);
@@ -313,7 +318,7 @@ class Menu extends \Soosyze\Controller
                 ]);
     }
 
-    public function delete($menu, $req)
+    public function delete(string $menu, ServerRequestInterface $req): ResponseInterface
     {
         if (!self::menu()->getMenu($menu)->fetch()) {
             return $this->get404($req);
@@ -358,7 +363,7 @@ class Menu extends \Soosyze\Controller
         );
     }
 
-    public function renderMenu($nameMenu, $parent = -1, $level = 1)
+    public function renderMenu(string $nameMenu, int $parent = -1, int $level = 1): Block
     {
         $query = self::query()
             ->from('menu_link')
@@ -387,7 +392,7 @@ class Menu extends \Soosyze\Controller
         return $this->createBlockMenuShowForm($nameMenu, $query, $level);
     }
 
-    public function getMenuSubmenu($keyRoute, $nameMenu)
+    public function getMenuSubmenu(string $keyRoute, string $nameMenu): array
     {
         $menu = [
             [
@@ -428,7 +433,7 @@ class Menu extends \Soosyze\Controller
         ];
     }
 
-    public function getListMenuSubmenu($nameMenu)
+    public function getListMenuSubmenu(string $nameMenu): Block
     {
         $menus = self::query()
             ->from('menu')
@@ -448,7 +453,7 @@ class Menu extends \Soosyze\Controller
         ]);
     }
 
-    private function createBlockMenuShowForm($nameMenu, $query, $level)
+    private function createBlockMenuShowForm(string $nameMenu, ?array $query, int $level): Block
     {
         return self::template()
                 ->createBlock('menu/content-menu-show_form.php', $this->pathViews)
@@ -456,7 +461,7 @@ class Menu extends \Soosyze\Controller
                 ->addVars([ 'level' => $level, 'menu' => $query ]);
     }
 
-    private function getValidator($req)
+    private function getValidator(ServerRequestInterface $req): Validator
     {
         return (new Validator())
                 ->setRules([

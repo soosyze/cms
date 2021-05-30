@@ -1,6 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Dashboard\Controller;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Dashboard extends \Soosyze\Controller
 {
@@ -11,7 +16,7 @@ class Dashboard extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function index()
+    public function index(): ResponseInterface
     {
         $messages = [];
         if (isset($_SESSION[ 'messages' ])) {
@@ -35,7 +40,7 @@ class Dashboard extends \Soosyze\Controller
         ]);
     }
 
-    public function info($req)
+    public function info(ServerRequestInterface $req): ResponseInterface
     {
         ob_start();
         phpinfo();

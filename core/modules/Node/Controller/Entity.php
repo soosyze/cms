@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Node\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Node\Form\FormNode;
@@ -13,7 +17,7 @@ class Entity extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function create($idNode, $entity, $req)
+    public function create(int $idNode, string $entity, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->byId($idNode))) {
             return $this->get404($req);
@@ -74,7 +78,7 @@ class Entity extends \Soosyze\Controller
         ]);
     }
 
-    public function store($idNode, $entity, $req)
+    public function store(int $idNode, string $entity, ServerRequestInterface $req): ResponseInterface
     {
         if ($req->isMaxSize()) {
             $_SESSION[ 'messages' ][ 'errors' ] = [
@@ -174,7 +178,7 @@ class Entity extends \Soosyze\Controller
         );
     }
 
-    public function edit($idNode, $entity, $idEntity, $req)
+    public function edit(int $idNode, string $entity, int $idEntity, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->byId($idNode))) {
             return $this->get404($req);
@@ -233,7 +237,7 @@ class Entity extends \Soosyze\Controller
                 ->make('page.content', 'node/content-entity-form.php', $this->pathViews, [ 'form' => $form ]);
     }
 
-    public function update($idNode, $entity, $idEntity, $req)
+    public function update(int $idNode, string $entity, int $idEntity, ServerRequestInterface $req): ResponseInterface
     {
         if ($req->isMaxSize()) {
             $_SESSION[ 'messages' ][ 'errors' ] = [
@@ -327,7 +331,7 @@ class Entity extends \Soosyze\Controller
         );
     }
 
-    public function delete($idNode, $typeEntity, $idEntity, $req)
+    public function delete(int $idNode, string $typeEntity, int $idEntity, ServerRequestInterface $req): ResponseInterface
     {
         if (!($node = self::node()->byId($idNode))) {
             return $this->get404($req);
@@ -386,7 +390,7 @@ class Entity extends \Soosyze\Controller
         );
     }
 
-    private function deleteFile($fieldsEntity, $entity)
+    private function deleteFile(array $fieldsEntity, string $entity): void
     {
         foreach ($fieldsEntity as $field) {
             if (!in_array($field[ 'field_type' ], [ 'image', 'file' ])) {
@@ -401,8 +405,14 @@ class Entity extends \Soosyze\Controller
         }
     }
 
-    private function saveFile($typeNode, $idNode, $typeEntity, $idEntity, $nameField, $validator)
-    {
+    private function saveFile(
+        string $typeNode,
+        int $idNode,
+        string $typeEntity,
+        int $idEntity,
+        string $nameField,
+        Validator $validator
+    ): void {
         self::file()
             ->add($validator->getInput($nameField), $validator->getInput("file-$nameField-name"))
             ->setPath("/node/$typeNode/{$idNode}/$typeEntity")

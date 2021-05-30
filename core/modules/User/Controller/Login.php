@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
@@ -14,7 +18,7 @@ class Login extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function login($url, $req)
+    public function login(string $url, ServerRequestInterface $req): ResponseInterface
     {
         if (self::user()->isConnectUrl($url)) {
             return $this->get404($req);
@@ -69,7 +73,7 @@ class Login extends \Soosyze\Controller
         ]);
     }
 
-    public function loginCheck($url, $req)
+    public function loginCheck(string $url, ServerRequestInterface $req): ResponseInterface
     {
         if (self::user()->isConnectUrl($url)) {
             return $this->get404($req);
@@ -110,7 +114,7 @@ class Login extends \Soosyze\Controller
         return new Redirect($route);
     }
 
-    public function logout()
+    public function logout(): ResponseInterface
     {
         session_destroy();
         session_unset();
@@ -118,7 +122,7 @@ class Login extends \Soosyze\Controller
         return new Redirect(self::router()->getBasePath(), 302);
     }
 
-    public function relogin($url, $req)
+    public function relogin(string $url, ServerRequestInterface $req): ResponseInterface
     {
         if (self::user()->isConnectUrl($url)) {
             return $this->get404($req);
@@ -161,7 +165,7 @@ class Login extends \Soosyze\Controller
         ]);
     }
 
-    public function reloginCheck($url, $req)
+    public function reloginCheck(string $url, ServerRequestInterface $req): ResponseInterface
     {
         if (self::user()->isConnectUrl($url)) {
             return $this->get404($req);
@@ -228,7 +232,7 @@ class Login extends \Soosyze\Controller
         ]));
     }
 
-    public function resetUser($id, $token, $req)
+    public function resetUser(int $id, string $token, ServerRequestInterface $req): ResponseInterface
     {
         if (!($user = self::user()->find($id))) {
             return $this->get404($req);
@@ -258,7 +262,7 @@ class Login extends \Soosyze\Controller
         return new Redirect(self::router()->getRoute('user.edit', [ ':id' => $id ]));
     }
 
-    private function getRedirectLogin($user)
+    private function getRedirectLogin(array $user): string
     {
         if (($redirect = self::config()->get('settings.connect_redirect', ''))) {
             $redirect = str_replace(':user_id', $user[ 'user_id' ], $redirect);

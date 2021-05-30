@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\FileManager\Hook\Config;
+use SoosyzeCore\Template\Services\Block;
 
 class FileCopy extends \Soosyze\Controller
 {
@@ -14,7 +19,10 @@ class FileCopy extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($path, $name, $ext, $req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function admin(string $path, string $name, string $ext, ServerRequestInterface $req)
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -53,12 +61,12 @@ class FileCopy extends \Soosyze\Controller
         ]);
     }
 
-    public function show($path, $req)
+    public function show(string $path, ServerRequestInterface $req): Block
     {
         return $this->getFileManager($path, $req);
     }
 
-    public function filter($path, $req)
+    public function filter(string $path, ServerRequestInterface $req): Block
     {
         $path = Util::cleanPath('/' . $path);
 
@@ -69,7 +77,11 @@ class FileCopy extends \Soosyze\Controller
 
         if (is_dir($filesPublic)) {
             $dirIterator = new \DirectoryIterator($filesPublic);
-            $iterator    = $this->get('filemanager.filter.iterator')->load($path, $dirIterator);
+
+            /** @var \SoosyzeCore\FileManager\Services\FilterManagerIterator $iterator */
+            $iterator = $this->get('filemanager.filter.iterator');
+            $iterator = $iterator->load($path, $dirIterator);
+
             foreach ($iterator as $file) {
                 try {
                     if ($file->isDir()) {
@@ -99,6 +111,9 @@ class FileCopy extends \Soosyze\Controller
             });
         }
 
+        /** @var \SoosyzeCore\FileManager\Hook\User $hookUser */
+        $hookUser =  $this->get('filemanager.hook.user');
+
         return self::template()
                 ->getTheme('theme_admin')
                 ->createBlock('filemanager/table-files_copy.php', $this->pathViews)
@@ -108,7 +123,7 @@ class FileCopy extends \Soosyze\Controller
                         ':path' => $path
                     ]),
                     'path'         => $path,
-                    'profil'       => $this->get('filemanager.hook.user')->getRight($path),
+                    'profil'       => $hookUser->getRight($path),
                     'size_all'     => Util::strFileSizeFormatted($size),
                     'text_copy'    => $path === ''
                     ? t('Copy')
@@ -119,7 +134,7 @@ class FileCopy extends \Soosyze\Controller
         ]);
     }
 
-    public function update($path, $name, $ext, $req)
+    public function update(string $path, string $name, string $ext, ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -180,7 +195,7 @@ class FileCopy extends \Soosyze\Controller
         return $this->json(200, $out);
     }
 
-    private function getFileManager($path, $req)
+    private function getFileManager(string $path, ServerRequestInterface $req): Block
     {
         $breadcrumb = self::template()
             ->getTheme('theme_admin')
@@ -197,7 +212,7 @@ class FileCopy extends \Soosyze\Controller
                 ->addBlock('table', $this->filter($path, $req));
     }
 
-    private function isResolveName($dir, $name, $ext)
+    private function isResolveName(string $dir, string $name, string $ext): string
     {
         $file = "$dir$name$ext";
 

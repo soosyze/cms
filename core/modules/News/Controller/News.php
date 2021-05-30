@@ -1,21 +1,40 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\News\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Response;
 use Soosyze\Components\Http\Stream;
 use Soosyze\Components\Paginate\Paginator;
 
 class News extends \Soosyze\Controller
 {
+    /**
+     * @var int
+     */
     public static $limit;
 
+    /**
+     * @var int
+     */
     private $dateCurrent;
 
+    /**
+     * @var int
+     */
     private $dateNext;
 
+    /**
+     * @var string
+     */
     private $titleMain;
 
+    /**
+     * @var string
+     */
     private $link;
 
     public function __construct()
@@ -25,12 +44,12 @@ class News extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function index($req)
+    public function index(ServerRequestInterface $req): ResponseInterface
     {
         return $this->page(1, $req);
     }
 
-    public function page($page, $req)
+    public function page(int $page, ServerRequestInterface $req): ResponseInterface
     {
         self::$limit = self::config()->get('settings.news_pagination', 6);
 
@@ -81,7 +100,7 @@ class News extends \Soosyze\Controller
         ]);
     }
 
-    public function viewYears($years, $page, $req)
+    public function viewYears(string $years, string $page, ServerRequestInterface $req): ResponseInterface
     {
         $date              = '01/01/' . $years;
         $this->dateCurrent = strtotime($date);
@@ -92,7 +111,7 @@ class News extends \Soosyze\Controller
         return $this->renderNews($page, $req);
     }
 
-    public function viewMonth($years, $month, $page, $req)
+    public function viewMonth(string $years, string $month, string $page, ServerRequestInterface $req): ResponseInterface
     {
         $date              = $month . '/01/' . $years;
         $this->dateCurrent = strtotime($date);
@@ -106,7 +125,7 @@ class News extends \Soosyze\Controller
         return $this->renderNews($page, $req);
     }
 
-    public function viewDay($years, $month, $day, $page, $req)
+    public function viewDay(string $years, string $month, string $day, string $page, ServerRequestInterface $req): ResponseInterface
     {
         $date              = $month . '/' . $day . '/' . $years;
         $this->dateCurrent = strtotime($date);
@@ -121,7 +140,7 @@ class News extends \Soosyze\Controller
         return $this->renderNews($page, $req);
     }
 
-    public function viewRss($req)
+    public function viewRss(ServerRequestInterface $req): ResponseInterface
     {
         self::$limit = self::config()->get('settings.news_pagination', 6);
 
@@ -169,7 +188,7 @@ class News extends \Soosyze\Controller
                 ->withHeader('expires', '0');
     }
 
-    private function renderNews($page, $req)
+    private function renderNews(string $page, ServerRequestInterface $req): ResponseInterface
     {
         $page = empty($page)
             ? 1
@@ -211,12 +230,12 @@ class News extends \Soosyze\Controller
         ]);
     }
 
-    private function getNews($dateCurrent, $dateNext, $offset = 0)
+    private function getNews(int $dateCurrent, int $dateNext, int $offset = 0): array
     {
         return self::query()
                 ->from('node')
                 ->where('type', '=', 'article')
-                ->between('date_created', $dateCurrent, $dateNext)
+                ->between('date_created', (string) $dateCurrent, (string) $dateNext)
                 ->where('node_status_id', '=', 1)
                 ->orderBy('sticky', SORT_DESC)
                 ->orderBy('date_created', SORT_DESC)
@@ -224,13 +243,13 @@ class News extends \Soosyze\Controller
                 ->fetchAll();
     }
 
-    private function getNewsAll($dateCurrent, $dateNext)
+    private function getNewsAll(int $dateCurrent, int $dateNext): array
     {
         return self::query()
                 ->from('node')
                 ->where('type', '=', 'article')
-                ->between('date_created', $dateCurrent, $dateNext)
-                ->where('node_status_id', '=',  1)
+                ->between('date_created', (string) $dateCurrent, (string) $dateNext)
+                ->where('node_status_id', '=', 1)
                 ->fetchAll();
     }
 }

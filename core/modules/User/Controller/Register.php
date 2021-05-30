@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
@@ -14,7 +18,7 @@ class Register extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function create()
+    public function create(): ResponseInterface
     {
         $values = [];
 
@@ -67,7 +71,7 @@ class Register extends \Soosyze\Controller
         ]);
     }
 
-    public function store($req)
+    public function store(ServerRequestInterface $req): ResponseInterface
     {
         $route     = self::router()->getRoute('user.register.create');
         $validator = (new Validator())->setInputs($req->getParsedBody());
@@ -149,7 +153,7 @@ class Register extends \Soosyze\Controller
         return new Redirect($route);
     }
 
-    public function activate($id, $token, $req)
+    public function activate(int $id, string $token, ServerRequestInterface $req): ResponseInterface
     {
         if (!($user = self::user()->find($id)) && $user[ 'token_actived' ] !== $token) {
             return $this->get404($req);
@@ -171,7 +175,7 @@ class Register extends \Soosyze\Controller
         ]));
     }
 
-    private function sendMailRegister($from)
+    private function sendMailRegister(string $from): void
     {
         $user     = self::user()->getUser($from);
         $urlReset = self::router()->getRoute('user.activate', [

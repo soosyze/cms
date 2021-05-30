@@ -1,19 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\User\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Paginate\Paginator;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
+use SoosyzeCore\QueryBuilder\Services\Query;
+use SoosyzeCore\Template\Services\Block;
 
 class UsersManager extends \Soosyze\Controller
 {
+    /**
+     * @var int
+     */
     private static $limit = 20;
 
+    /**
+     * @var int
+     */
     private static $page = 1;
 
+    /**
+     * @var bool
+     */
     private $isAdmin = false;
 
+    /**
+     * @var string
+     */
     private $username = '';
 
     public function __construct()
@@ -21,7 +39,7 @@ class UsersManager extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin($req)
+    public function admin(ServerRequestInterface $req): ResponseInterface
     {
         $messages = [];
         if (isset($_SESSION[ 'messages' ])) {
@@ -47,12 +65,18 @@ class UsersManager extends \Soosyze\Controller
                 ->addBlock('content.table', $this->filterPage(1, $req));
     }
 
-    public function filter($req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function filter(ServerRequestInterface $req)
     {
         return $this->filterPage(1, $req);
     }
 
-    public function filterPage($page, $req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function filterPage(int $page, ServerRequestInterface $req)
     {
         if (!$req->isAjax() && !$this->isAdmin) {
             return $this->get404($req);
@@ -166,11 +190,11 @@ class UsersManager extends \Soosyze\Controller
         ]);
     }
 
-    private function sortUser($users, $req)
+    private function sortUser(Query $users, ServerRequestInterface $req): Query
     {
         $get = $req->getQueryParams();
 
-        if (!empty($get[ 'order_by' ]) && in_array($get[ 'order_by' ], [
+        if (in_array($get[ 'order_by' ] ?? [], [
                 'actived', 'time_access', 'time_installed', 'username'
             ])) {
             $sort = !isset($get[ 'sort' ]) || $get[ 'sort' ] !== 'asc'
@@ -183,7 +207,7 @@ class UsersManager extends \Soosyze\Controller
         return $users->orderBy('time_access', SORT_DESC);
     }
 
-    private function hydrateUsersLinks(&$users)
+    private function hydrateUsersLinks(array &$users): void
     {
         foreach ($users as &$user) {
             $user[ 'link_show' ]   = self::router()->getRoute('user.show', [
@@ -201,7 +225,7 @@ class UsersManager extends \Soosyze\Controller
         unset($user);
     }
 
-    private function getSortParams($req)
+    private function getSortParams(ServerRequestInterface $req): array
     {
         $get = $req->getQueryParams();
 

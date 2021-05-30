@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\System\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
@@ -19,12 +22,12 @@ class Theme extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function index()
+    public function index(): ResponseInterface
     {
         return $this->admin(self::TYPE_PUBLIC);
     }
 
-    public function admin($type)
+    public function admin(string $type): ResponseInterface
     {
         $composers = self::composer()->getThemeComposers();
 
@@ -90,7 +93,7 @@ class Theme extends \Soosyze\Controller
         ]);
     }
 
-    public function active($type, $name, ServerRequestInterface $req)
+    public function active(string $type, string $name, ServerRequestInterface $req): ResponseInterface
     {
         $themes = $this->getThemes($type);
 
@@ -121,7 +124,7 @@ class Theme extends \Soosyze\Controller
         return new Redirect($route, 302);
     }
 
-    public function edit($type)
+    public function edit(string $type): ResponseInterface
     {
         $values = self::config()->get('settings');
 
@@ -169,7 +172,7 @@ class Theme extends \Soosyze\Controller
                 ]);
     }
 
-    public function update($type, ServerRequestInterface $req)
+    public function update(string $type, ServerRequestInterface $req): ResponseInterface
     {
         $validator = (new Validator())
             ->setRules(
@@ -221,7 +224,7 @@ class Theme extends \Soosyze\Controller
         );
     }
 
-    public function getListThemeSubmenu($keyRoute)
+    public function getListThemeSubmenu(string $keyRoute): array
     {
         $menus = [
             [
@@ -242,7 +245,7 @@ class Theme extends \Soosyze\Controller
         return [ 'key_route' => $keyRoute, 'menu' => $menus ];
     }
 
-    private function installTheme($type, $title)
+    private function installTheme(string $type, string $title): array
     {
         $errors = [];
 
@@ -290,7 +293,7 @@ class Theme extends \Soosyze\Controller
         return [];
     }
 
-    private function getThemes($type)
+    private function getThemes(string $type): array
     {
         $out = [];
 
@@ -310,9 +313,9 @@ class Theme extends \Soosyze\Controller
         return $out;
     }
 
-    private function getToken()
+    private function getToken(): string
     {
-        $token = uniqid(rand(), true);
+        $token = uniqid((string) rand(), true);
 
         $_SESSION[ 'token' ][ 'token' ] = $token;
 
@@ -321,7 +324,7 @@ class Theme extends \Soosyze\Controller
         return $token;
     }
 
-    private function saveFile($key, $validator)
+    private function saveFile(string $key, Validator $validator): void
     {
         self::file()
             ->add($validator->getInput($key), $validator->getInput("file-$key-name"))

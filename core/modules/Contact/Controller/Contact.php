@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\Contact\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\Contact\Form\FormContact;
@@ -15,7 +19,7 @@ class Contact extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function form()
+    public function form(): ResponseInterface
     {
         $values = [];
 
@@ -56,7 +60,7 @@ class Contact extends \Soosyze\Controller
                 ->override('page', [ 'page-contact.php' ]);
     }
 
-    public function formCheck($req)
+    public function formCheck(ServerRequestInterface $req): ResponseInterface
     {
         $validator = (new Validator())
             ->setRules([

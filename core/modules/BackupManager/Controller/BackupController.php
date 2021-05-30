@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\BackupManager\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Http\Response;
 use Soosyze\Components\Http\Stream;
@@ -15,7 +19,7 @@ class BackupController extends \Soosyze\Controller
         $this->pathViews    = dirname(__DIR__) . '/Views/';
     }
 
-    public function admin()
+    public function admin(): ResponseInterface
     {
         $messages = [];
         if (isset($_SESSION[ 'messages' ])) {
@@ -48,7 +52,7 @@ class BackupController extends \Soosyze\Controller
         ]);
     }
 
-    public function deleteAll()
+    public function deleteAll(): ResponseInterface
     {
         $_SESSION[ 'messages' ] = self::backupmanager()->deleteAll()
             ? [ 'success' => [ t('Backups deleted successfuly') ] ]
@@ -60,7 +64,7 @@ class BackupController extends \Soosyze\Controller
         );
     }
 
-    public function download($path)
+    public function download(string $path): ResponseInterface
     {
         if ($content = self::backupmanager()->getBackup($path)) {
             return new Response(200, new Stream($content), [
@@ -72,7 +76,7 @@ class BackupController extends \Soosyze\Controller
         return $this->get404();
     }
 
-    public function restore($path)
+    public function restore(string $path): ResponseInterface
     {
         $_SESSION[ 'messages' ] = self::backupmanager()->restore($path)
             ? [ 'success' => [ t('Backup restored successfuly') ] ]
@@ -83,7 +87,7 @@ class BackupController extends \Soosyze\Controller
         );
     }
 
-    public function delete($path, $req)
+    public function delete(string $path, ServerRequestInterface $req): ResponseInterface
     {
         $_SESSION[ 'messages' ] = self::backupmanager()->delete($path)
             ? [ 'success' => [ t('Backup deleted successfuly') ] ]
@@ -95,7 +99,7 @@ class BackupController extends \Soosyze\Controller
         );
     }
 
-    public function doBackup()
+    public function doBackup(): ResponseInterface
     {
         $_SESSION[ 'messages' ] = self::backupmanager()->doBackup()
             ? [ 'success' => [ t('Backup done successfuly') ] ]

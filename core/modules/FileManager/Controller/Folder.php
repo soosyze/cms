@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace SoosyzeCore\FileManager\Controller;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\FileManager\Form\FormFolder;
+use SoosyzeCore\Template\Services\Block;
 
 class Folder extends \Soosyze\Controller
 {
@@ -14,7 +19,10 @@ class Folder extends \Soosyze\Controller
         $this->pathViews = dirname(__DIR__) . '/Views/';
     }
 
-    public function create($path, $req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function create(string $path, ServerRequestInterface $req)
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -45,7 +53,7 @@ class Folder extends \Soosyze\Controller
         ]);
     }
 
-    public function store($path, $req)
+    public function store(string $path, ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -83,7 +91,10 @@ class Folder extends \Soosyze\Controller
         return $this->json(400, $out);
     }
 
-    public function edit($path, $req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function edit(string $path, ServerRequestInterface $req)
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -120,7 +131,7 @@ class Folder extends \Soosyze\Controller
         ]);
     }
 
-    public function update($path, $req)
+    public function update(string $path, ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -163,7 +174,10 @@ class Folder extends \Soosyze\Controller
         return $this->json(400, $out);
     }
 
-    public function remove($path, $req)
+    /**
+     * @return Block|ResponseInterface
+     */
+    public function remove(string $path, ServerRequestInterface $req)
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
@@ -203,7 +217,7 @@ class Folder extends \Soosyze\Controller
         ]);
     }
 
-    public function delete($path, $req)
+    public function delete(string $path, ServerRequestInterface $req): ResponseInterface
     {
         if (!$req->isAjax()) {
             return $this->get404($req);
