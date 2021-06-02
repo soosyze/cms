@@ -15,12 +15,24 @@ if (!$require->isValid()) {
 
 class Requiement
 {
+    /**
+     * @var bool
+     */
     protected $error;
 
+    /**
+     * @var bool
+     */
     protected $warning;
 
+    /**
+     * @var array
+     */
     protected $requiements = array();
 
+    /**
+     * @var array
+     */
     protected $tests = array();
 
     public function __toString()
@@ -86,6 +98,12 @@ class Requiement
         </html>';
     }
 
+    /**
+     * @param string $version
+     * @param string $operator
+     *
+     * @return $this
+     */
     public function versionPhp($version, $operator = '>=')
     {
         $this->tests[] = array(
@@ -98,6 +116,11 @@ class Requiement
         return $this;
     }
 
+    /**
+     * @param array $extensions
+     *
+     * @return $this
+     */
     public function extensions($extensions)
     {
         $this->tests[] = array(
@@ -108,6 +131,12 @@ class Requiement
         return $this;
     }
 
+    /**
+     * @param int $size
+     * @param string $unit
+     *
+     * @return $this
+     */
     public function memoryLimit($size = 128, $unit = 'MB')
     {
         $this->tests[] = array(
@@ -120,34 +149,53 @@ class Requiement
         return $this;
     }
 
+    /**
+     * @return bool
+     */
     public function isValid()
     {
-        $this->error   = null;
-        $this->warning = null;
+        $this->error   = false;
+        $this->warning = false;
         foreach ($this->tests as $test) {
-            call_user_func_array(array( $this, 'valid' . $test[ 'func' ] ), $test[ 'args' ]);
+            $callable = array( $this, 'valid' . $test[ 'func' ] );
+            if (!is_callable($callable)) {
+                continue;
+            }
+            call_user_func_array($callable, $test[ 'args' ]);
         }
 
         return empty($this->error) && empty($this->warning);
     }
 
+    /**
+     * @param string $version
+     * @param string $operator
+     *
+     * @return void
+     */
     protected function validVersionPhp($version, $operator = '>=')
     {
-        if (!function_exists('version_compare')) {
+        $phpVersion = phpversion();
+        if (!function_exists('version_compare') || $phpVersion === false) {
             $this->addReturn('versionphp', 'warning', 'PHP version', 'La version ne peut être comparée.');
-        } elseif (!version_compare(phpversion(), $version, $operator)) {
+        } elseif (version_compare($phpVersion, $version, $operator) === false) {
             $this->addReturn('versionphp', 'error', 'PHP version', 'La version PHP :version :operator est attendue. Vous êtes actuellement en version :current_version', array(
                 ':version'         => htmlspecialchars($version),
                 ':operator'        => htmlspecialchars($operator),
-                ':current_version' => phpversion()
+                ':current_version' => $phpVersion
             ));
         } else {
             $this->addReturn('versionphp', 'success', 'PHP version', 'La version PHP :version_current est ok.', array(
-                ':version_current' => phpversion()
+                ':version_current' => $phpVersion
             ));
         }
     }
 
+    /**
+     * @param array $extensions
+     *
+     * @return void
+     */
     protected function validExtensions($extensions = array())
     {
         foreach ($extensions as $value) {
@@ -166,6 +214,12 @@ class Requiement
         }
     }
 
+    /**
+     * @param int $size
+     * @param string $bytes
+     *
+     * @return void
+     */
     protected function validMemoryLimit($size = 128, $bytes = 'MB')
     {
         if (!function_exists('ini_get')) {
@@ -176,11 +230,20 @@ class Requiement
         $memory = ini_get('memory_limit');
         if ($memory === false) {
             $this->addReturn('memory', 'warning', 'PHP memory limit', 'La configuration memory_limit n\'existe pas.');
-        } elseif ($memory === null) {
+        } elseif ($memory === '') {
             $this->addReturn('memory', 'warning', 'PHP memory limit', 'La configuration memory_limit est vide.');
         }
     }
 
+    /**
+     * @param string $key
+     * @param string $type
+     * @param string $name
+     * @param string $message
+     * @param array $args
+     *
+     * @return void
+     */
     private function addReturn($key, $type, $name, $message, $args = array())
     {
         $msg = str_replace(array_keys($args), $args, $message);
@@ -190,14 +253,10 @@ class Requiement
             'name'    => $name,
             'message' => $msg
         ));
-        if ($type === 'error') {
-            if (empty($this->error)) {
-                $this->error = true;
-            }
-        } elseif ($type === 'warning') {
-            if (empty($this->warning)) {
-                $this->warning = true;
-            }
+        if ($type === 'error' && $this->error === false) {
+            $this->error = true;
+        } elseif ($type === 'warning' && $this->warning === false) {
+            $this->warning = true;
         }
     }
 }
