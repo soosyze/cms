@@ -2,8 +2,7 @@
 
 return [
     'dashboard' => [
-        'class' => 'SoosyzeCore\Dashboard\Services\Dashboard',
-        'arguments' => ['@config', '@core']
+        'class' => 'SoosyzeCore\Dashboard\Services\Dashboard'
     ],
     'dashboard.extend' => [
         'class' => 'SoosyzeCore\Dashboard\Extend',

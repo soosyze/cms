@@ -3,7 +3,6 @@
 return [
     'config.hook.user' => [
         'class' => 'SoosyzeCore\Config\Hook\User',
-        'arguments' => ['@core'],
         'hooks' => [
             'user.permission.module' => 'hookUserPermissionModule',
             'route.config.admin' => 'hookConfigAdmin',

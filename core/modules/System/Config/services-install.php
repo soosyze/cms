@@ -3,14 +3,12 @@
 return [
     'install' => [
         'class' => 'SoosyzeCore\System\Hook\AppInstall',
-        'arguments' => ['@router'],
         'hooks' => [
             'app.404' => 'hook404'
         ]
     ],
     'install.hook.install' => [
         'class' => 'SoosyzeCore\System\Hook\Step',
-        'arguments' => ['@core', '@router', '@translate'],
         'hooks' => [
             'step' => 'hookStep',
             'step.language' => 'hookLanguage',

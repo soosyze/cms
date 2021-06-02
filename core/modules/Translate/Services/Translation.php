@@ -204,7 +204,7 @@ class Translation extends \Soosyze\Config
         'zu'  => 'Zulu'
     ];
 
-    public function __construct(\ArrayAccess $config, string $dir, string $langDefault = 'en')
+    public function __construct(\Soosyze\Config $config, string $dir, string $langDefault = 'en')
     {
         parent::__construct($dir);
         $this->lang = isset($config[ 'settings.lang' ])

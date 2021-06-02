@@ -10,7 +10,6 @@ return [
     ],
     'contact.hook.api.route' => [
         'class' => 'SoosyzeCore\Contact\Hook\ApiRoute',
-        'arguments' => ['@alias', '@config', '@router'],
         'hooks' => [
             'api.route' => 'apiRoute'
         ]

@@ -2,8 +2,7 @@
 
 return [
     'menu' => [
-        'class' => 'SoosyzeCore\Menu\Services\Menu',
-        'arguments' => ['@alias', '@config', '@core', '@query', '@router', '@template']
+        'class' => 'SoosyzeCore\Menu\Services\Menu'
     ],
     'menu.extend' => [
         'class' => 'SoosyzeCore\Menu\Extend',
@@ -34,7 +33,6 @@ return [
     ],
     'menu.hook.app' => [
         'class' => 'SoosyzeCore\Menu\Hook\App',
-        'arguments' => ['@core', '@menu'],
         'hooks' => [
             'app.response.after' => 'hookResponseAfter',
             'menu.admin.response.after' => 'hookMenuShowResponseAfter',
@@ -43,7 +41,6 @@ return [
     ],
     'menu.hook.block' => [
         'class' => 'SoosyzeCore\Menu\Hook\Block',
-        'arguments' => ['@menu', '@router'],
         'hooks' => [
             'block.create.form.data' => 'hookBlockCreateFormData',
             'block.menu' => 'hookBlockMenu',

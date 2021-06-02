@@ -2,27 +2,22 @@
 
 return [
     'alias' => [
-        'class' => 'SoosyzeCore\System\Services\Alias',
-        'arguments' => ['@config', '@query']
+        'class' => 'SoosyzeCore\System\Services\Alias'
     ],
     'composer' => [
-        'class' => 'SoosyzeCore\System\Services\Composer',
-        'arguments' => ['@core', '@module', '@semver']
+        'class' => 'SoosyzeCore\System\Services\Composer'
     ],
     'semver' => [
         'class' => 'SoosyzeCore\System\Services\Semver'
     ],
     'module' => [
-        'class' => 'SoosyzeCore\System\Services\Modules',
-        'arguments' => ['@query', '@translate']
+        'class' => 'SoosyzeCore\System\Services\Modules'
     ],
     'migration' => [
-        'class' => 'SoosyzeCore\System\Services\Migration',
-        'arguments' => ['@composer', '@config', '@query', '@schema']
+        'class' => 'SoosyzeCore\System\Services\Migration'
     ],
     'system.hook.app' => [
         'class' => 'SoosyzeCore\System\Hook\App',
-        'arguments' => ['@alias', '@config', '@core', '@query', '@router', '@template'],
         'hooks' => [
             'app.response.before' => 'hookSys',
             'app.403' => 'hooks403',
@@ -59,7 +54,6 @@ return [
     ],
     'system.hook.config' => [
         'class' => 'SoosyzeCore\System\Hook\Config',
-        'arguments' => ['@file', '@router', '@translate'],
         'hooks' => [
             'config.edit.menu' => 'menu'
         ]

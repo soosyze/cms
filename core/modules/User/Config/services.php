@@ -3,7 +3,6 @@
 return [
     'user' => [
         'class' => 'SoosyzeCore\User\Services\User',
-        'arguments' => ['@core', '@config', '@query', '@router'],
         'hooks' => [
             'app.granted' => 'isGranted',
             'app.granted.request' => 'isGrantedRequest',
@@ -12,8 +11,7 @@ return [
         ]
     ],
     'auth' => [
-        'class' => 'SoosyzeCore\User\Services\Auth',
-        'arguments' => ['@query']
+        'class' => 'SoosyzeCore\User\Services\Auth'
     ],
     'user.extend' => [
         'class' => 'SoosyzeCore\User\Extend',
@@ -23,14 +21,12 @@ return [
     ],
     'user.hook.api.route' => [
         'class' => 'SoosyzeCore\User\Hook\ApiRoute',
-        'arguments' => ['@config', '@router'],
         'hooks' => [
             'api.route' => 'apiRoute'
         ]
     ],
     'user.hook.user' => [
         'class' => 'SoosyzeCore\User\Hook\User',
-        'arguments' => ['@config', '@user'],
         'hooks' => [
             'user.permission.module' => 'hookUserPermissionModule',
             'route.user.login' => 'hookLogin',
@@ -68,14 +64,12 @@ return [
     ],
     'user.hook.config' => [
         'class' => 'SoosyzeCore\User\Hook\Config',
-        'arguments' => ['@router'],
         'hooks' => [
             'config.edit.menu' => 'menu'
         ]
     ],
     'user.hook.block' => [
         'class' => 'SoosyzeCore\User\Hook\Block',
-        'arguments' => ['@config', '@router', '@user'],
         'hooks' => [
             'block.create.form.data' => 'hookBlockCreateFormData',
             'block.user.login' => 'hookUserLogin',

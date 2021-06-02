@@ -2,16 +2,13 @@
 
 return [
     'filemanager' => [
-        'class' => 'SoosyzeCore\FileManager\Services\FileManager',
-        'arguments' => ['@core', '@config', '@filemanager.hook.user', '@router', '@template']
+        'class' => 'SoosyzeCore\FileManager\Services\FileManager'
     ],
     'fileprofil' => [
-        'class' => 'SoosyzeCore\FileManager\Services\FileProfil',
-        'arguments' => ['@query']
+        'class' => 'SoosyzeCore\FileManager\Services\FileProfil'
     ],
     'filemanager.filter.iterator' => [
-        'class' => 'SoosyzeCore\FileManager\Services\FilterManagerIterator',
-        'arguments' => ['@filemanager.hook.user']
+        'class' => 'SoosyzeCore\FileManager\Services\FilterManagerIterator'
     ],
     'filemanager.extend' => [
         'class' => 'SoosyzeCore\FileManager\Extend',
@@ -22,28 +19,24 @@ return [
     ],
     'filemanager.hook.api.route' => [
         'class' => 'SoosyzeCore\FileManager\Hook\ApiRoute',
-        'arguments' => ['@alias', '@config', '@router'],
         'hooks' => [
             'api.route' => 'apiRoute'
         ]
     ],
     'filemanager.hook.app' => [
         'class' => 'SoosyzeCore\FileManager\Hook\App',
-        'arguments' => ['@core'],
         'hooks' => [
             'app.response.after' => 'hookResponseAfter'
         ]
     ],
     'filemanager.hook.config' => [
         'class' => 'SoosyzeCore\FileManager\Hook\Config',
-        'arguments' => ['@core'],
         'hooks' => [
             'config.edit.menu' => 'menu'
         ]
     ],
     'filemanager.hook.menu' => [
         'class' => 'SoosyzeCore\FileManager\Hook\Menu',
-        'arguments' => ['@router', '@user'],
         'hooks' => [
             'user.submenu' => 'hookUsersMenu',
             'user.manager.submenu' => 'hookUserManagerSubmenu'
@@ -51,7 +44,6 @@ return [
     ],
     'filemanager.hook.user' => [
         'class' => 'SoosyzeCore\FileManager\Hook\User',
-        'arguments' => ['@fileprofil', '@user'],
         'hooks' => [
             'user.permission.module' => 'hookUserPermissionModule',
             'route.filemanager.permission.admin' => 'hookFileAdmin',
@@ -87,7 +79,6 @@ return [
     ],
     'filemanager.hook.role' => [
         'class' => 'SoosyzeCore\FileManager\Hook\Role',
-        'arguments' => ['@query'],
         'hooks' => [
             'role.delete.before' => 'hookRoleDeleteBefore'
         ]

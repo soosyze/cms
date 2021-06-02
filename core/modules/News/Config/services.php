@@ -10,7 +10,6 @@ return [
     ],
     'news.hook.api.route' => [
         'class' => 'SoosyzeCore\News\Hook\ApiRoute',
-        'arguments' => ['@alias', '@config', '@router'],
         'hooks' => [
             'api.route' => 'apiRoute'
         ]
@@ -31,14 +30,12 @@ return [
     ],
     'news.hook.config' => [
         'class' => 'SoosyzeCore\News\Hook\Config',
-        'arguments' => ['@file'],
         'hooks' => [
             'config.edit.menu' => 'menu'
         ]
     ],
     'news.hook.block' => [
         'class' => 'SoosyzeCore\News\Hook\Block',
-        'arguments' => ['@alias', '@node', '@query', '@router'],
         'hooks' => [
             'block.create.form.data' => 'hookBlockCreateFormData',
             'block.news.archive.select' => 'hookBlockNewsArchiveSelect',
@@ -54,7 +51,6 @@ return [
     ],
     'news.hook.node' => [
         'class' => 'SoosyzeCore\News\Hook\Node',
-        'arguments' => ['@config'],
         'hooks' => [
             'node.makefields' => 'hookNodeMakefields',
             'node.create.form.data' => 'hookNodeFormData',

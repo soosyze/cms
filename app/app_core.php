@@ -4,7 +4,7 @@ use Soosyze\App;
 
 class Core extends App
 {
-    public function loadModules()
+    public function loadModules(): array
     {
         if (!$this->get('config')->get('settings.time_installed')) {
             $modules[] = new SoosyzeCore\System\Controller\Install();
@@ -20,27 +20,26 @@ class Core extends App
         return $modules;
     }
 
-    public function loadServices()
+    public function loadServices(): array
     {
         return [
             'schema'   => [
                 'class'     => 'SoosyzeCore\QueryBuilder\Services\Schema',
                 'arguments' => [
-                    '#database.host',
-                    '#database.schema'
+                    'host' => '#database.host',
+                    'name' => '#database.schema'
                 ]
             ],
             'query'    => [
                 'class'     => 'SoosyzeCore\QueryBuilder\\Services\Query',
                 'arguments' => [
-                    '@schema'
+                    'schema' => '@schema'
                 ]
             ],
             'template' => [
                 'class'     => 'SoosyzeCore\Template\Services\Templating',
                 'arguments' => [
-                    '@core',
-                    '@config'
+                    'app' => '@core'
                 ]
             ],
             'template.hook.user' => [
@@ -59,9 +58,8 @@ class Core extends App
             'translate'     => [
                 'class'     => 'SoosyzeCore\Translate\Services\Translation',
                 'arguments' => [
-                    '@config',
-                    __DIR__ . '/lang',
-                    'en'
+                    'dir'=> __DIR__ . '/lang',
+                    'langDefault'=> 'en'
                 ]
             ],
             'mailer'        => [

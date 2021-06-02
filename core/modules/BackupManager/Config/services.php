@@ -8,8 +8,7 @@ return [
         ]
     ],
     'backupmanager' => [
-        'class' => 'SoosyzeCore\BackupManager\Services\BackupManager',
-        'arguments' => ['@config', '@core', '@router']
+        'class' => 'SoosyzeCore\BackupManager\Services\BackupManager'
     ],
     'backupmanager.hook.config' => [
         'class' => 'SoosyzeCore\BackupManager\Hook\Config',
@@ -31,14 +30,12 @@ return [
     ],
     'backupmanager.hook.cron' => [
         'class' => 'SoosyzeCore\BackupManager\Hook\Cron',
-        'arguments' => ['@backupmanager', '@config'],
         'hooks' => [
             'app.cron' => 'hookAppCron'
         ]
     ],
     'backupmanager.hook.tool' => [
         'class' => 'SoosyzeCore\BackupManager\Hook\Tool',
-        'arguments' => ['@router'],
         'hooks' => [
             'tools.admin' => 'hookToolAdmin'
         ]

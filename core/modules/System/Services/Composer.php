@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\System\Services;
 
-use Composer\Semver\Semver;
 use Core;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\System\ExtendModule;
 use SoosyzeCore\System\ExtendTheme;
+use SoosyzeCore\System\Services\Semver;
 
 class Composer
 {

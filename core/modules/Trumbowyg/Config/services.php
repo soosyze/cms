@@ -9,7 +9,6 @@ return [
     ],
     'trumbowyg.hook.app' => [
         'class' => 'SoosyzeCore\Trumbowyg\Hook\App',
-        'arguments' => ['@core', '@config', '@router'],
         'hooks' => [
             'node.create.response.after' => 'getEditor',
             'node.edit.response.after' => 'getEditor',

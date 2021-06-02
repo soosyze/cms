@@ -2,12 +2,10 @@
 
 return [
     'node' => [
-        'class' => 'SoosyzeCore\Node\Services\Node',
-        'arguments' => ['@config', '@core', '@query', '@schema', '@template']
+        'class' => 'SoosyzeCore\Node\Services\Node'
     ],
     'nodeuser' => [
-        'class' => 'SoosyzeCore\Node\Services\NodeUser',
-        'arguments' => ['@alias', '@config', '@node.hook.user', '@query', '@router', '@user']
+        'class' => 'SoosyzeCore\Node\Services\NodeUser'
     ],
     'node.extend' => [
         'class' => 'SoosyzeCore\Node\Extend',
@@ -19,7 +17,6 @@ return [
     ],
     'node.hook.block' => [
         'class' => 'SoosyzeCore\Node\Hook\Block',
-        'arguments' => ['@alias', '@node', '@query', '@router'],
         'hooks' => [
             'block.create.form.data' => 'hookBlockCreateFormData',
             'block.node.next_previous' => 'hookBlockNextPrevious',
@@ -30,14 +27,12 @@ return [
     ],
     'node.hook.config' => [
         'class' => 'SoosyzeCore\Node\Hook\Config',
-        'arguments' => ['@query'],
         'hooks' => [
             'config.edit.menu' => 'menu'
         ]
     ],
     'node.hook.filemanager' => [
         'class' => 'SoosyzeCore\Node\Hook\FileManager',
-        'arguments' => ['@core', '@module', '@router'],
         'hooks' => [
             'node.create.form' => 'hookNodeCreateForm',
             'node.edit.form' => 'hookNodeEditForm',
@@ -47,21 +42,18 @@ return [
     ],
     'node.hook.app' => [
         'class' => 'SoosyzeCore\Node\Hook\App',
-        'arguments' => ['@core'],
         'hooks' => [
             'app.response.after' => 'hookResponseAfter'
         ]
     ],
     'node.hook.api.route' => [
         'class' => 'SoosyzeCore\Node\Hook\ApiRoute',
-        'arguments' => ['@alias', '@query', '@router'],
         'hooks' => [
             'api.route' => 'apiRoute'
         ]
     ],
     'node.hook.url' => [
         'class' => 'SoosyzeCore\Node\Hook\Url',
-        'arguments' => ['@alias', '@config', '@query', '@schema'],
         'hooks' => [
             'node.create.form.data' => 'hookCreateFormData',
             'node.create.form' => 'hookCreateForm',
@@ -76,7 +68,6 @@ return [
     ],
     'node.hook.menu' => [
         'class' => 'SoosyzeCore\Node\Hook\Menu',
-        'arguments' => ['@alias', '@query', '@schema'],
         'hooks' => [
             'node.fieldset.submenu' => 'hookNodeFieldsetSubmenu',
             'node.create.form.data' => 'hookCreateFormData',
@@ -93,7 +84,6 @@ return [
     ],
     'node.hook.user' => [
         'class' => 'SoosyzeCore\Node\Hook\User',
-        'arguments' => ['@query'],
         'hooks' => [
             'user.permission.module' => 'hookUserPermissionModule',
             'route.node.admin' => 'hookNodeManager',
@@ -121,7 +111,6 @@ return [
     ],
     'node.hook.nodeuser' => [
         'class' => 'SoosyzeCore\Node\Hook\NodeUser',
-        'arguments' => ['@config', '@node', '@nodeuser', '@query', '@router', '@template', '@user'],
         'hooks' => [
             'user.show' => 'hookUserShow',
             'user.delete.after' => 'hookUserDeleteAfter'
@@ -129,7 +118,6 @@ return [
     ],
     'node.hook.cron' => [
         'class' => 'SoosyzeCore\Node\Hook\Cron',
-        'arguments' => ['@config', '@query'],
         'hooks' => [
             'app.cron' => 'hookCron'
         ]

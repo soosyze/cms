@@ -3,14 +3,12 @@
 return [
     'block' => [
         'class' => 'SoosyzeCore\Block\Services\Block',
-        'arguments' => ['@config', '@core'],
         'hooks' => [
             'block.social' => 'hookBlockSocial'
         ]
     ],
     'block.hook.app' => [
         'class' => 'SoosyzeCore\Block\Hook\App',
-        'arguments' => ['@core', '@block', '@query', '@router', '@template', '@user'],
         'hooks' => [
             'app.response.after' => 'hookResponseAfter'
         ]
