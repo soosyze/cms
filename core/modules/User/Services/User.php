@@ -240,7 +240,7 @@ class User
         return [ 'key_route' => $keyRoute, 'menu' => $menu ];
     }
 
-    public function hasPermission(string $idPermission): bool
+    public function hasPermission(?string $idPermission): bool
     {
         if (!empty($this->permissions)) {
             return isset($this->permissions[ $idPermission ]);

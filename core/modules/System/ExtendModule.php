@@ -8,6 +8,9 @@ use Psr\Container\ContainerInterface;
 
 abstract class ExtendModule
 {
+    /**
+     * @var array
+     */
     private $translations = [];
 
     public function getTranslations(): array
@@ -15,11 +18,9 @@ abstract class ExtendModule
         return $this->translations;
     }
 
-    public function loadTranslation($lang, $file)
+    public function loadTranslation(string $lang, string $file): void
     {
         $this->translations[ $lang ][] = $file;
-
-        return $this;
     }
 
     abstract public function getDir(): string;

@@ -1,4 +1,3 @@
-
 <?php if ($previous || $next): ?>
 
 <nav class="nav-flex post-nav">

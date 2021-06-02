@@ -6,6 +6,7 @@ namespace SoosyzeCore\Template\Services;
 
 use Core;
 use Soosyze\Components\Http\Stream;
+use Soosyze\Components\Template\Template;
 use Soosyze\Components\Util\Util;
 use Soosyze\Config;
 
@@ -108,6 +109,11 @@ class Templating extends \Soosyze\Components\Http\Response
      * @var string
      */
     private $basePath;
+
+    /**
+     * @var string
+     */
+    private $filesPublic;
 
     public function __construct(Core $core, Config $config)
     {
@@ -212,9 +218,6 @@ class Templating extends \Soosyze\Components\Http\Response
     /**
      * Ajoute des variables à la template courante ou à une sous template.
      *
-     * @param string $parent
-     * @param array  $vars
-     *
      * @return $this
      */
     public function view(string $parent, array $vars): self
@@ -227,19 +230,13 @@ class Templating extends \Soosyze\Components\Http\Response
     /**
      * Ajoute un bloc à la template courante ou une sous template.
      * Ce bloc peut recevoir des variables fournit en dernier paramètre de la fonction.
-     *
-     * @param sring  $selector
-     * @param string $tpl
-     * @param string $tplPath
-     * @param array  $vars
-     *
-     * @return $this
      */
     public function make(string $selector, string $tpl, string $tplPath, array $vars = []): self
     {
         $template = $this->createBlock($tpl, $tplPath);
+        $this->addBlock($selector, $template, $vars);
 
-        return $this->addBlock($selector, $template, $vars);
+        return $this;
     }
 
     public function addFilterVar(string $selector, string $key, callable $function): self
@@ -270,19 +267,11 @@ class Templating extends \Soosyze\Components\Http\Response
         return $this;
     }
 
-    /*
-     * @param string $selector
-     *
-     * @return \Soosyze\Components\Template\Template
-     */
-    public function getBlock(string $selector): \Soosyze\Components\Template\Template
+    public function getBlock(string $selector): Template
     {
         return $this->getThemplate()->getBlockWithParent($selector);
     }
 
-    /**
-     * @return Block
-     */
     public function createBlock(string $tpl, string $tplPath): Block
     {
         return (new Block($tpl, $tplPath))

@@ -10,6 +10,9 @@ use Soosyze\Components\Template\Template;
 
 class Extend extends \SoosyzeCore\System\ExtendModule
 {
+    /**
+     * @var string
+     */
     private $pathContent;
 
     public function __construct()

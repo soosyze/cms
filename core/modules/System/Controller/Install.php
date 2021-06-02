@@ -35,7 +35,7 @@ class Install extends \Soosyze\Controller
     /**
      * Liste des thèmes à installer.
      *
-     * @array
+     * @var array
      */
     private $themes = [
         'Fez'   => 'SoosyzeCore\\Theme\\Fez\\',

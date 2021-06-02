@@ -105,7 +105,7 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
         ];
     }
 
-    public function after(&$validator, array $data, string $id): void
+    public function after(Validator &$validator, array $data, string $id): void
     {
     }
 

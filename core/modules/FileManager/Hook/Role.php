@@ -19,7 +19,7 @@ class Role
         $this->query = $query;
     }
 
-    public function hookRoleDeleteBefore(Validator $validator, int $id): Query
+    public function hookRoleDeleteBefore(Validator $validator, int $id): void
     {
         $this->query
             ->from('profil_file_role')

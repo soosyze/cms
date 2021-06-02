@@ -35,7 +35,7 @@ class FileManager
         $this->hasFileManager = $module->has('FileManager');
     }
 
-    public function hookNodeCreateForm(FormBuilder &$form, string $content, string $type): void
+    public function hookNodeCreateForm(FormBuilder &$form, array $content, string $type): void
     {
         if (!$this->hasFileManager) {
             return;
@@ -71,7 +71,7 @@ class FileManager
         $this->getFileManager($form, $request);
     }
 
-    public function hookEntityForm(FormBuilder &$form, string $content, array $node, string $entity): void
+    public function hookEntityForm(FormBuilder &$form, array $content, array $node, string $entity): void
     {
         if (!$this->hasFileManager) {
             return;

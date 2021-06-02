@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Template\Services;
 
-class Block extends \Soosyze\Components\Template\Template
+use Soosyze\Components\Template\Template;
+
+class Block extends Template
 {
-    public function getBlockWithParent(string $parent): Block
+    public function getBlockWithParent(string $parent): Template
     {
         if ($block = strstr($parent, '.', true)) {
             return $this->getBlock($block)
