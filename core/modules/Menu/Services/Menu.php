@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Menu\Services;
 
+use Core;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\UriInterface;
-use Soosyze\App;
 use Soosyze\Components\Http\Uri;
 use Soosyze\Components\Router\Router;
 use Soosyze\Config;
@@ -28,7 +28,7 @@ class Menu
     private $config;
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -52,7 +52,7 @@ class Menu
      */
     private $templating;
 
-    public function __construct(Alias $alias, Config $config, App $core, Query $query, Router $router, Templating $templating)
+    public function __construct(Alias $alias, Config $config, Core $core, Query $query, Router $router, Templating $templating)
     {
         $this->alias      = $alias;
         $this->config     = $config;

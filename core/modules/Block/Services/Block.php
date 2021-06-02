@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Block\Services;
 
-use Soosyze\App;
+use Core;
 use Soosyze\Config;
 use SoosyzeCore\Template\Services\Block as ServiceBlock;
 
@@ -16,7 +16,7 @@ class Block
     private $config;
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -25,7 +25,7 @@ class Block
      */
     private $pathViews;
 
-    public function __construct(Config $config, App $core)
+    public function __construct(Config $config, Core $core)
     {
         $this->config    = $config;
         $this->core      = $core;

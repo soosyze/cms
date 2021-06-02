@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Block\Hook;
 
+use Core;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Soosyze\App as SoosyzeApp;
 use Soosyze\Components\Router\Router;
 use SoosyzeCore\Block\Services\Block;
 use SoosyzeCore\QueryBuilder\Services\Query;
@@ -57,7 +57,7 @@ class App
      */
     private $userCurrent;
 
-    public function __construct(SoosyzeApp $core, Block $block, Query $query, Router $router, Templating $template, User $user)
+    public function __construct(Core $core, Block $block, Query $query, Router $router, Templating $template, User $user)
     {
         $this->core   = $core;
         $this->block  = $block;

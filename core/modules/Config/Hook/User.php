@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Config\Hook;
 
-use Soosyze\App;
+use Core;
 
 class User implements \SoosyzeCore\User\UserInterface
 {
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
-    public function __construct(App $core)
+    public function __construct(Core $core)
     {
         $this->core = $core;
     }

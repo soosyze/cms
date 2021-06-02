@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Trumbowyg\Hook;
 
+use Core;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Soosyze\App as SoosyzeApp;
 use Soosyze\Components\Router\Router;
 use Soosyze\Config;
 use SoosyzeCore\Template\Services\Templating;
@@ -14,7 +14,7 @@ use SoosyzeCore\Template\Services\Templating;
 class App
 {
     /**
-     * @var SoosyzeApp
+     * @var Core
      */
     private $core;
 
@@ -28,7 +28,7 @@ class App
      */
     private $router;
 
-    public function __construct(SoosyzeApp $core, Config $config, Router $router)
+    public function __construct(Core $core, Config $config, Router $router)
     {
         $this->core   = $core;
         $this->config = $config;

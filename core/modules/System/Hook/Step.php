@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\System\Hook;
 
+use Core;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Soosyze\App;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Router\Router;
 use Soosyze\Components\Template\Template;
@@ -34,7 +34,7 @@ class Step
     ];
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -74,7 +74,7 @@ class Step
     private $pathContent;
 
     public function __construct(
-        App $core,
+        Core $core,
         Config $config,
         Query $query,
         Router $router,

@@ -2,7 +2,7 @@
 
 namespace SoosyzeCore\FileManager\Services;
 
-use Soosyze\App;
+use Core;
 use Soosyze\Components\Router\Router;
 use Soosyze\Components\Util\Util;
 use Soosyze\Config;
@@ -43,7 +43,7 @@ class FileManager
     private $copyFileLink;
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -67,7 +67,7 @@ class FileManager
      */
     private $templating;
 
-    public function __construct(App $core, Config $config, HookUser $hookUser, Router $router, Templating $templating)
+    public function __construct(Core $core, Config $config, HookUser $hookUser, Router $router, Templating $templating)
     {
         $this->core       = $core;
         $this->hookUser   = $hookUser;

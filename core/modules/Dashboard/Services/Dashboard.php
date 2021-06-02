@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Dashboard\Services;
 
-use Soosyze\App;
+use Core;
 use Soosyze\Config;
 
 class Dashboard
@@ -15,11 +15,11 @@ class Dashboard
     private $config;
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
-    public function __construct(Config $config, App $core)
+    public function __construct(Config $config, Core $core)
     {
         $this->config = $config;
         $this->core   = $core;

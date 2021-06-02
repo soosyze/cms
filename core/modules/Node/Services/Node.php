@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Node\Services;
 
-use Soosyze\App;
+use Core;
 use Soosyze\Config;
 use SoosyzeCore\QueryBuilder\Services\Query;
 use SoosyzeCore\QueryBuilder\Services\Schema;
@@ -18,7 +18,7 @@ class Node
     private $config;
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -69,7 +69,7 @@ class Node
      */
     private $tpl;
 
-    public function __construct(Config $config, App $core, Query $query, Schema $schema, Templating $tpl)
+    public function __construct(Config $config, Core $core, Query $query, Schema $schema, Templating $tpl)
     {
         $this->config = $config;
         $this->core   = $core;

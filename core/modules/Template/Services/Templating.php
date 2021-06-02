@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Template\Services;
 
-use Soosyze\App;
+use Core;
 use Soosyze\Components\Http\Stream;
 use Soosyze\Components\Util\Util;
 use Soosyze\Config;
@@ -41,7 +41,7 @@ class Templating extends \Soosyze\Components\Http\Response
     private $configJs = [];
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -109,7 +109,7 @@ class Templating extends \Soosyze\Components\Http\Response
      */
     private $basePath;
 
-    public function __construct(App $core, Config $config)
+    public function __construct(Core $core, Config $config)
     {
         parent::__construct();
 

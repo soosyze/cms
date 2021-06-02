@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\FileManager\Hook;
 
+use Core;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Soosyze\App as SoosyzeApp;
 use SoosyzeCore\Template\Services\Templating;
 
 class App
@@ -16,7 +16,7 @@ class App
      */
     private $core;
 
-    public function __construct(SoosyzeApp $core)
+    public function __construct(Core $core)
     {
         $this->core = $core;
     }

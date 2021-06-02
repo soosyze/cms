@@ -13,7 +13,7 @@ class RouteValue extends \Soosyze\Components\Validator\Rule
     protected function test($key, $value, $arg, $not = true)
     {
         /**
-         * @var \Soosyze\App
+         * @var \Core
          */
         $app = \Core::getInstance();
 

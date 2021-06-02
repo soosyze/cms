@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\FileSystem\Services;
 
+use Core;
 use Psr\Http\Message\UploadedFileInterface;
-use Soosyze\App;
 use Soosyze\Components\Form\FormGroupBuilder;
 use Soosyze\Components\Util\Util;
 
@@ -110,9 +110,9 @@ class File
     private $root;
 
     /**
-     * @param App $core
+     * @param Core $core
      */
-    public function __construct(App $core)
+    public function __construct(Core $core)
     {
         $this->basePath = $core->getRequest()->getBasePath();
         $this->dir      = $core->getDir('files_public', 'app/files');

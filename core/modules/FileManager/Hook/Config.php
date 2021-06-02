@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\FileManager\Hook;
 
+use Core;
 use Psr\Http\Message\ServerRequestInterface;
-use Soosyze\App;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Validator\Validator;
 
@@ -22,11 +22,11 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
     const COPY_RELATIVE = 2;
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
-    public function __construct(App $core)
+    public function __construct(Core $core)
     {
         $this->core = $core;
     }

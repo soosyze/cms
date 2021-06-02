@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace SoosyzeCore\System\Services;
 
 use Composer\Semver\Semver;
-use Soosyze\App;
+use Core;
 use Soosyze\Components\Util\Util;
 use Soosyze\Components\Validator\Validator;
 use SoosyzeCore\System\ExtendModule;
@@ -18,7 +18,7 @@ class Composer
     const TYPE_THEME = 'soosyze-theme';
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -53,7 +53,7 @@ class Composer
      */
     private $themeComposers = [];
 
-    public function __construct(App $core, Modules $module, Semver $semver)
+    public function __construct(Core $core, Modules $module, Semver $semver)
     {
         $this->core   = $core;
         $this->module = $module;

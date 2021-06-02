@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Menu\Hook;
 
+use Core;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Soosyze\App as SoosyzeApp;
 use SoosyzeCore\Menu\Services\Menu;
 use SoosyzeCore\Template\Services\Templating;
 
 class App
 {
     /**
-     * @var SoosyzeApp
+     * @var Core
      */
     private $core;
 
@@ -22,7 +22,7 @@ class App
      */
     private $menu;
 
-    public function __construct(SoosyzeApp $core, Menu $menu)
+    public function __construct(Core $core, Menu $menu)
     {
         $this->core = $core;
         $this->menu = $menu;

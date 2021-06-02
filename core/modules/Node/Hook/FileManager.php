@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\Node\Hook;
 
+use Core;
 use Psr\Http\Message\RequestInterface;
-use Soosyze\App;
 use Soosyze\Components\Form\FormBuilder;
 use Soosyze\Components\Router\Router;
 use SoosyzeCore\System\Services\Modules;
@@ -13,7 +13,7 @@ use SoosyzeCore\System\Services\Modules;
 class FileManager
 {
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -27,7 +27,7 @@ class FileManager
      */
     private $router;
 
-    public function __construct(App $core, Modules $module, Router $router)
+    public function __construct(Core $core, Modules $module, Router $router)
     {
         $this->core   = $core;
         $this->router = $router;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\User\Services;
 
+use Core;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Soosyze\App;
 use Soosyze\Components\Http\Response;
 use Soosyze\Components\Http\Stream;
 use Soosyze\Components\Router\Router;
@@ -24,7 +24,7 @@ class User
     private $connect = null;
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -62,7 +62,7 @@ class User
      */
     private $pathViews;
 
-    public function __construct(App $core, Config $config, Query $query, Router $router)
+    public function __construct(Core $core, Config $config, Query $query, Router $router)
     {
         $this->core   = $core;
         $this->config = $config;

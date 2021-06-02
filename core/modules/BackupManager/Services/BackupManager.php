@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\BackupManager\Services;
 
-use Soosyze\App;
+use Core;
 use Soosyze\Components\Router\Router;
 use Soosyze\Config;
 
@@ -25,7 +25,7 @@ class BackupManager
     private $config;
 
     /**
-     * @var App
+     * @var Core
      */
     private $core;
 
@@ -39,7 +39,7 @@ class BackupManager
      */
     private $repository;
 
-    public function __construct(Config $config, App $core, Router $router)
+    public function __construct(Config $config, Core $core, Router $router)
     {
         $this->config = $config;
         $this->core   = $core;

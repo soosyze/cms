@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace SoosyzeCore\System\Hook;
 
+use Core;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Soosyze\App as SoosyzeApp;
 use Soosyze\Components\Http\Redirect;
 use Soosyze\Components\Router\Router;
 use Soosyze\Config;
@@ -27,7 +27,7 @@ class App
     private $config;
 
     /**
-     * @var SoosyzeApp
+     * @var Core
      */
     private $core;
 
@@ -54,7 +54,7 @@ class App
     public function __construct(
         Alias $alias,
         Config $config,
-        SoosyzeApp $core,
+        Core $core,
         Query $query,
         Router $router,
         Templating $template
