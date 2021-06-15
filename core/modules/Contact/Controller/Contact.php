@@ -109,6 +109,6 @@ class Contact extends \Soosyze\Controller
             $_SESSION[ 'errors_keys' ]          = $validator->getKeyInputErrors();
         }
 
-        return new Redirect(self::router()->getRoute('contact'));
+        return new Redirect(self::router()->getRoute('contact.form'));
     }
 }

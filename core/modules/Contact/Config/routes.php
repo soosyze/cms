@@ -2,7 +2,7 @@
 
 use Soosyze\Components\Router\Route as R;
 
-R::useNamespace('SoosyzeCore\Contact\Controller');
-
-R::get('contact', 'contact', 'Contact@form');
-R::post('contact.check', 'contact', 'Contact@formCheck');
+R::useNamespace('SoosyzeCore\Contact\Controller')->name('contact')->prefix('contact.')->group(function () {
+    R::get('form', '/', 'Contact@form');
+    R::post('check', '/', 'Contact@formCheck');
+});

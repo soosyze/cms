@@ -85,6 +85,7 @@ class Install extends \Soosyze\Controller
                 ->addBlock('page', $blockPage)
                 ->addBlock('messages', $blockMessages)
                 ->addVars([
+                    'base_path'     => self::router()->getBasePath(),
                     'router'        => self::router(),
                     'steps'         => $steps,
                     'step_active'   => $id,
@@ -273,8 +274,7 @@ class Install extends \Soosyze\Controller
             ->set('settings.time_installed', time())
             ->set('settings.lang', $saveLanguage['lang'])
             ->set('settings.timezone', $saveLanguage['timezone'])
-            ->set('settings.key_cron', Util::strRandom(50))
-            ->set('settings.rewrite_engine', false);
+            ->set('settings.key_cron', Util::strRandom(50));
 
         $profil = htmlspecialchars($_SESSION[ 'inputs' ][ 'profil' ][ 'profil' ]);
         $this->container->callHook("step.install.finish.$profil", [ $this->container ]);

@@ -52,7 +52,6 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
             'path_index'         => '',
             'path_maintenance'   => '',
             'path_no_found'      => '',
-            'rewrite_engine'     => '',
             'timezone'           => ''
         ];
     }
@@ -102,23 +101,6 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
                         ->label('maintenance-label', '<i class="ui" aria-hidden="true"></i> ' . t('Put the site in maintenance'), [
                             'for' => 'maintenance'
                         ]);
-                    }, self::$attrGrp)
-                    ->group('rewrite_engine-group', 'div', function ($form) use ($data) {
-                        $isModeRewrite = function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules());
-
-                        $form->checkbox('rewrite_engine', [
-                            'checked'  => $data[ 'rewrite_engine' ],
-                            'disabled' => !$isModeRewrite
-                        ])
-                        ->label('rewrite_engine-label', '<i class="ui" aria-hidden="true"></i> ' . t('Make the URLs clean'), [
-                                'for' => 'rewrite_engine'
-                        ]);
-                        if (!$isModeRewrite) {
-                            $form->html('rewrite_engine-info', '<p:attr>:content</p>', [
-                                ':content' => t('Your server does not determine whether clean URLs can be enabled.'),
-                                'style'    => 'color: red;'
-                            ]);
-                        }
                     }, self::$attrGrp);
                 })
                 ->group('path-fieldset', 'fieldset', function ($form) use ($data) {
@@ -242,7 +224,6 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
             'path_index'         => 'route',
             'path_maintenance'   => '!required|route',
             'path_no_found'      => '!required|route',
-            'rewrite_engine'     => 'bool',
             'timezone'           => 'required|timezone'
         ])->setLabels([
             'lang'               => t('Language'),
@@ -254,7 +235,6 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
             'path_index'         => t('Default page'),
             'path_maintenance'   => t('Page de maintenance par défaut'),
             'path_no_found'      => t('Page 404 by default (page not found)'),
-            'rewrite_engine'     => t('Make the URLs clean'),
             'timezone'           => t('Timezone'),
         ]);
     }
@@ -271,7 +251,6 @@ final class Config implements \SoosyzeCore\Config\ConfigInterface
             'path_index'         => $validator->getInput('path_index'),
             'path_maintenance'   => $validator->getInput('path_maintenance'),
             'path_no_found'      => $validator->getInput('path_no_found'),
-            'rewrite_engine'     => (bool) $validator->getInput('rewrite_engine'),
             'timezone'           => $validator->getInput('timezone'),
         ];
     }

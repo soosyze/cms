@@ -385,7 +385,7 @@ class Menu extends \Soosyze\Controller
                 continue;
             }
 
-            $link[ 'link' ] = self::menu()->rewiteUri($link);
+            $link[ 'link' ] = self::menu()->rewiteUri($link['link'], $link['query'], $link['fragment']);
         }
         unset($link);
 

@@ -8,6 +8,7 @@ use Core;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Soosyze\Components\Http\Redirect;
+use Soosyze\Components\Http\Uri;
 use Soosyze\Components\Router\Router;
 use Soosyze\Config;
 use SoosyzeCore\QueryBuilder\Services\Query;
@@ -76,9 +77,7 @@ class App
 
         $request = $request
             ->withUri(
-                $this->router->isRewrite()
-                ? $request->getUri()->withPath($path)
-                : $request->getUri()->withQuery('q=' . $path)
+                Uri::create($this->router->getBasePath() . $path)
             );
 
         if (
@@ -96,9 +95,7 @@ class App
 
             $requestNoFound = $request
                 ->withUri(
-                    $this->router->isRewrite()
-                    ? $request->getUri()->withPath($path)
-                    : $request->getUri()->withQuery('q=' . $path)
+                    Uri::create($this->router->getBasePath() . $path)
                 )
                 ->withMethod('GET');
 
@@ -134,9 +131,7 @@ class App
 
             $requestDenied = $request
                 ->withUri(
-                    $this->router->isRewrite()
-                    ? $request->getUri()->withPath($path)
-                    : $request->getUri()->withQuery('q=' . $path)
+                    Uri::create($this->router->getBasePath() . $path)
                 )
                 ->withMethod('GET');
 
@@ -167,9 +162,7 @@ class App
 
             $requestMaintenance = $request
                 ->withUri(
-                    $this->router->isRewrite()
-                    ? $request->getUri()->withPath($path)
-                    : $request->getUri()->withQuery('q=' . $path)
+                    Uri::create($this->router->getBasePath() . $path)
                 )
                 ->withMethod('GET');
 

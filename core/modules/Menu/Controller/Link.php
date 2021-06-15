@@ -131,7 +131,6 @@ class Link extends \Soosyze\Controller
 
         $form = (new FormLink([ 'action' => $action, 'method' => 'post' ], self::router()))
             ->setValues($values)
-            ->setRewrite(self::router()->isRewrite())
             ->makeFields();
 
         $this->container->callHook('menu.link.edit.form', [ &$form, $values ]);

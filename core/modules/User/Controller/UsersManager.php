@@ -138,39 +138,26 @@ class UsersManager extends \Soosyze\Controller
 
         if ($params) {
             $linkPagination = $linkPagination->withQuery(
-                self::router()->isRewrite()
-                ? http_build_query($params)
-                : $linkPagination->getQuery() . '&' . http_build_query($params)
+                http_build_query($params)
             );
         }
 
-        $parseQuery = [];
-
-        parse_str($linkSort->getQuery(), $parseQuery);
-        $route = self::router()->isRewrite()
-            ? null
-            : $parseQuery[ 'q' ];
-
         $paramsActivedSort += [
-            'q'        => $route,
             'order_by' => 'actived',
             'sort'     => $sortInverse
         ];
 
         $paramsTimeAccessSort += [
-            'q'        => $route,
             'order_by' => 'time_access',
             'sort'     => $sortInverse
         ];
 
         $paramsTimeInstalledSort += [
-            'q'        => $route,
             'order_by' => 'time_installed',
             'sort'     => $sortInverse
         ];
 
         $paramsUsernameSort += [
-            'q'        => $route,
             'order_by' => 'username',
             'sort'     => $sortInverse
         ];

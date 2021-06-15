@@ -14,11 +14,6 @@ class FormLink extends \Soosyze\Components\Form\FormBuilder
     private static $attrGrp = [ 'class' => 'form-group' ];
 
     /**
-     * @var string
-     */
-    private $isRewrite = '';
-
-    /**
      * @var Router
      */
     private $router;
@@ -44,15 +39,6 @@ class FormLink extends \Soosyze\Components\Form\FormBuilder
     public function setValues(array $values): self
     {
         $this->values = array_merge($this->values, $values);
-
-        return $this;
-    }
-
-    public function setRewrite(bool $isRewrite): self
-    {
-        $this->isRewrite = $isRewrite
-            ? '?'
-            : '&';
 
         return $this;
     }
@@ -128,7 +114,7 @@ class FormLink extends \Soosyze\Components\Form\FormBuilder
     {
         $query = empty($this->values[ 'query' ])
             ? ''
-            : $this->isRewrite . $this->values[ 'query' ];
+            : '?' . $this->values[ 'query' ];
 
         $fragment = empty($this->values[ 'fragment' ])
             ? ''

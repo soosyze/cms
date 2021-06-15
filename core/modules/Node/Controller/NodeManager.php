@@ -132,39 +132,26 @@ class NodeManager extends \Soosyze\Controller
 
         if ($params) {
             $linkPagination = $linkPagination->withQuery(
-                self::router()->isRewrite()
-                ? http_build_query($params)
-                : $linkPagination->getQuery() . '&' . http_build_query($params)
+                http_build_query($params)
             );
         }
 
-        $parseQuery = [];
-
-        parse_str($linkSort->getQuery(), $parseQuery);
-        $route = self::router()->isRewrite()
-            ? null
-            : $parseQuery[ 'q' ];
-
         $paramsDateChangedSort += [
-            'q'        => $route,
             'order_by' => 'date_changed',
             'sort'     => $sortInverse
         ];
 
         $paramsStatusSort += [
-            'q'        => $route,
             'order_by' => 'node_status_id',
             'sort'     => $sortInverse
         ];
 
         $paramsTitleSort += [
-            'q'        => $route,
             'order_by' => 'title',
             'sort'     => $sortInverse
         ];
 
         $paramsTypeSort += [
-            'q'        => $route,
             'order_by' => 'type',
             'sort'     => $sortInverse
         ];

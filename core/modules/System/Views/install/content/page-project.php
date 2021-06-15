@@ -10,7 +10,7 @@
             illum libero molestiae (<em>nam nihil nulla pariatur)</em> quo saepe sequi sint,
             vitae voluptates voluptatum.
         </p>
-        <a href="?q=node/4" class="btn btn-default">Read more</a>
+        <a href="project/1" class="btn btn-default">Read more</a>
     </div>
 </div>
 <hr>
@@ -22,7 +22,7 @@
             illum libero molestiae (<em>nam nihil nulla pariatur)</em> quo saepe sequi sint,
             vitae voluptates voluptatum.
         </p>
-        <a href="?q=node/5" class="btn btn-default">Read more</a>
+        <a href="project/2" class="btn btn-default">Read more</a>
     </div>
     <div class="col-md-4">
         <img src="https://picsum.photos/id/41/300/200" alt="">
@@ -40,7 +40,7 @@
             illum libero molestiae (<em>nam nihil nulla pariatur)</em> quo saepe sequi sint,
             vitae voluptates voluptatum.
         </p>
-        <a href="?q=node/6" class="btn btn-default">Read more</a>
+        <a href="project/3" class="btn btn-default">Read more</a>
     </div>
 </div>
 <hr>
@@ -52,7 +52,7 @@
             illum libero molestiae (<em>nam nihil nulla pariatur)</em> quo saepe sequi sint,
             vitae voluptates voluptatum.
         </p>
-        <a href="?q=node/7" class="btn btn-default">Read more</a>
+        <a href="project/4" class="btn btn-default">Read more</a>
     </div>
     <div class="col-md-4">
         <img src="https://picsum.photos/id/43/300/200" alt="">

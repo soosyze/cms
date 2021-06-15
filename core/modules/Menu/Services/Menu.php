@@ -129,24 +129,9 @@ class Menu
             ];
         }
 
-        $isRewrite = $this->router->isRewrite();
-        $uri       = Uri::create(($isRewrite
-                ? ''
-                : 'q=') . $link);
-        if (!$isRewrite) {
-            $parse = parse_url("?q=$link");
-            parse_str($parse[ 'query' ], $result);
-
-            $uri = $uri->withPath($result[ 'q' ]);
-            unset($result[ 'q' ]);
-            $uri = $uri->withQuery(http_build_query($result));
-        }
-
+        $uri        = Uri::create($link);
         $linkSource = $this->alias->getSource($uri->getPath(), $uri->getPath());
-
-        $uriSource = $isRewrite
-            ? $uri->withPath($linkSource)
-            : $uri->withQuery('q=' . $linkSource);
+        $uriSource  = $uri->withPath($linkSource);
 
         $route = $this->router->parse($request->withUri($uriSource)->withMethod('get'));
 
@@ -234,25 +219,13 @@ class Menu
         ]);
     }
 
-    public function rewiteUri(array $link): UriInterface
+    public function rewiteUri(string $link, ?string $query, ?string $fragment): UriInterface
     {
-        $basePath = $this->core->getRequest()->getBasePath();
-        $uri      = Uri::create($basePath)->withFragment($link[ 'fragment' ]);
+        $basePath = $this->core->getRequest()->getBasePath() . trim($link, '//');
 
-        if ($this->router->isRewrite()) {
-            return $uri->withPath($link[ 'link' ])
-                    ->withQuery($link[ 'query' ]);
-        }
-
-        $path = $link[ 'link' ] === '/'
-            ? ''
-            : 'q=' . $link[ 'link' ];
-
-        $query = $path && $link[ 'query' ]
-            ? '&' . $link[ 'query' ]
-            : $link[ 'query' ];
-
-        return $uri->withQuery($path . $query);
+        return Uri::create($basePath)
+                ->withQuery($query)
+                ->withFragment($fragment);
     }
 
     /**
@@ -278,11 +251,7 @@ class Menu
                 ? $menu[ 'link_router' ]
                 : $menu[ 'link' ];
 
-            $link = $request->withUri(
-                $this->router->isRewrite()
-                ? $request->getUri()->withPath($linkRouter)
-                : $request->getUri()->withQuery('q=' . $linkRouter)
-            );
+            $link = $request->withUri($this->rewiteUri($linkRouter, $menu['query'], $menu['fragment']));
 
             /* Test avec un hook si le menu doit-être affiché à partir du lien du menu. */
             if (!$this->core->callHook('app.granted.request', [ $link ])) {
@@ -295,7 +264,7 @@ class Menu
                 ? 'active'
                 : '';
 
-            $menu[ 'link' ] = $this->rewiteUri($menu);
+            $menu[ 'link' ] = $this->rewiteUri($menu[ 'link' ], $menu['query'], $menu['fragment']);
         }
         unset($menu);
 

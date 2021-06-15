@@ -60,7 +60,6 @@ class Extend extends \SoosyzeCore\System\ExtendModule
             ->set('settings.maintenance', false)
             ->set('settings.module_update_time', '')
             ->set('settings.module_update', false)
-            ->set('settings.rewrite_engine', false)
             ->set('settings.path_no_found', 'node/1')
             ->set('settings.path_index', 'node/2')
             ->set('settings.path_access_denied', 'user/login')

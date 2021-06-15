@@ -4,20 +4,25 @@ use Soosyze\Components\Router\Route as R;
 
 R::useNamespace('SoosyzeCore\System\Controller');
 
-R::get('system.module.edit', 'admin/modules', 'ModulesManager@edit');
-R::post('system.module.update', 'admin/modules', 'ModulesManager@update');
-
-R::get('system.migration.check', 'admin/migration/check', 'ModulesMigration@check');
-R::get('system.migration.update', 'admin/migration/update', 'ModulesMigration@update');
-
-R::get('system.theme.index', 'admin/theme', 'Theme@index');
-R::get('system.theme.admin', 'admin/theme/:type', 'Theme@admin', [ ':type' => 'admin|public' ]);
-R::get('system.theme.active', 'admin/theme/:type/active/:name', 'Theme@active', [ ':type' => 'admin|public', ':name' => '\w+' ]);
-R::get('system.theme.edit', 'admin/theme/:type/edit', 'Theme@edit', [ ':type' => 'admin|public' ]);
-R::post('system.theme.update', 'admin/theme/:type/edit', 'Theme@update', [ ':type' => 'admin|public' ]);
-
-R::get('system.tool.admin', 'admin/tool', 'Tool@admin');
-R::get('system.tool.cron', 'admin/tool/cron', 'Tool@cron');
-R::get('system.tool.trans', 'admin/tool/trans', 'Tool@updateTranslations');
-
 R::get('api.route', 'api/route', 'RouteApi@index');
+
+R::useNamespace('SoosyzeCore\System\Controller')->name('system.module.')->prefix('admin/module')->group(function () {
+    R::get('edit', '/', 'ModulesManager@edit');
+    R::post('update', '/', 'ModulesManager@update');
+});
+R::useNamespace('SoosyzeCore\System\Controller')->name('system.migration.')->prefix('admin/migration')->group(function () {
+    R::get('check', '/check', 'ModulesMigration@check');
+    R::get('update', '/update', 'ModulesMigration@update');
+});
+R::useNamespace('SoosyzeCore\System\Controller')->name('system.theme.')->prefix('admin/theme')->group(function () {
+    R::get('index', '/', 'Theme@index');
+    R::get('admin', '/:type', 'Theme@admin', [ ':type' => 'admin|public' ]);
+    R::get('active', '/:type/active/:name', 'Theme@active', [ ':type' => 'admin|public', ':name' => '\w+' ]);
+    R::get('edit', '/:type/edit', 'Theme@edit', [ ':type' => 'admin|public' ]);
+    R::post('update', '/:type/edit', 'Theme@update', [ ':type' => 'admin|public' ]);
+});
+R::useNamespace('SoosyzeCore\System\Controller')->name('system.tool.')->prefix('admin/tool')->group(function () {
+    R::get('admin', '/', 'Tool@admin');
+    R::get('cron', '/cron', 'Tool@cron');
+    R::get('trans', '/trans', 'Tool@updateTranslations');
+});

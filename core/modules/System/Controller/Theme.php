@@ -60,9 +60,7 @@ class Theme extends \Soosyze\Controller
                     ->getUri();
 
                 $themes[ $key ][ 'link_activate' ] = $uriActivate->withQuery(
-                    self::router()->isRewrite()
-                    ? http_build_query($params)
-                    : $uriActivate->getQuery() . '&' . http_build_query($params)
+                    http_build_query($params)
                 );
             }
         }

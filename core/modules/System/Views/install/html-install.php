@@ -13,7 +13,7 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="logo-name">
-                        <img class="header_logo" src="logo.svg" alt="logo">
+                        <img class="header_logo" src="<?php echo $base_path; ?>logo.svg" alt="logo">
                         <h1>Soosyze</h1>
                     </div>
 

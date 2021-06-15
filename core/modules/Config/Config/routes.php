@@ -2,8 +2,8 @@
 
 use Soosyze\Components\Router\Route as R;
 
-R::useNamespace('SoosyzeCore\Config\Controller');
-
-R::get('config.admin', 'admin/config', 'Config@admin');
-R::get('config.edit', 'admin/config/:id', 'Config@edit', [ ':id' => '\w+' ]);
-R::post('config.update', 'admin/config/:id', 'Config@update', [ ':id' => '\w+' ]);
+R::useNamespace('SoosyzeCore\Config\Controller')->name('config.')->prefix('admin/config')->group(function () {
+    R::get('admin', '', 'Config@admin');
+    R::get('edit', '/:id', 'Config@edit', [ ':id' => '\w+' ]);
+    R::post('update', '/:id', 'Config@update', [ ':id' => '\w+' ]);
+});

@@ -2,41 +2,52 @@
 
 use Soosyze\Components\Router\Route as R;
 
+define('FILEMANAGER_FILE_WITH', [
+    ':path' => '(/[-\w]+){0,255}',
+    ':name' => '/[-\w ]{1,255}',
+    ':ext' => '\.[a-zA-Z0-9]{1,10}'
+]);
+define('FILEMANAGER_PATH_WITH', [ ':path' => '(/[-\w]+){0,255}' ]);
+
 R::useNamespace('SoosyzeCore\FileManager\Controller');
-
-R::get('filemanager.permission.admin', 'admin/user/permission/filemanager', 'FilePermissionManager@admin');
-R::post('filemanager.permission.admin.check', 'admin/user/permission/filemanager', 'FilePermissionManager@adminCheck');
-
-R::get('filemanager.permission.create', 'admin/user/permission/filemanager/create', 'FilePermission@create');
-R::post('filemanager.permission.store', 'admin/user/permission/filemanager/store', 'FilePermission@store');
-R::get('filemanager.permission.edit', 'admin/user/permission/filemanager/:id/edit', 'FilePermission@edit', [ ':id' => '\d+' ]);
-R::post('filemanager.permission.update', 'admin/user/permission/filemanager/:id/edit', 'FilePermission@update', [ ':id' => '\d+' ]);
-R::get('filemanager.permission.remove', 'admin/user/permission/filemanager/:id/delete', 'FilePermission@remove', [ ':id' => '\d+' ]);
-R::post('filemanager.permission.delete', 'admin/user/permission/filemanager/:id/delete', 'FilePermission@delete', [ ':id' => '\d+' ]);
 
 /* Affichage du filemanager complet. */
 R::get('filemanager.admin', 'admin/filemanager/show', 'Manager@admin');
-R::get('filemanager.public', 'filemanager/public:path', 'Manager@showPublic', [ ':path' => '(/[-\w]+){0,255}' ]);
-R::get('filemanager.show', 'filemanager/show:path', 'Manager@show', [ ':path' => '(/[-\w]+){0,255}' ]);
-R::get('filemanager.filter', 'filemanager/filter:path', 'Manager@filter', [ ':path' => '(/[-\w]+){0,255}' ]);
+R::get('filemanager.public', 'filemanager/public:path', 'Manager@showPublic', FILEMANAGER_PATH_WITH);
+R::get('filemanager.show', 'filemanager/show:path', 'Manager@show', FILEMANAGER_PATH_WITH);
+R::get('filemanager.filter', 'filemanager/filter:path', 'Manager@filter', FILEMANAGER_PATH_WITH);
 
-R::get('filemanager.file.show', 'filemanager/file:path:name:ext', 'File@show', [ ':path' => '(/[-\w]+){0,255}', ':name' => '/[-\w]{1,255}', ':ext' => '\.[a-zA-Z0-9]{1,10}' ]);
-R::get('filemanager.file.create', 'filemanager/file:path', 'File@create', [ ':path' => '(/[-\w]+){0,255}' ]);
-R::post('filemanager.file.store', 'filemanager/file:path', 'File@store', [ ':path' => '(/[-\w]+){0,255}' ]);
-R::get('filemanager.file.edit', 'filemanager/file:path:name:ext/edit', 'File@edit', [ ':path' => '(/[-\w]+){0,255}', ':name' => '/[-\w ]{1,255}', ':ext' => '\.[a-zA-Z0-9]{1,10}' ]);
-R::post('filemanager.file.update', 'filemanager/file:path:name:ext/edit', 'File@update', [ ':path' => '(/[-\w]+){0,255}', ':name' => '/[-\w ]{1,255}', ':ext' => '\.[a-zA-Z0-9]{1,10}' ]);
-R::get('filemanager.file.remove', 'filemanager/file:path:name:ext/delete', 'File@remove', [ ':path' => '(/[-\w]+){0,255}', ':name' => '/[-\w ]{1,255}', ':ext' => '\.[a-zA-Z0-9]{1,10}' ]);
-R::post('filemanager.file.delete', 'filemanager/file:path:name:ext/delete', 'File@delete', [ ':path' => '(/[-\w]+){0,255}', ':name' => '/[-\w ]{1,255}', ':ext' => '\.[a-zA-Z0-9]{1,10}' ]);
-R::get('filemanager.file.download', 'filemanager/download:path:name:ext', 'File@download', [ ':path' => '(/[-\w]+){0,255}', ':name' => '/[-\w ]{1,255}', ':ext' => '\.[a-zA-Z0-9]{1,10}' ]);
-
+R::useNamespace('SoosyzeCore\FileManager\Controller')->name('filemanager.file.')->prefix('filemanager')->group(function () {
+    R::get('show', '/file:path:name:ext', 'File@show', FILEMANAGER_FILE_WITH);
+    R::get('create', '/file:path', 'File@create', FILEMANAGER_PATH_WITH);
+    R::post('store', '/file:path', 'File@store', FILEMANAGER_PATH_WITH);
+    R::get('edit', '/file:path:name:ext/edit', 'File@edit', FILEMANAGER_FILE_WITH);
+    R::post('update', '/file:path:name:ext/edit', 'File@update', FILEMANAGER_FILE_WITH);
+    R::get('remove', '/file:path:name:ext/delete', 'File@remove', FILEMANAGER_FILE_WITH);
+    R::post('delete', '/file:path:name:ext/delete', 'File@delete', FILEMANAGER_FILE_WITH);
+    R::get('download', '/download:path:name:ext', 'File@download', FILEMANAGER_FILE_WITH);
+});
 /* Affichage du filemanager uniquement les répertoires. */
-R::get('filemanager.copy.admin', 'filemanager/copy:path:name:ext', 'FileCopy@admin', [ ':path' => '(/[-\w]+){0,255}', ':name' => '/[-\w ]{1,255}', ':ext' => '\.[a-zA-Z0-9]{1,10}' ]);
-R::post('filemanager.copy.update', 'filemanager/copy:path:name:ext', 'FileCopy@update', [ ':path' => '(/[-\w]+){0,255}', ':name' => '/[-\w ]{1,255}', ':ext' => '\.[a-zA-Z0-9]{1,10}' ]);
-R::get('filemanager.copy.show', 'filemanager/copy:path', 'FileCopy@show', [ ':path' => '(/[-\w]+){0,255}' ]);
-
-R::get('filemanager.folder.create', 'filemanager/folder:path/create', 'Folder@create', [ ':path' => '(/[-\w]+){0,255}' ]);
-R::post('filemanager.folder.store', 'filemanager/folder:path/store', 'Folder@store', [ ':path' => '(/[-\w]+){0,255}' ]);
-R::get('filemanager.folder.edit', 'filemanager/folder:path/edit', 'Folder@edit', [ ':path' => '(/[-\w]+){1,255}' ]);
-R::post('filemanager.folder.update', 'filemanager/folder:path/edit', 'Folder@update', [ ':path' => '(/[-\w]+){1,255}' ]);
-R::get('filemanager.folder.remove', 'filemanager/folder:path/delete', 'Folder@remove', [ ':path' => '(/[-\w]+){1,255}' ]);
-R::post('filemanager.folder.delete', 'filemanager/folder:path/delete', 'Folder@delete', [ ':path' => '(/[-\w]+){1,255}' ]);
+R::useNamespace('SoosyzeCore\FileManager\Controller')->name('filemanager.copy.')->prefix('filemanager')->group(function () {
+    R::get('admin', '/copy:path:name:ext', 'FileCopy@admin', FILEMANAGER_FILE_WITH);
+    R::post('update', '/copy:path:name:ext', 'FileCopy@update', FILEMANAGER_FILE_WITH);
+    R::get('show', '/copy:path', 'FileCopy@show', FILEMANAGER_PATH_WITH);
+});
+R::useNamespace('SoosyzeCore\FileManager\Controller')->name('filemanager.folder.')->prefix('filemanager/folder:path')->group(function () {
+    R::get('create', '/create', 'Folder@create', FILEMANAGER_PATH_WITH);
+    R::post('store', '/store', 'Folder@store', FILEMANAGER_PATH_WITH);
+    R::get('edit', '/edit', 'Folder@edit', [ ':path' => '(/[-\w]+){1,255}' ]);
+    R::post('update', '/edit', 'Folder@update', [ ':path' => '(/[-\w]+){1,255}' ]);
+    R::get('remove', '/delete', 'Folder@remove', [ ':path' => '(/[-\w]+){1,255}' ]);
+    R::post('delete', '/delete', 'Folder@delete', [ ':path' => '(/[-\w]+){1,255}' ]);
+});
+R::useNamespace('SoosyzeCore\FileManager\Controller')->name('filemanager.permission.')->prefix('admin/user/permission/filemanager')->group(function () {
+    R::get('admin', '/', 'FilePermissionManager@admin');
+    R::post('admin.check', '', 'FilePermissionManager@adminCheck');
+    R::get('create', '/create', 'FilePermission@create');
+    R::post('store', '/store', 'FilePermission@store');
+    R::get('edit', '/:id/edit', 'FilePermission@edit', [ ':id' => '\d+' ]);
+    R::post('update', '/:id/edit', 'FilePermission@update', [ ':id' => '\d+' ]);
+    R::get('remove', '/:id/delete', 'FilePermission@remove', [ ':id' => '\d+' ]);
+    R::post('delete', '/:id/delete', 'FilePermission@delete', [ ':id' => '\d+' ]);
+});

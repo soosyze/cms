@@ -17,10 +17,7 @@ class RouteValue extends \Soosyze\Components\Validator\Rule
          */
         $app = \Core::getInstance();
 
-        $isRewrite  = $app->get('router')->isRewrite();
-        $uri        = \Soosyze\Components\Http\Uri::create(($isRewrite
-                ? ''
-                : '?q=') . $value);
+        $uri        = \Soosyze\Components\Http\Uri::create($value);
         $linkSource = $app->get('router')->parseQueryFromRequest(
             $app->getRequest()->withUri($uri)
         );
